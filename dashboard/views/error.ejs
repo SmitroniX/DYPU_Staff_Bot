@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Error | <%= settings.name %></title>
+        
+        
+        <meta property="og:title" content="Error | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>>">
+    
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+        <style>
+            :root {
+                --accent-color: <%= settings.accentColor %>;
+                --accent-color-rgb: <%= accentColorRgb %>;
+            }
+            
+            
+            html, body {
+                background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+                height: 100%;
+                font-family: 'Inter', sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            
+            .error-section {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            }
+            
+            
+            .error-card {
+                background: #1a1a2e;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                border-radius: 16px;
+                padding: 2.5rem;
+                transition: all 0.3s ease;
+                width: 100%;
+                max-width: 480px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .error-icon {
+                font-size: 3.5rem;
+                color: var(--accent-color);
+                margin-bottom: 1.5rem;
+                animation: pulse 2s infinite;
+            }
+            
+            .error-title {
+                font-size: 1.8rem;
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 1rem;
+            }
+            
+            .error-message {
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 2rem;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+            
+            .error-status {
+                position: absolute;
+                top: -30px;
+                right: -20px;
+                font-size: 8rem;
+                font-weight: 800;
+                color: rgba(var(--accent-color-rgb), 0.05);
+                z-index: 0;
+            }
+            
+            .button-group {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .error-button {
+                padding: 0.75rem 1.5rem;
+                border-radius: 12px;
+                font-size: 1rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .error-button.home {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+            }
+            
+            .error-button.home:hover {
+                background: rgba(var(--accent-color-rgb), 0.25);
+                transform: translateY(-3px);
+                box-shadow: 0 4px 12px rgba(var(--accent-color-rgb), 0.3);
+            }
+            
+            .error-button.logout {
+                background: rgba(255, 255, 255, 0.05);
+                color: rgba(255, 255, 255, 0.7);
+            }
+            
+            .error-button.logout:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-3px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+        
+            
+            
+            .error-shape {
+                position: absolute;
+                opacity: 0.4;
+                z-index: 0;
+            }
+            
+            .error-shape.circle {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0) 70%);
+                top: -60px;
+                left: -60px;
+            }
+            
+            .error-shape.square {
+                width: 80px;
+                height: 80px;
+                background: rgba(var(--accent-color-rgb), 0.1);
+                border-radius: 16px;
+                bottom: -30px;
+                right: -30px;
+                transform: rotate(20deg);
+            }
+            
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+            
+            @media screen and (max-width: 768px) {
+                .error-card {
+                    padding: 2rem;
+                }
+                
+                .error-status {
+                    font-size: 6rem;
+                }
+                
+                .button-group {
+                    flex-direction: column;
+                }
+                
+                .error-icon {
+                    font-size: 3rem;
+                }
+                
+                .error-title {
+                    font-size: 1.5rem;
+                }
+            }
+                </style>
+</head>
+<body>
+    <section class="error-section">
+        <div class="error-card">
+            <div class="error-shape circle"></div>
+            <div class="error-shape square"></div>
+            <div class="error-status">404</div>
+            
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <h1 class="error-title">Something went wrong</h1>
+            
+            <p class="error-message"><%= errorMessage %></p>
+            
+            <div class="button-group">
+                <a href="/home" class="error-button home">
+                    <i class="fas fa-home"></i>
+                    Back to Dashboard
+                </a>
+                <a href="/logout" class="error-button logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const errorMessage = "<%= errorMessage %>";
+            const errorMatch = errorMessage.match(/^(\d{3}):/);
+            
+            if (errorMatch && errorMatch[1]) {
+                document.querySelector('.error-status').textContent = errorMatch[1];
+            }
+            
+
+            const card = document.querySelector('.error-card');
+            card.addEventListener('mousemove', function(e) {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const angleX = (y - centerY) / 30;
+                const angleY = (centerX - x) / 30;
+                
+                card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

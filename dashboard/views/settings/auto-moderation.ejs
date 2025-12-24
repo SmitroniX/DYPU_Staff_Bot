@@ -1,0 +1,2269 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Auto Moderation | <%= settings.name %></title>
+        
+        
+        <meta property="og:title" content="Auto Moderation | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+:root {
+    --accent-color: <%= settings.accentColor %>;
+    --accent-color-rgb: <%= accentColorRgb %>;
+}
+
+
+body {
+    background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.section {
+    flex: 1;
+    padding: 1rem;
+    margin: 0;
+}
+
+
+.glass-card {
+    background: #1a1a2e;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.section-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+}
+
+
+.automod-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.automod-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.automod-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.automod-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.automod-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-badge.is-enabled {
+    background: rgba(72, 199, 116, 0.1);
+    color: #48c774;
+}
+
+.status-badge.is-disabled {
+    background: rgba(241, 70, 104, 0.1);
+    color: #f14668;
+}
+
+.automod-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.automod-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+
+.action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-button.edit {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+}
+
+.action-button.delete2 {
+    background: rgba(217, 83, 79, 0.1);
+    color: #d9534f;
+}
+
+.action-button.back {
+    background: rgba(30, 27, 38, 0.4);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(120%);
+}
+
+
+.accordion {
+    margin-top: 1rem;
+}
+
+.accordion-header {
+    background: rgba(30, 27, 38, 0.4);
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.accordion-button {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.accordion-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.1);
+}
+
+.accordion-button:focus {
+    outline: none;
+}
+
+.accordion-button .icon {
+    transition: transform 0.3s ease;
+}
+
+.accordion-button[aria-expanded="true"] .icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    background: rgba(24, 21, 31, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: none;
+}
+
+.accordion-content.is-active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.permission-item {
+    background: rgba(30, 27, 38, 0.6);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    word-break: break-word; 
+    hyphens: auto; 
+}
+
+.permission-item:hover {
+    background: rgba(var(--accent-color-rgb), 0.1);
+}
+
+.permission-item i {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    flex-shrink: 0; 
+}
+
+.permission-item span {
+    flex: 1; 
+}
+
+
+.modal-background {
+    background: rgba(19, 17, 26, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-card {
+    background: rgba(30, 27, 38, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 16px;
+    max-width: 700px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-card-head {
+    background: rgba(35, 32, 44, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px 16px 0 0;
+    padding: 1.25rem;
+}
+
+.modal-card-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-card-title i {
+    color: var(--accent-color);
+}
+
+.modal-card-body {
+    background: none;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-height: 70vh;
+}
+
+.modal-card-foot {
+    background: rgba(35, 32, 44, 0.6);
+    border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 0 0 16px 16px;
+    padding: 1.25rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.modal-delete {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.modal-delete:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-delete::before,
+.modal-delete::after {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-input, .form-select {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    height: 42px !important;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.form-input::placeholder, .form-select::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-select {
+    height: auto !important;
+    min-height: 42px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+
+.form-select option {
+    padding: 8px 12px;
+    min-height: 30px;
+    display: block;
+}
+
+
+.form-select[multiple] option:checked {
+    background-color: rgba(var(--accent-color-rgb), 0.15);
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+
+#timeoutUnit, #altTimeoutUnit, #messageTimeUnit {
+    height: 36px !important;
+    display: flex;
+    align-items: center;
+}
+
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+
+.switch-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+
+.permission-category {
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.category-header {
+    background: rgba(30, 27, 38, 0.6);
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.category-header:hover {
+    background: rgba(var(--accent-color-rgb), 0.1);
+}
+
+.category-header i {
+    transition: transform 0.3s ease;
+}
+
+.category-header.collapsed i {
+    transform: rotate(-90deg);
+}
+
+.category-content {
+    background: rgba(24, 21, 31, 0.3);
+    padding: 1rem;
+}
+
+.permission-checkbox-container {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.permission-checkbox-container:hover {
+    background: rgba(var(--accent-color-rgb), 0.05);
+}
+
+.permission-checkbox-container input[type="checkbox"] {
+    margin-right: 0.75rem;
+}
+
+.visually-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    z-index: -1;
+}
+
+.checkbox-custom {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.permission-checkbox-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+
+.modal-button {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-button.primary {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+}
+
+.modal-button.primary:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.danger {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+}
+
+.modal-button.danger:hover {
+    background: rgba(217, 83, 79, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.action-limits-card {
+    background: rgba(24, 21, 31, 0.3);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.action-limits-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert.is-success {
+    background: rgba(72, 199, 116, 0.1);
+    border: 1px solid rgba(72, 199, 116, 0.2);
+    color: #48c774;
+}
+
+.alert.is-danger {
+    background: rgba(241, 70, 104, 0.1);
+    border: 1px solid rgba(241, 70, 104, 0.2);
+    color: #f14668;
+}
+
+.alert i {
+    font-size: 1.1rem;
+}
+
+.radio-custom {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+input[type="radio"]:checked + .radio-custom {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+input[type="radio"]:checked ~ .permission-checkbox-label {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.permission-checkbox-container:has(input[type="radio"]:checked) {
+    background: rgba(var(--accent-color-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+}
+
+.radio-container {
+    background: rgba(30, 27, 38, 0.3);
+    border-radius: 8px;
+    
+    min-height: 42px;
+    position: relative;
+    
+    border: 1px solid transparent;
+    
+    transition: all 0.2s ease;
+}
+
+
+.radio-selected, 
+.radio-container:has(input[type="radio"]:checked) {
+    background: rgba(var(--accent-color-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3) !important;
+}
+
+
+.radio-container:hover {
+    background: rgba(40, 36, 50, 0.4);
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+@media screen and (max-width: 768px) {
+    .automod-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .automod-status {
+        width: 100%;
+    }
+    
+    .automod-actions {
+        flex-wrap: wrap;
+    }
+
+    .permissions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-card {
+        width: 95%;
+        margin: 0 auto;
+    }
+}
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar', { user: user, currentPage: 'settings' }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-robot"></i>
+                        Auto Moderation
+                    </div>
+                    <a href="/settings" class="action-button back" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); font-weight: 500; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Back to Settings
+                    </a>
+                </div>
+                
+                <p class="section-description">Configure automatic moderation rules to protect your server from spam, unwanted content, and malicious links.</p>
+    
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    <div class="alert is-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages && messages.error && messages.error.length > 0) { %>
+                    <div class="alert is-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+
+                
+                <div class="automod-card" data-rule-type="spam">
+                    <div class="automod-header">
+                        <div class="automod-title">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Spam Protection
+                        </div>
+                        <div class="automod-status">
+                            <span class="status-badge <%= autoModSettings.spamProtection.enabled ? 'is-enabled' : 'is-disabled' %>">
+                                <i class="fas <%= autoModSettings.spamProtection.enabled ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                <%= autoModSettings.spamProtection.enabled ? 'Enabled' : 'Disabled' %>
+                            </span>
+                        </div>
+                    </div>
+                    <p class="automod-description">
+                        Prevent message spam, mention spam, and rapid message flooding. Set custom thresholds and actions for different types of spam behavior.
+                    </p>
+                    <div class="automod-actions">
+                        <button class="action-button edit edit-automod-btn" data-rule-type="spam">
+                            <i class="fas fa-edit"></i>
+                            Configure
+                        </button>
+                        <% if (autoModSettings.spamProtection.enabled) { %>
+                        <button class="action-button delete2" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Disable
+                        </button>
+                        <% } else { %>
+                        <button class="action-button edit" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Enable
+                        </button>
+                        <% } %>
+                    </div>
+                </div>
+
+                
+                <div class="automod-card" data-rule-type="discord_invites">
+                    <div class="automod-header">
+                        <div class="automod-title">
+                            <i class="fab fa-discord"></i>
+                            Anti Discord Invite Links
+                        </div>
+                        <div class="automod-status">
+                            <span class="status-badge <%= autoModSettings.discordInviteFilter.enabled ? 'is-enabled' : 'is-disabled' %>">
+                                <i class="fas <%= autoModSettings.discordInviteFilter.enabled ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                <%= autoModSettings.discordInviteFilter.enabled ? 'Enabled' : 'Disabled' %>
+                            </span>
+                        </div>
+                    </div>
+                    <p class="automod-description">
+                        Automatically detect and block messages containing Discord invite links. Protect your server from member poaching and unwanted server advertisements.
+                    </p>
+                    <div class="automod-actions">
+                        <button class="action-button edit edit-automod-btn" data-rule-type="discord_invites">
+                            <i class="fas fa-edit"></i>
+                            Configure
+                        </button>
+                        <% if (autoModSettings.discordInviteFilter.enabled) { %>
+                        <button class="action-button delete2" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Disable
+                        </button>
+                        <% } else { %>
+                        <button class="action-button edit" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Enable
+                        </button>
+                        <% } %>
+                    </div>
+                </div>
+
+                
+                <div class="automod-card" data-rule-type="phishing">
+                    <div class="automod-header">
+                        <div class="automod-title">
+                            <i class="fas fa-user-secret"></i>
+                            Anti Phishing Links
+                        </div>
+                        <div class="automod-status">
+                            <span class="status-badge <%= autoModSettings.phishingProtection.enabled ? 'is-enabled' : 'is-disabled' %>">
+                                <i class="fas <%= autoModSettings.phishingProtection.enabled ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                <%= autoModSettings.phishingProtection.enabled ? 'Enabled' : 'Disabled' %>
+                            </span>
+                        </div>
+                    </div>
+                    <p class="automod-description">
+                        Block known phishing domains and suspicious URLs to protect your community from scams and malicious websites. Uses an up-to-date database of known phishing domains.
+                    </p>
+                    <div class="automod-actions">
+                        <button class="action-button edit edit-automod-btn" data-rule-type="phishing">
+                            <i class="fas fa-edit"></i>
+                            Configure
+                        </button>
+                        <% if (autoModSettings.phishingProtection.enabled) { %>
+                        <button class="action-button delete2" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Disable
+                        </button>
+                        <% } else { %>
+                        <button class="action-button edit" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Enable
+                        </button>
+                        <% } %>
+                    </div>
+                </div>
+                
+                
+                <div class="automod-card" data-rule-type="alt_prevention">
+                    <div class="automod-header">
+                        <div class="automod-title">
+                            <i class="fas fa-user-shield"></i>
+                            Alt Account Prevention
+                        </div>
+                        <div class="automod-status">
+                            <span class="status-badge <%= autoModSettings.altPrevention.enabled ? 'is-enabled' : 'is-disabled' %>">
+                                <i class="fas <%= autoModSettings.altPrevention.enabled ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                <%= autoModSettings.altPrevention.enabled ? 'Enabled' : 'Disabled' %>
+                            </span>
+                        </div>
+                    </div>
+                    <p class="automod-description">
+                        Prevent alt accounts from joining your server by setting a minimum account age requirement. Choose what happens to accounts that are too new.
+                    </p>
+                    <div class="automod-actions">
+                        <button class="action-button edit edit-automod-btn" data-rule-type="alt_prevention">
+                            <i class="fas fa-edit"></i>
+                            Configure
+                        </button>
+                        <% if (autoModSettings.altPrevention.enabled) { %>
+                        <button class="action-button delete2" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Disable
+                        </button>
+                        <% } else { %>
+                        <button class="action-button edit" data-action="toggle">
+                            <i class="fas fa-power-off"></i>
+                            Enable
+                        </button>
+                        <% } %>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    
+    
+    <div class="modal" id="automodModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-sliders-h"></i>
+                    <span id="automodModalLabel">Configure Auto Moderation</span>
+                </p>
+                <button class="modal-delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <form id="automodForm">
+                    <input type="hidden" id="automodType" value="">
+                    
+                    <div class="field mb-4">
+                        <label class="form-label">Actions to Take</label>
+                        <div class="action-limits-card">
+                            <div class="columns is-multiline">
+                                
+                                <div class="column is-12">
+                                    <div class="permission-checkbox-container">
+                                        <input class="permission-checkbox visually-hidden" type="checkbox" id="action_delete" value="delete" checked>
+                                        <label class="checkbox-custom" for="action_delete"></label>
+                                        <label class="permission-checkbox-label" for="action_delete">
+                                            <i class="fas fa-trash-alt mr-2" style="color: var(--accent-color);"></i>
+                                            Delete Message
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-12">
+                                    <div class="action-limits-header mb-2">
+                                        <i class="fas fa-gavel mr-2"></i>
+                                        Punishment (Choose one)
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_none" value="none" checked>
+                                        <label class="radio-custom" for="punishment_none"></label>
+                                        <label class="permission-checkbox-label" for="punishment_none">
+                                            <i class="fas fa-times-circle mr-2" style="color: #95a5a6;"></i>
+                                            No Punishment
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_warn" value="warn">
+                                        <label class="radio-custom" for="punishment_warn"></label>
+                                        <label class="permission-checkbox-label" for="punishment_warn">
+                                            <i class="fas fa-exclamation-triangle mr-2" style="color: #f1c40f;"></i>
+                                            Warn User
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_timeout" value="timeout">
+                                        <label class="radio-custom" for="punishment_timeout"></label>
+                                        <label class="permission-checkbox-label" for="punishment_timeout">
+                                            <i class="fas fa-clock mr-2" style="color: #3498db;"></i>
+                                            Timeout User
+                                        </label>
+                                    </div>
+                                    
+                                    
+                                    <div id="timeoutDurationSection" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                                        <label class="form-label mb-2">Timeout Duration</label>
+                                        <div class="is-flex" style="gap: 0.5rem;">
+                                            <div class="control" style="flex: 1;">
+                                                <input type="number" class="form-input" id="timeoutDuration" min="1" value="5" style="height: 36px;">
+                                            </div>
+                                            <div class="control" style="width: 120px;">
+                                                <select class="form-select" id="timeoutUnit" style="height: 36px;">
+                                                    <option value="m">Minutes</option>
+                                                    <option value="h">Hours</option>
+                                                    <option value="d">Days</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_kick" value="kick">
+                                        <label class="radio-custom" for="punishment_kick"></label>
+                                        <label class="permission-checkbox-label" for="punishment_kick">
+                                            <i class="fas fa-shoe-prints mr-2" style="color: #e67e22;"></i>
+                                            Kick User
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_ban" value="ban">
+                                        <label class="radio-custom" for="punishment_ban"></label>
+                                        <label class="permission-checkbox-label" for="punishment_ban">
+                                            <i class="fas fa-gavel mr-2" style="color: #e74c3c;"></i>
+                                            Ban User
+                                        </label>
+                                    </div>
+                                    
+                                    
+                                    <div id="banDurationSection" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                                        <div class="switch-container mb-2">
+                                            <label class="switch">
+                                                <input type="checkbox" id="permanentBan">
+                                                <span class="switch-slider"></span>
+                                            </label>
+                                            <span class="switch-label">Permanent Ban</span>
+                                        </div>
+                                        
+                                        <div id="tempBanDurationSection">
+                                            <label class="form-label mb-2">Ban Duration</label>
+                                            <div class="is-flex" style="gap: 0.5rem;">
+                                                <div class="control" style="flex: 1;">
+                                                    <input type="number" class="form-input" id="banDuration" min="1" value="7" style="height: 36px;">
+                                                </div>
+                                                <div class="control" style="width: 120px;">
+                                                    <select class="form-select" id="banUnit" style="height: 36px;">
+                                                        <option value="d">Days</option>
+                                                        <option value="w">Weeks</option>
+                                                        <option value="m">Months</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    
+                    <div class="field mb-4">
+                        <label class="form-label"><i class="fas fa-hashtag mr-2" style="color: var(--accent-color);"></i>Channel Settings</label>
+                        <div class="action-limits-card">
+                            <div class="switch-container mb-2">
+                                <label class="switch">
+                                    <input type="checkbox" id="noExcludedChannels" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                                <span class="switch-label">Apply to all channels</span>
+                            </div>
+                            <div id="channelSelectSection" style="display: none; margin-top: 10px;">
+                                <label class="form-label mb-2">Whitelisted Channels (Excluded)</label>
+                                <div class="control">
+                                    <p class="form-input" id="channelIdsInput" contenteditable="true" style="min-height: 80px; overflow-y: auto; white-space: pre-wrap; color: rgba(255, 255, 255, 0.9);" data-placeholder="Enter channel IDs separated by commas"></p>
+                                    <p class="help has-text-grey-light mt-2">Enter IDs of channels to whitelist (exclude from moderation), separated by commas. The rule will NOT apply to these channels. You can also input category IDs to whitelist all channels within a category.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            
+                                
+                    <div id="spamConfig" class="rule-config-section field mb-4" style="display: none;">
+                        <label class="form-label"><i class="fas fa-sliders-h mr-2" style="color: var(--accent-color);"></i>Spam Protection Settings</label>
+                        <div class="action-limits-card">
+                            <p class="help has-text-grey-light mb-3" style="font-style: italic; padding: 0.5rem; background: rgba(var(--accent-color-rgb), 0.05); border-radius: 8px;">
+                                <i class="fas fa-info-circle mr-2"></i> Set any value to 0 to disable that specific check. For example, setting Mention Limit to 0 will disable mention spam detection.
+                            </p>
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="messageLimit">Messages Limit</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="messageLimit" min="0" value="5">
+                                        </div>
+                                        <p class="help has-text-grey-light">Max messages allowed in time period (0 to disable)</p>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="messageTimeValue">Within Time Period</label>
+                                        <div class="is-flex" style="gap: 0.5rem;">
+                                            <div class="control" style="flex: 1;">
+                                                <input type="number" class="form-input" id="messageTimeValue" min="1" value="4">
+                                            </div>
+                                            <div class="control" style="width: 120px;">
+                                                <select class="form-select" id="messageTimeUnit">
+                                                    <option value="s">Seconds</option>
+                                                    <option value="m">Minutes</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="mentionLimit">Mention Limit</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="mentionLimit" min="0" value="5">
+                                        </div>
+                                        <p class="help has-text-grey-light">Max mentions in a single message (0 to disable)</p>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="duplicateLimit">Duplicate Limit</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="duplicateLimit" min="0" value="3">
+                                        </div>
+                                        <p class="help has-text-grey-light">Identical messages within time period (0 to disable)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            
+                            
+            
+            
+            <div id="altPreventionConfig" class="rule-config-section field mb-4" style="display: none;">
+                <label class="form-label"><i class="fas fa-user-shield mr-2" style="color: var(--accent-color);"></i>Alt Prevention Settings</label>
+                <div class="action-limits-card">
+                    <div class="columns is-multiline">
+                        <div class="column is-6">
+                            <div class="field">
+                                <label class="form-label" for="accountAgeDays">Minimum Account Age (Days)</label>
+                                <div class="control">
+                                    <input type="number" class="form-input" id="accountAgeDays" min="1" value="7">
+                                </div>
+                                <p class="help has-text-grey-light">Accounts must be at least this many days old</p>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-12">
+                            <div class="action-limits-header mb-2">
+                                <i class="fas fa-gavel mr-2"></i>
+                                Punishment (Choose one)
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="column is-6">
+                            <div class="permission-checkbox-container radio-container">
+                                <input class="alt-punishment-radio visually-hidden" type="radio" name="alt_punishment_type" id="alt_punishment_none" value="none">
+                                <label class="radio-custom" for="alt_punishment_none"></label>
+                                <label class="permission-checkbox-label" for="alt_punishment_none">
+                                    <i class="fas fa-times-circle mr-2" style="color: #95a5a6;"></i>
+                                    No Punishment
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-6">
+                            <div class="permission-checkbox-container radio-container">
+                                <input class="alt-punishment-radio visually-hidden" type="radio" name="alt_punishment_type" id="alt_punishment_kick" value="kick" checked>
+                                <label class="radio-custom" for="alt_punishment_kick"></label>
+                                <label class="permission-checkbox-label" for="alt_punishment_kick">
+                                    <i class="fas fa-shoe-prints mr-2" style="color: #e67e22;"></i>
+                                    Kick User
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-6">
+                            <div class="permission-checkbox-container radio-container">
+                                <input class="alt-punishment-radio visually-hidden" type="radio" name="alt_punishment_type" id="alt_punishment_ban" value="ban">
+                                <label class="radio-custom" for="alt_punishment_ban"></label>
+                                <label class="permission-checkbox-label" for="alt_punishment_ban">
+                                    <i class="fas fa-gavel mr-2" style="color: #e74c3c;"></i>
+                                    Ban User
+                                </label>
+                            </div>
+                            
+                            
+                            <div id="altBanDurationSection" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                                <div class="switch-container mb-2">
+                                    <label class="switch">
+                                        <input type="checkbox" id="altPermanentBan">
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Permanent Ban</span>
+                                </div>
+                                
+                                <div id="altTempBanDurationSection">
+                                    <label class="form-label mb-2">Ban Duration</label>
+                                    <div class="is-flex" style="gap: 0.5rem;">
+                                        <div class="control" style="flex: 1;">
+                                            <input type="number" class="form-input" id="altBanDuration" min="1" value="7" style="height: 36px;">
+                                        </div>
+                                        <div class="control" style="width: 120px;">
+                                            <select class="form-select" id="altBanUnit" style="height: 36px;">
+                                                <option value="d">Days</option>
+                                                <option value="w">Weeks</option>
+                                                <option value="m">Months</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-6">
+                            <div class="permission-checkbox-container radio-container">
+                                <input class="alt-punishment-radio visually-hidden" type="radio" name="alt_punishment_type" id="alt_punishment_timeout" value="timeout">
+                                <label class="radio-custom" for="alt_punishment_timeout"></label>
+                                <label class="permission-checkbox-label" for="alt_punishment_timeout">
+                                    <i class="fas fa-clock mr-2" style="color: #3498db;"></i>
+                                    Timeout User
+                                </label>
+                            </div>
+                            
+                            
+                            <div id="altTimeoutDurationSection" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                                <label class="form-label mb-2">Timeout Duration</label>
+                                <div class="is-flex" style="gap: 0.5rem;">
+                                    <div class="control" style="flex: 1;">
+                                        <input type="number" class="form-input" id="altTimeoutDuration" min="1" value="24" style="height: 36px;">
+                                    </div>
+                                    <div class="control" style="width: 120px;">
+                                        <select class="form-select" id="altTimeoutUnit" style="height: 36px;">
+                                            <option value="h">Hours</option>
+                                            <option value="d">Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="column is-12">
+                            <div class="field">
+                                <label class="form-label" for="customMessage">Custom Message to User</label>
+                                <div class="control">
+                                    <textarea class="form-input" id="customMessage" rows="3" placeholder="Your account is too new to join this server.">Your account is too new to join this server.</textarea>
+                                </div>
+                                <p class="help has-text-grey-light">Message sent to users who are affected by this rule</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="button" class="modal-button primary" id="saveAutomodBtn">
+                    <i class="fas fa-save"></i>
+                    Save Configuration
+                </button>
+                <button type="button" class="modal-button cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    
+
+                    if (targetContent.classList.contains('is-active')) {
+                        targetContent.classList.remove('is-active');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        targetContent.classList.add('is-active');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                    
+
+                    const icon = this.querySelector('.icon i');
+                    icon.style.transform = targetContent.classList.contains('is-active') ? 'rotate(180deg)' : 'rotate(0)';
+                });
+            });
+        
+
+            function setupModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    const closeButtons = modal.querySelectorAll('.modal-delete, .modal-button.cancel, [data-dismiss="modal"]');
+    const background = modal.querySelector('.modal-background');
+
+    function closeModal() {
+        modal.classList.remove('is-active');
+        
+
+        const form = modal.querySelector('form');
+        if (form) form.reset();
+        
+
+        const timeoutDurationSection = document.getElementById('timeoutDurationSection');
+        if (timeoutDurationSection) timeoutDurationSection.style.display = 'none';
+        
+        const channelSelectSection = document.getElementById('channelSelectSection');
+        if (channelSelectSection) channelSelectSection.style.display = 'none';
+        
+
+        const channelIdsInput = document.getElementById('channelIdsInput');
+        if (channelIdsInput) {
+            channelIdsInput.textContent = '';
+
+            channelIdsInput.style.color = 'rgba(255, 255, 255, 0.4)';
+            channelIdsInput.textContent = channelIdsInput.getAttribute('data-placeholder');
+        }
+    }
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
+    
+    background.addEventListener('click', closeModal);
+
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+            closeModal();
+        }
+    });
+    
+
+    return closeModal;
+}
+        
+
+            setupModal('automodModal');
+            
+
+            const actionTimeout = document.getElementById('action_timeout');
+            if (actionTimeout) {
+                actionTimeout.addEventListener('change', function() {
+                    document.getElementById('timeoutDurationSection').style.display = this.checked ? 'block' : 'none';
+                });
+            }
+            
+
+            const allChannels = document.getElementById('allChannels');
+            if (allChannels) {
+                allChannels.addEventListener('change', function() {
+                    document.getElementById('channelSelectSection').style.display = this.checked ? 'none' : 'block';
+                });
+            }
+        
+
+    const permanentBanCheckbox = document.getElementById('permanentBan');
+    if (permanentBanCheckbox) {
+        permanentBanCheckbox.addEventListener('change', function() {
+            const tempBanDurationSection = document.getElementById('tempBanDurationSection');
+            if (tempBanDurationSection) {
+                tempBanDurationSection.style.display = this.checked ? 'none' : 'block';
+            }
+        });
+    }
+    
+
+    const altPermanentBanCheckbox = document.getElementById('altPermanentBan');
+    if (altPermanentBanCheckbox) {
+        altPermanentBanCheckbox.addEventListener('change', function() {
+            const altTempBanDurationSection = document.getElementById('altTempBanDurationSection');
+            if (altTempBanDurationSection) {
+                altTempBanDurationSection.style.display = this.checked ? 'none' : 'block';
+            }
+        });
+    }
+
+
+            const punishmentRadios = document.querySelectorAll('.punishment-radio');
+    punishmentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+
+            const timeoutDurationSection = document.getElementById('timeoutDurationSection');
+            if (timeoutDurationSection) {
+                timeoutDurationSection.style.display = this.value === 'timeout' ? 'block' : 'none';
+            }
+            
+
+            const banDurationSection = document.getElementById('banDurationSection');
+            if (banDurationSection) {
+                banDurationSection.style.display = this.value === 'ban' ? 'block' : 'none';
+            }
+            
+
+            document.querySelectorAll('.punishment-radio').forEach(r => {
+                const container = r.closest('.permission-checkbox-container');
+                if (r.checked) {
+                    container.classList.add('radio-selected');
+                } else {
+                    container.classList.remove('radio-selected');
+                }
+            });
+        });
+    });
+            
+
+            const altPunishmentRadios = document.querySelectorAll('input[name="alt_punishment_type"]');
+    if (altPunishmentRadios.length > 0) {
+        altPunishmentRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+
+                const altTimeoutDurationSection = document.getElementById('altTimeoutDurationSection');
+                if (altTimeoutDurationSection) {
+                    altTimeoutDurationSection.style.display = this.value === 'timeout' ? 'block' : 'none';
+                }
+                
+
+                const altBanDurationSection = document.getElementById('altBanDurationSection');
+                if (altBanDurationSection) {
+                    altBanDurationSection.style.display = this.value === 'ban' ? 'block' : 'none';
+                }
+                
+
+                document.querySelectorAll('input[name="alt_punishment_type"]').forEach(r => {
+                    const container = r.closest('.permission-checkbox-container');
+                    if (r.checked) {
+                        container.classList.add('radio-selected');
+                    } else {
+                        container.classList.remove('radio-selected');
+                    }
+                });
+            });
+        });
+    }
+        
+    const closeModal = setupModal('automodModal');
+
+            document.querySelectorAll('.edit-automod-btn').forEach(button => {
+        const ruleType = button.getAttribute('data-rule-type');
+        
+        if (ruleType !== 'alt_prevention') {
+            button.addEventListener('click', function() {
+                const modal = document.getElementById('automodModal');
+                
+
+
+                const form = document.getElementById('automodForm');
+                if (form) form.reset();
+                
+
+                const channelIdsInput = document.getElementById('channelIdsInput');
+                if (channelIdsInput) {
+                    channelIdsInput.textContent = '';
+                    channelIdsInput.style.color = 'rgba(255, 255, 255, 0.4)';
+                    channelIdsInput.textContent = channelIdsInput.getAttribute('data-placeholder');
+                }
+                
+
+                const noExcludedChannels = document.getElementById('noExcludedChannels');
+                if (noExcludedChannels) {
+                    noExcludedChannels.checked = true;
+                }
+                
+
+                const channelSelectSection = document.getElementById('channelSelectSection');
+                if (channelSelectSection) {
+                    channelSelectSection.style.display = 'none';
+                }
+                
+
+
+                let modalTitle = 'Configure Auto Moderation';
+                let ruleIcon = 'fa-sliders-h';
+                
+                switch(ruleType) {
+                    case 'spam':
+                        modalTitle = 'Configure Spam Protection';
+                        ruleIcon = 'fa-exclamation-circle';
+                        break;
+                    case 'discord_invites':
+                        modalTitle = 'Configure Discord Invite Filter';
+                        ruleIcon = 'fa fa-link';
+                        break;
+                    case 'phishing':
+                        modalTitle = 'Configure Phishing Link Protection';
+                        ruleIcon = 'fa-user-secret';
+                        break;
+                    default:
+                        modalTitle = 'Configure Auto Moderation';
+                        ruleIcon = 'fa-sliders-h';
+                        break;
+                }
+                
+                document.getElementById('automodModalLabel').innerHTML = `<i class="fas ${ruleIcon}"></i> ${modalTitle}`;
+                document.getElementById('automodType').value = ruleType;
+                
+
+                const actionsSection = document.querySelector('form#automodForm > div.field.mb-4:nth-child(2)');
+                const channelsSection = document.querySelector('form#automodForm > div.field.mb-4:nth-child(3)');
+                
+                if (actionsSection) actionsSection.style.display = 'block';
+                if (channelsSection) channelsSection.style.display = 'block';
+                
+
+                document.querySelectorAll('.rule-config-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+
+                switch(ruleType) {
+                    case 'spam':
+                        document.getElementById('spamConfig').style.display = 'block';
+                        break;
+                    case 'discord_invites':
+                        break;
+                    case 'phishing':
+                        break;
+                }
+                
+
+                fetchRuleConfiguration(ruleType).then(configData => {
+                    if (configData && configData.success) {
+                        populateFormWithConfig(ruleType, configData.config);
+                    }
+                });
+                
+                modal.classList.add('is-active');
+            });
+        }
+    });
+            
+
+            const altPreventionEditBtn = document.querySelector('.edit-automod-btn[data-rule-type="alt_prevention"]');
+            if (altPreventionEditBtn) {
+                altPreventionEditBtn.addEventListener('click', function() {
+                    const modal = document.getElementById('automodModal');
+                    
+
+                    document.getElementById('automodModalLabel').innerHTML = `<i class="fas fa-user-shield"></i> Configure Alt Prevention`;
+                    document.getElementById('automodType').value = 'alt_prevention';
+                    
+
+                    const actionsSection = document.querySelector('form#automodForm > div.field.mb-4:nth-child(2)');
+                    const channelsSection = document.querySelector('form#automodForm > div.field.mb-4:nth-child(3)');
+                    
+                    if (actionsSection) actionsSection.style.display = 'none';
+                    if (channelsSection) channelsSection.style.display = 'none';
+                    
+
+                    document.querySelectorAll('.rule-config-section').forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+
+                    document.getElementById('altPreventionConfig').style.display = 'block';
+                    
+
+                    fetchRuleConfiguration('alt_prevention').then(configData => {
+                        if (configData && configData.success) {
+                            populateAltPreventionForm(configData.config);
+                        }
+                    });
+                    
+                    modal.classList.add('is-active');
+                });
+            }
+            
+
+            document.querySelectorAll('.automod-card .action-button.delete2, .automod-card .action-button[data-action="toggle"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.automod-card');
+                    const ruleType = card.getAttribute('data-rule-type');
+                    const statusBadge = card.querySelector('.status-badge');
+                    const isCurrentlyEnabled = statusBadge.classList.contains('is-enabled');
+                    
+
+                    const newEnabledState = this.textContent.trim().includes('Enable');
+                    
+
+                    fetch('/settings/toggle-automod', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ruleType: ruleType,
+                            enabled: newEnabledState
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+
+                            updateRuleCardStatus(ruleType, newEnabledState);
+                            
+
+                            showAlert('success', `${getRuleTypeName(ruleType)} has been ${newEnabledState ? 'enabled' : 'disabled'}`);
+                        } else {
+                            showAlert('error', `Error: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error toggling rule:', error);
+                        showAlert('error', 'An error occurred. Please try again.');
+                    });
+                });
+            });
+            
+
+            const saveAutomodBtn = document.getElementById('saveAutomodBtn');
+    if (saveAutomodBtn) {
+
+        const newSaveBtn = saveAutomodBtn.cloneNode(true);
+        saveAutomodBtn.parentNode.replaceChild(newSaveBtn, saveAutomodBtn);
+        
+
+        newSaveBtn.addEventListener('click', function(event) {
+
+            event.preventDefault();
+            
+            console.log("Save button clicked!");
+            
+            const ruleType = document.getElementById('automodType').value;
+            console.log("Rule type:", ruleType);
+            
+            let ruleConfig;
+            let isEnabled = true;
+            
+
+            const enabledCheckbox = document.getElementById('automodEnabled');
+            if (enabledCheckbox) {
+                isEnabled = enabledCheckbox.checked;
+            }
+            
+            try {
+
+                if (ruleType === 'alt_prevention') {
+                    ruleConfig = buildAltPreventionConfig();
+                } else {
+
+                    ruleConfig = buildSpamConfigurationObject(ruleType);
+                }
+                
+                console.log("Built configuration:", ruleConfig);
+                
+
+                console.log("Sending request to server...");
+                fetch('/settings/save-automod', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ruleType: ruleType,
+                        enabled: isEnabled,
+                        config: ruleConfig
+                    })
+                })
+                .then(response => {
+                    console.log("Received response:", response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Server response data:", data);
+                    if (data.success) {
+
+                        updateRuleCardStatus(ruleType, isEnabled);
+                        
+
+                        document.getElementById('automodModal').classList.remove('is-active');
+                        
+
+                        showAlert('success', `${getRuleTypeName(ruleType)} settings have been saved successfully.`);
+                    } else {
+                        showAlert('error', `Error: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving configuration:', error);
+                    showAlert('error', 'Error saving configuration. Please try again.');
+                });
+            } catch (error) {
+                console.error("Error building configuration:", error);
+                showAlert('error', 'Error building configuration: ' + error.message);
+            }
+        });
+        
+        console.log("Save button handler installed successfully");
+    } else {
+        console.error("Could not find save button with ID 'saveAutomodBtn'");
+    }
+            
+
+            const useRegexCheckbox = document.getElementById('useRegex');
+            if (useRegexCheckbox) {
+                useRegexCheckbox.addEventListener('change', function() {
+                    const helpText = document.getElementById('patternsHelp');
+                    if (this.checked) {
+                        helpText.textContent = 'Enter regex patterns, one per line. Example: \\b(word1|word2)\\b will match exact words.';
+                    } else {
+                        helpText.textContent = 'Enter words to block, one per line. Enable regex for advanced pattern matching.';
+                    }
+                });
+            }
+            
+
+            const checkedRadio = document.querySelector('.punishment-radio:checked');
+    if (checkedRadio) {
+        checkedRadio.dispatchEvent(new Event('change'));
+    }
+    
+    const checkedAltRadio = document.querySelector('input[name="alt_punishment_type"]:checked');
+    if (checkedAltRadio) {
+        checkedAltRadio.dispatchEvent(new Event('change'));
+    }
+});
+        
+
+        function fetchRuleConfiguration(ruleType) {
+            return fetch(`/settings/get-automod-config?ruleType=${ruleType}`)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error fetching rule configuration:', error);
+                    showAlert('error', 'Error fetching configuration. Please try again.');
+                    return { success: false };
+                });
+        }
+        
+
+        function populateAltPreventionForm(config) {
+    if (!config) return;
+    
+
+    document.getElementById('accountAgeDays').value = config.accountAgeDays || 7;
+    
+
+    if (config.customMessage) {
+        document.getElementById('customMessage').value = config.customMessage;
+    }
+    
+
+    if (config.actions) {
+        if (config.actions.kickUser) {
+            document.getElementById('alt_punishment_kick').checked = true;
+        } else if (config.actions.banUser) {
+            document.getElementById('alt_punishment_ban').checked = true;
+            
+
+            const altBanDurationSection = document.getElementById('altBanDurationSection');
+            if (altBanDurationSection) {
+                altBanDurationSection.style.display = 'block';
+            }
+            
+
+            document.getElementById('altPermanentBan').checked = !config.actions.isTempBan;
+            
+
+            document.getElementById('altTempBanDurationSection').style.display = 
+                config.actions.isTempBan ? 'block' : 'none';
+            
+            if (config.actions.isTempBan) {
+                document.getElementById('altBanDuration').value = config.actions.banDuration || 7;
+                document.getElementById('altBanUnit').value = config.actions.banUnit || 'd';
+            }
+        } else if (config.actions.timeout) {
+            document.getElementById('alt_punishment_timeout').checked = true;
+            
+
+            const altTimeoutDurationSection = document.getElementById('altTimeoutDurationSection');
+            if (altTimeoutDurationSection) {
+                altTimeoutDurationSection.style.display = 'block';
+            }
+            
+
+            document.getElementById('altTimeoutDuration').value = config.actions.timeoutDuration || 24;
+            document.getElementById('altTimeoutUnit').value = config.actions.timeoutUnit || 'h';
+        } else {
+
+            document.getElementById('alt_punishment_none').checked = true;
+        }
+    }
+    
+
+    const checkedAltRadio = document.querySelector('input[name="alt_punishment_type"]:checked');
+    if (checkedAltRadio) {
+        checkedAltRadio.dispatchEvent(new Event('change'));
+    }
+}
+        
+
+        function buildAltPreventionConfig() {
+    const config = {
+        accountAgeDays: parseInt(document.getElementById('accountAgeDays').value) || 7,
+        customMessage: document.getElementById('customMessage').value,
+        actions: {
+            kickUser: false,
+            banUser: false,
+            timeout: false,
+            timeoutDuration: 24,
+            timeoutUnit: 'h',
+
+            isTempBan: false,
+            banDuration: 0,
+            banUnit: 'd'
+        }
+    };
+            
+
+            const selectedAltPunishment = document.querySelector('input[name="alt_punishment_type"]:checked');
+    if (selectedAltPunishment) {
+        switch (selectedAltPunishment.value) {
+            case 'none':
+
+                break;
+            case 'kick':
+                config.actions.kickUser = true;
+                break;
+            case 'ban':
+                config.actions.banUser = true;
+                const isAltPermanent = document.getElementById('altPermanentBan').checked;
+                config.actions.isTempBan = !isAltPermanent;
+                if (!isAltPermanent) {
+                    config.actions.banDuration = parseInt(document.getElementById('altBanDuration').value) || 7;
+                    config.actions.banUnit = document.getElementById('altBanUnit').value || 'd';
+                }
+                break;
+            case 'timeout':
+                config.actions.timeout = true;
+                config.actions.timeoutDuration = parseInt(document.getElementById('altTimeoutDuration').value) || 24;
+                config.actions.timeoutUnit = document.getElementById('altTimeoutUnit').value || 'h';
+                break;
+        }
+    }
+    
+    return config;
+}
+        
+
+        function populateFormWithConfig(ruleType, config) {
+    if (!config) return;
+
+
+    const enabledCheckbox = document.getElementById('automodEnabled');
+    if (enabledCheckbox) {
+        enabledCheckbox.checked = config.enabled;
+    }
+
+    if (config.channels) {
+
+        document.getElementById('noExcludedChannels').checked = config.channels.allChannels;
+
+
+        const channelSelectSection = document.getElementById('channelSelectSection');
+        if (channelSelectSection) {
+            channelSelectSection.style.display = config.channels.allChannels ? 'none' : 'block';
+        }
+
+
+        if (!config.channels.allChannels && config.channels.specificChannels && config.channels.specificChannels.length > 0) {
+            const channelIdsInput = document.getElementById('channelIdsInput');
+            if (channelIdsInput) {
+
+                channelIdsInput.textContent = config.channels.specificChannels.join(', ');
+
+                channelIdsInput.style.color = 'rgba(255, 255, 255, 0.9)';
+            }
+        }
+    }
+
+
+    if (config.actions) {
+        document.getElementById('action_delete').checked = config.actions.deleteMessage;
+
+
+        if (config.actions.warnUser) {
+            document.getElementById('punishment_warn').checked = true;
+        } else if (config.actions.timeout) {
+            document.getElementById('punishment_timeout').checked = true;
+
+
+            const timeoutDurationSection = document.getElementById('timeoutDurationSection');
+            if (timeoutDurationSection) {
+                timeoutDurationSection.style.display = 'block';
+            }
+
+
+            document.getElementById('timeoutDuration').value = config.actions.timeoutDuration || 5;
+            document.getElementById('timeoutUnit').value = config.actions.timeoutUnit || 'm';
+        } else if (config.actions.kickUser) {
+            document.getElementById('punishment_kick').checked = true;
+        } else if (config.actions.banUser) {
+            document.getElementById('punishment_ban').checked = true;
+
+
+            const banDurationSection = document.getElementById('banDurationSection');
+            if (banDurationSection) {
+                banDurationSection.style.display = 'block';
+            }
+
+
+            document.getElementById('permanentBan').checked = !config.actions.isTempBan;
+
+
+            document.getElementById('tempBanDurationSection').style.display = 
+                config.actions.isTempBan ? 'block' : 'none';
+
+            if (config.actions.isTempBan) {
+                document.getElementById('banDuration').value = config.actions.banDuration || 7;
+                document.getElementById('banUnit').value = config.actions.banUnit || 'd';
+            }
+        } else {
+
+            document.getElementById('punishment_none').checked = true;
+        }
+    }
+
+
+    switch(ruleType) {
+        case 'spam':
+
+            document.getElementById('messageLimit').value = config.messageLimit !== undefined ? config.messageLimit : 5;
+            document.getElementById('messageTimeValue').value = config.messageDuration || 4;
+            document.getElementById('messageTimeUnit').value = config.messageDurationUnit || 's';
+            document.getElementById('mentionLimit').value = config.mentionLimit !== undefined ? config.mentionLimit : 5;
+            document.getElementById('duplicateLimit').value = config.duplicateLimit !== undefined ? config.duplicateLimit : 3;
+            break;
+
+        case 'discord_invites':
+            break;
+
+        case 'phishing':
+            break;
+    }
+
+
+    const checkedPunishmentRadio = document.querySelector('.punishment-radio:checked');
+    if (checkedPunishmentRadio) {
+        checkedPunishmentRadio.dispatchEvent(new Event('change'));
+    }
+}
+
+        
+
+        function getInputValue(elementId, defaultValue) {
+    const element = document.getElementById(elementId);
+    if (!element) return defaultValue;
+    
+
+    if (element.value === "0" || element.value === 0) {
+        console.log(`${elementId} value is zero`);
+        return 0;
+    }
+    
+
+    if (element.value === "" || element.value === null || element.value === undefined) {
+        return defaultValue;
+    }
+    
+
+    const numVal = Number(element.value);
+    return isNaN(numVal) ? element.value : numVal;
+}
+
+function buildSpamConfigurationObject(ruleType) {
+    console.log("Building spam configuration for", ruleType);
+    
+
+    const config = {
+        actions: {
+            deleteMessage: document.getElementById('action_delete').checked,
+            warnUser: false,
+            timeout: false,
+            kickUser: false,
+            banUser: false,
+            isTempBan: false,
+            banDuration: 0,
+            banUnit: 'd'
+        },
+        channels: {
+            allChannels: document.getElementById('noExcludedChannels').checked,
+            specificChannels: []
+        }
+    };
+    
+
+    const messageLimitEl = document.getElementById('messageLimit');
+    const mentionLimitEl = document.getElementById('mentionLimit');
+    const duplicateLimitEl = document.getElementById('duplicateLimit');
+    
+    console.log("Raw form values:", {
+        messageLimit: messageLimitEl ? messageLimitEl.value : 'not found',
+        mentionLimit: mentionLimitEl ? mentionLimitEl.value : 'not found',
+        duplicateLimit: duplicateLimitEl ? duplicateLimitEl.value : 'not found'
+    });
+            
+    if (!config.channels.allChannels) {
+        const channelIdsInput = document.getElementById('channelIdsInput');
+        if (channelIdsInput && 
+            channelIdsInput.textContent && 
+            channelIdsInput.textContent !== channelIdsInput.getAttribute('data-placeholder')) {
+            
+
+            config.channels.specificChannels = channelIdsInput.textContent
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id !== '');
+        }
+    }
+
+
+    const selectedPunishment = document.querySelector('input[name="punishment_type"]:checked');
+    if (selectedPunishment) {
+        switch (selectedPunishment.value) {
+            case 'none':
+
+                break;
+            case 'warn':
+                config.actions.warnUser = true;
+                break;
+            case 'timeout':
+                config.actions.timeout = true;
+                config.actions.timeoutDuration = Number(document.getElementById('timeoutDuration').value) || 5;
+                config.actions.timeoutUnit = document.getElementById('timeoutUnit').value || 'm';
+                break;
+            case 'kick':
+                config.actions.kickUser = true;
+                break;
+            case 'ban':
+                config.actions.banUser = true;
+                const isPermanent = document.getElementById('permanentBan').checked;
+                config.actions.isTempBan = !isPermanent;
+                if (!isPermanent) {
+                    config.actions.banDuration = Number(document.getElementById('banDuration').value) || 7;
+                    config.actions.banUnit = document.getElementById('banUnit').value || 'd';
+                }
+                break;
+        }
+    }
+            
+
+    switch(ruleType) {
+        case 'spam':
+
+            
+
+            if (messageLimitEl) {
+                const mlVal = messageLimitEl.value;
+                config.messageLimit = (mlVal === "0" || mlVal === 0) ? 0 : (Number(mlVal) || 5);
+            } else {
+                config.messageLimit = 5; // default
+            }
+            
+
+            if (mentionLimitEl) {
+                const mentVal = mentionLimitEl.value;
+                config.mentionLimit = (mentVal === "0" || mentVal === 0) ? 0 : (Number(mentVal) || 5);
+            } else {
+                config.mentionLimit = 5; // default
+            }
+            
+
+            if (duplicateLimitEl) {
+                const dupVal = duplicateLimitEl.value;
+                config.duplicateLimit = (dupVal === "0" || dupVal === 0) ? 0 : (Number(dupVal) || 3);
+            } else {
+                config.duplicateLimit = 3; // default
+            }
+            
+
+            const msgTimeVal = document.getElementById('messageTimeValue');
+            config.messageDuration = msgTimeVal ? (Number(msgTimeVal.value) || 4) : 4;
+            config.messageDurationUnit = document.getElementById('messageTimeUnit')?.value || 's';
+            
+
+            console.log("Final spam configuration values:", {
+                messageLimit: config.messageLimit,
+                mentionLimit: config.mentionLimit,
+                duplicateLimit: config.duplicateLimit,
+                messageDuration: config.messageDuration,
+            });
+            break;
+            
+        case 'phishing':
+
+            config.useExternalDatabase = true; // Always use external database
+            config.customDomains = []; // Empty array for custom domains
+            break;
+    }
+    
+    return config;
+}
+
+
+        
+
+        function updateRuleCardStatus(ruleType, isEnabled) {
+            const allCards = document.querySelectorAll('.automod-card');
+            let targetCard;
+            
+
+            allCards.forEach(card => {
+                if (card.getAttribute('data-rule-type') === ruleType) {
+                    targetCard = card;
+                }
+            });
+            
+            if (!targetCard) return;
+            
+
+            const statusBadge = targetCard.querySelector('.status-badge');
+            const statusIcon = statusBadge.querySelector('i');
+            
+            if (isEnabled) {
+                statusBadge.className = 'status-badge is-enabled';
+                statusIcon.className = 'fas fa-check-circle';
+                statusBadge.textContent = ' Enabled';
+                statusBadge.prepend(statusIcon);
+                
+
+                const enableButton = targetCard.querySelector('.action-button[data-action="toggle"]');
+                if (enableButton && enableButton.textContent.includes('Enable')) {
+                    enableButton.innerHTML = '<i class="fas fa-power-off"></i> Disable';
+                    enableButton.classList.remove('edit');
+                    enableButton.classList.add('delete2');
+                }
+            } else {
+                statusBadge.className = 'status-badge is-disabled';
+                statusIcon.className = 'fas fa-times-circle';
+                statusBadge.textContent = ' Disabled';
+                statusBadge.prepend(statusIcon);
+                
+
+                const disableButton = targetCard.querySelector('.action-button[data-action="toggle"]');
+                if (disableButton && disableButton.textContent.includes('Disable')) {
+                    disableButton.innerHTML = '<i class="fas fa-power-off"></i> Enable';
+                    disableButton.classList.remove('delete2');
+                    disableButton.classList.add('edit');
+                }
+            }
+        }
+        
+
+        function showAlert(type, message) {
+
+            const alert = document.createElement('div');
+            alert.className = `alert is-${type === 'success' ? 'success' : 'danger'}`; // Use 'danger' for errors
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+        
+
+            const container = document.querySelector('.glass-card');
+            container.insertBefore(alert, container.querySelector('.section-description').nextSibling);
+        
+
+            alert.style.animation = 'fadeIn 0.3s ease';
+        
+
+            setTimeout(() => {
+                alert.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            }, 5000);
+        }
+        
+
+        function getRuleTypeName(ruleType) {
+            switch(ruleType) {
+                case 'spam': return 'Spam Protection';
+                case 'discord_invites': return 'Discord Invite Filter';
+                case 'phishing': return 'Phishing Link Protection';
+                case 'alt_prevention': return 'Alt Prevention';
+                default: return 'Auto Moderation';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+    const noExcludedChannels = document.getElementById('noExcludedChannels');
+    if (noExcludedChannels) {
+        noExcludedChannels.addEventListener('change', function() {
+            document.getElementById('channelSelectSection').style.display = this.checked ? 'none' : 'block';
+        });
+    }
+    
+    const channelIdsInput = document.getElementById('channelIdsInput');
+    if (channelIdsInput) {
+
+        function updatePlaceholder() {
+            if (channelIdsInput.textContent.trim() === '') {
+                channelIdsInput.innerHTML = '';
+                channelIdsInput.style.color = 'rgba(255, 255, 255, 0.4)';
+                channelIdsInput.textContent = channelIdsInput.getAttribute('data-placeholder');
+            }
+        }
+        
+
+        updatePlaceholder();
+        
+
+        channelIdsInput.addEventListener('focus', function() {
+            if (channelIdsInput.textContent === channelIdsInput.getAttribute('data-placeholder')) {
+                channelIdsInput.textContent = '';
+                channelIdsInput.style.color = 'rgba(255, 255, 255, 0.9)';
+            }
+        });
+        
+
+        channelIdsInput.addEventListener('blur', function() {
+            updatePlaceholder();
+        });
+
+
+    window.getWhitelistedChannels = function() {
+    if (document.getElementById('noExcludedChannels').checked) {
+        return [];
+    }
+    
+    const channelIdsInput = document.getElementById('channelIdsInput');
+    
+
+    if (!channelIdsInput || channelIdsInput.textContent === channelIdsInput.getAttribute('data-placeholder')) {
+        return [];
+    }
+    
+
+    const channelIdsText = channelIdsInput.textContent.trim();
+    if (!channelIdsText) {
+        return [];
+    }
+    
+
+    return channelIdsText.split(',')
+        .map(id => id.trim())
+        .filter(id => id !== '');
+};
+}
+});
+
+        </script>

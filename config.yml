@@ -1,0 +1,271 @@
+# ===========================================================================
+# Plex Staff Configuration
+# If you find any issues, need support, or have a suggestion for the bot, let us know in our Discord server.
+# Discord: https://discord.gg/plexdev
+# Documentation: https://docs.plexdevelopment.net
+# ===========================================================================
+
+# ===========================================================================
+# BOT INFORMATION
+# You must not leave them as blank!
+# ===========================================================================
+Token: "BOT_TOKEN" # If you don't know how to get it, Look at our docs: https://docs.plexdevelopment.net
+BotName: "Plex Staff"
+GuildID: "GUILD_ID" # This is your server's ID, Right click on your server icon and copy ID
+EmbedColors: "#7060be" # Hex color!
+LogCommands: false # If this is enabled it will log all the commands executed to the terminal
+Statistics: false # Show statistics in terminal when the bot starts?
+MongoURI: "CONNECTION_URL" # https://docs.plexdevelopment.net/plex-licenses/creating-a-mongodb-cluster
+DashboardLogs: true # Enable dashboard logs?
+
+# ===========================================================================
+# BOT ACTIVITY
+# ===========================================================================
+BotActivitySettings:
+  Enabled: true
+  ActivityType: "WATCHING" # WATCHING, PLAYING, COMPETING
+  Status: "ONLINE" # ONLINE, IDLE, DND, INVISIBLE
+  Interval: 30 # Time in seconds between status changes
+  Statuses: # Valid Variables: {total-users}, {total-channels}, {total-actions}, {total-messages}, {total-warns}, {total-timeouts}, {total-kicks}, {total-bans}
+    - "{total-users} users"
+    - "{total-actions} actions"
+    - "{total-messages} messages"
+
+# ===========================================================================
+# DISCORD OAUTH2
+# You must not leave them as blank!
+# ===========================================================================
+# Discord OAuth2 credentials, get these from the Discord Developer Portal: https://discord.com/developers/applications
+# Note: MAKE SURE TO REPLACE LOCALHOST:3000 WITH THE DOMAIN OR IP YOU ACCESS THE WEBSITE WITH!
+clientID: "CLIENT_ID"
+clientSecret: "CLIENT_SECRET"
+callbackURL: "http://localhost:3000/auth/discord/callback"  # Create a Redirect URL in the Developer Portal and set it to this callback URL
+
+secretKey: "" # This can be anything, We recommend using this https://www.dashlane.com/features/password-generator with at least 20 characters
+
+Secure: false # Enable if you are using HTTPS
+trustProxy: 0 # Set to 0 to disable, or use a number equal to how many reverse proxies your app sits behind (e.g., 1 for Nginx, 2 for Nginx + Cloudflare, etc.)
+SessionExpires: "7d" # How long should a session be valid
+
+# ===========================================================================
+# WEBSERVER
+# You must not leave them as blank!
+# ===========================================================================
+baseURL: "http://localhost:3000" # The exact URL you use to access the website, No trailing slashes
+Port: 3000 # The port you want the webserver to be ran on
+
+# ===========================================================================
+# STAFF ACCESS CONFIGURATION
+# ===========================================================================
+# NOTE: Staff roles and permissions are managed through the web dashboard.
+# Go to Settings > Staff Roles to create and manage staff permissions.
+
+# The Discord server owner automatically has full access to everything in Plex Staff.
+
+# Full Access Users: Add Discord user IDs below for people who need complete
+# admin access (same as server owner). 
+# Only use this if you're setting up Plex Staff in a server where you aren't the owner.
+FullAccessUsers: ["USER_ID", "USER_ID"]
+
+# ===========================================================================
+# DASHBOARD
+# ===========================================================================
+Dashboard:
+  Timezone: "America/New_York" # The timezone all timestamps will be displayed in, Use a timezone from this list: https://docs.plexdevelopment.net/frequently-asked-questions/valid-timezones
+
+GeneralSettings:
+  SaveRecentMessages: true # Should recent messages of all users be saved?
+  RecentMessagesLimit: 20 # The amount of recent messages to save for all users before old messages get overwritten
+
+# ===========================================================================
+# VERIFICATION SYSTEM
+# ===========================================================================
+
+# Verification Types:
+# BUTTON - When a user clicks the button, they get the specified role
+# CAPTCHA - When a user clicks the button, It will open a URL (your dashboard) and will ask them to complete a captcha to get the specified role
+VerificationSettings:
+  Enabled: false # Enable users to verify when they join your discord server?
+  ChannelID: "CHANNEL_ID" # The channel users should verify in (Embed will be automatically sent)
+  VerificationType: "CAPTCHA" # BUTTON, When a user clicks the button, they get the specified role, CAPTCHA - When a user clicks the button, It will open a URL (your dashboard) and will ask them to complete a captcha to get the specified role
+  VerifiedRoleID: ["ROLE_ID"] # The roles users get when they successfully verify, You can add multiple
+  hCaptchaSiteKey: "SITE_KEY" # This is required for the CAPTCHA type to work, You can get the API key here, https://www.hcaptcha.com/signup-interstitial
+  hCaptchaSecretKey: "SECRET_KEY" # Get secret key here (Account settings), https://dashboard.hcaptcha.com/settings
+
+VerificationMessages:
+  alreadyVerified: "You have already verified!"
+  successVerifyTitle: "Successfully verified"
+  successVerify: "You have successfully verified! You now have full access to the server." 
+  embedMsg: "Click **[here]({link})** to complete the CAPTCHA and get verified." # Use {link} for the url
+
+VerificationEmbed:  # This embed will be automatically sent to the verification channel you specified.
+  Embed:
+    Title: "Verification System"
+    Description: "> Please verify to get full access to the server.\n> Click the **button** below to get verified!"
+    Color: "#7060be"  # Hex color code, leave blank to use bot default
+    PanelImage: "https://i.imgur.com/aLHw381.png" # Recommended Size: 450x103, you can also use the default one, Leave blank for none
+    CustomThumbnailURL: ""  # Use a custom image URL, leave blank to disable
+    Timestamp: false
+    Footer:
+      Enabled: true
+      CustomIconURL: ""  # Use a custom image URL, ONLY WORKS IF TEXT IS NOT BLANK!, Leave blank to disable
+      text: ""
+
+# Valid colors:
+# Primary = blurple
+# Secondary = gray
+# Success = green
+# Danger = red
+VerificationButton:
+  Name: "Verify"
+  Emoji: "✅"
+  Color: "Secondary"
+
+# ===========================================================================
+# MODERATION COMMANDS
+# ===========================================================================
+Note: # /note
+  Enabled: true # Enable the command?
+  LogsChannelID: "CHANNEL_ID" # The channel all note logs should be sent to, leave blank for none
+
+Warn: # /warn
+  Enabled: true # Enable the command?
+  RequireReason: true # Should the staff be required to enter a reason?
+  Appealable: true # Should users be able to appeal warns?
+  LogsChannelID: "CHANNEL_ID" # The channel all warn logs should be sent to, leave blank for none
+  DMUser:
+    Enabled: true
+    Embed:
+      Author: "Warning • Moderation Action"  # Leave blank to disable
+      AuthorIcon: "https://i.imgur.com/SoEFOgk.png"
+      Color: "#FFEB3B" # Hex color code
+      ThumbnailEnabled: true
+      CustomThumbnail: ""  # Leave blank to use user's profile picture, or use a custom image URL
+      Description: ""  # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}
+      Fields: # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}
+        - name: "`📋` **Action Information**"
+          value: "> **Server:** `{guildName}`\n> **Reason:** {reason}\n> **Case ID:** `{punishmentID}`"
+      Timestamp: true
+      Footer:
+        Enabled: true
+        IconEnabled: true
+        CustomIconURL: "" # Leave blank to use user's profile picture, or use a custom image URL, ONLY WORKS IF TEXT IS NOT BLANK!
+        text: "You can appeal this warning using the button below" # Valid variables: {guildName}, {username}, {reason}, {punishmentID}
+
+Timeout: # /timeout
+  Enabled: true # Enable the command?
+  RequireReason: true # Should the staff be required to enter a reason?
+  Appealable: true # Should users be able to appeal timeouts?
+  LogsChannelID: "CHANNEL_ID" # The channel all timeout logs should be sent to, leave blank for none
+  DMUser:
+    Enabled: true
+    Embed:
+      Author: "Timeout • Moderation Action" # Leave blank to disable
+      AuthorIcon: "https://i.imgur.com/iqTKj9P.png"
+      Color: "#FFB74D"  # Hex color code
+      ThumbnailEnabled: true
+      CustomThumbnail: ""  # Leave blank to use user's profile picture, or use a custom image URL
+      Description: "" # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}, {expires}, s{time}
+      Fields: # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}, {expires}, {time}
+        - name: "`📋` **Action Information**"
+          value: "> **Server:** `{guildName}`\n> **Reason:** {reason}\n> **Case ID:** `{punishmentID}`"
+        - name: "`⏱️` **Timeout Information**"
+          value: "> **Duration:** {time}\n> **Expires:** {expires}"
+      Timestamp: true
+      Footer:
+        Enabled: true
+        IconEnabled: true
+        CustomIconURL: "" # Leave blank to use user's profile picture, or use a custom image URL, ONLY WORKS IF TEXT IS NOT BLANK!
+        text: "You can appeal this timeout using the button below" # Valid variables: {guildName}, {username}, {reason}, {punishmentID}
+
+Kick: # /kick
+  Enabled: true # Enable the command?
+  RequireReason: true # Should the staff be required to enter a reason?
+  Appealable: true # Should users be able to appeal kicks?
+  LogsChannelID: "CHANNEL_ID" # The channel all kick logs should be sent to, leave blank for none
+  DMUser:
+    Enabled: true
+    Embed:
+      Author: "Kick • Moderation Action" # Leave blank to disable
+      AuthorIcon: "https://i.imgur.com/HVtH27Y.png"
+      Color: "#FF9800"  # Hex color code
+      ThumbnailEnabled: true
+      CustomThumbnail: ""  # Leave blank to use user's profile picture, or use a custom image URL
+      Description: "" # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}
+      Fields: # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}
+        - name: "`📋` **Action Information**"
+          value: "> **Server:** `{guildName}`\n> **Reason:** {reason}\n> **Case ID:** `{punishmentID}`"
+        - name: "`ℹ️` **Additional Information**"
+          value: "> You have been removed from the server but may rejoin at any time"
+      Timestamp: true
+      Footer:
+        Enabled: true
+        IconEnabled: true
+        CustomIconURL: ""  # Leave blank to use user's profile picture, or use a custom image URL, ONLY WORKS IF TEXT IS NOT BLANK!
+        text: "You can appeal this kick using the button below" # Valid variables: {guildName}, {username}, {reason}, {punishmentID}
+
+Ban: # /ban
+  Enabled: true # Enable the command?
+  RequireReason: true # Should the staff be required to enter a reason?
+  Appealable: true # Should users be able to appeal bans?
+  LogsChannelID: "CHANNEL_ID" # The channel all ban logs should be sent to, leave blank for none
+  DMUser:
+    Enabled: true
+    Embed:
+      Author: "Ban • Moderation Action" # Leave blank to disable
+      AuthorIcon: "https://i.imgur.com/jEKNGOe.png"
+      Color: "#FF5252"  # Hex color code
+      ThumbnailEnabled: true
+      CustomThumbnail: ""  # Leave blank to use user's profile picture, or use a custom image URL
+      Description: "" # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}
+      Fields: # Valid variables: {guildName}, {user}, {username}, {staff}, {reason}, {punishmentID}
+        - name: "`📋` **Action Information**"
+          value: "> **Server:** `{guildName}`\n> **Reason:** {reason}\n> **Case ID:** `{punishmentID}`"
+      # Special field for temporary bans, only shown for temporary bans
+      TemporaryBan:
+        Enabled: true # Enable special fields for temporary bans
+        Fields:
+          - name: "`⏱️` **Ban Duration**"
+            value: "> **Duration:** {duration}\n> **Expires:** {expiresAt} *({expiresDate})*" # {duration} is human-readable duration, {expiresAt} is Discord timestamp
+      Timestamp: true
+      Footer:
+        Enabled: true
+        IconEnabled: true
+        CustomIconURL: ""  # Leave blank to use user's profile picture, or use a custom image URL, ONLY WORKS IF TEXT IS NOT BLANK!
+        text: "You can appeal this ban using the button below" # Valid variables: {guildName}, {username}, {reason}, {punishmentID}
+
+Unban: # /unban
+  Enabled: true # Enable the command?
+  RequireReason: true # Should the staff be required to enter a reason?
+  LogsChannelID: "CHANNEL_ID" # The channel all ban logs should be sent to, leave blank for none
+
+Purge: # /purge
+  Enabled: true # Enable the command?
+  RequireReason: false # Should the staff be required to enter a reason?
+  LogsChannelID: "CHANNEL_ID" # The channel all purge logs should be sent to, leave blank for none
+
+Slowmode: # /slowmode
+  Enabled: true # Enable the command?
+  RequireReason: false # Should the staff be required to enter a reason?
+  LogsChannelID: "CHANNEL_ID" # The channel all slowmode logs should be sent to, leave blank for none
+
+ClearChannel: # /clearchannel
+  Enabled: true # Enable the command?
+  RequireReason: false # Should the staff be required to enter a reason?
+  LogsChannelID: "CHANNEL_ID" # The channel all clearchannel logs should be sent to, leave blank for none
+
+# ===========================================================================
+# HELP COMMAND
+# ===========================================================================
+HelpCommand:
+  EmbedColor: "" # Hex color, Leave blank to use the default one
+  FooterTimestamp: true # Enable timestamp when the message was sent in the footer?
+  GuildIcon: true # Display the server's icon as embed thumbnail?
+  Title: "{botName}'s Commands List" # Use {botName} for the bot's name, (This is the name you specified at the top of the config)
+  StaffCategory:
+    Name: "🛠️ | Staff —" # Category name for ticket commands
+    ShowCount: true # Display the command count for ticket category?
+  FooterMsg: "{guildName}" # You can use {guildName} and {userTag}
+  FooterIcon: "" # The image in the footer, leave blank for no icon
+
+# 027ADHZU5J6ZFONSC6NRO1

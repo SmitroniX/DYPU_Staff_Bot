@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Management | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Staff Management | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.member-count {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: normal;
+}
+
+        
+        .add-staff-form {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        .input, .select select {
+            background: rgba(24, 21, 31, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .input:focus, .select select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+            background: rgba(30, 27, 38, 0.8);
+        }
+
+        .input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .select {
+    width: 100%;
+    position: relative;
+}
+
+.select select {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    padding-right: 2.5rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    height: auto;
+    display: flex;
+    align-items: center;
+}
+
+.select::after {
+    content: '\f107';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-color);
+    pointer-events: none;
+    border-color: var(--accent-color) !important;
+}
+
+.select select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+}
+
+.select select option {
+    background: #1e1b26;
+    color: #ffffff;
+    padding: 1rem;
+}
+
+        
+        .staff-card {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+        }
+
+        .staff-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .staff-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            border: 2px solid var(--accent-color);
+            padding: 2px;
+        }
+
+        .staff-info {
+            flex: 1;
+        }
+
+        .staff-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .staff-role {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .staff-since {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        .staff-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(24, 21, 31, 0.4);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .staff-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+.staff-actions .select {
+    min-width: 150px;
+}
+
+        .button {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .button.is-primary {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: none;
+        }
+
+        .button.is-primary:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-1px);
+        }
+
+        .button.is-danger {
+            background: rgba(217, 83, 79, 0.15);
+            color: #d9534f;
+            border: none;
+        }
+
+        .button.is-danger:hover {
+            background: rgba(217, 83, 79, 0.25);
+            transform: translateY(-1px);
+        }
+
+        
+        .notification {
+            background: transparent;
+            border: 1px solid;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .notification.is-success {
+            border-color: #48c774;
+            color: #48c774;
+            background: rgba(72, 199, 116, 0.1);
+        }
+
+        .notification.is-danger {
+            border-color: #f14668;
+            color: #f14668;
+            background: rgba(241, 70, 104, 0.1);
+        }
+
+        
+        @media screen and (max-width: 768px) {
+            .staff-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .staff-avatar {
+                margin: 0 auto;
+            }
+
+            .staff-info {
+                text-align: center;
+            }
+
+            .staff-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .staff-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .staff-actions .select {
+        width: 100%;
+    }
+
+    .select select {
+        width: 100%;
+    }
+
+            .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'staff' }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="section-title">
+                    <i class="fas fa-user-shield"></i>
+                    Staff Management
+                    <span class="member-count">(<%= totalStaffMembers %>)</span>
+                </div>
+
+                
+                <% if (messages.success && messages.success.length > 0) { %>
+                    <div class="notification is-success">
+                        <button class="delete"></button>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages.error && messages.error.length > 0) { %>
+                    <div class="notification is-danger">
+                        <button class="delete"></button>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+
+                
+                <div class="add-staff-form">
+                    <form action="/staff/add" method="POST">
+                        <div class="field">
+                            <div class="control">
+                                <input class="input" type="text" id="userIdOrUsername" name="userIdOrUsername" 
+                                       placeholder="Discord user ID or username" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="roleId" name="roleId" required>
+                                        <% staffRoles.forEach(role => { %>
+                                            <option value="<%= role._id %>"><%= role.name %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="button is-primary is-fullwidth">
+                            <i class="fas fa-plus"></i>
+                            Add Staff Member
+                        </button>
+                    </form>
+                </div>
+
+                
+                <div class="staff-list">
+                    <% existingStaffMembers.forEach(member => { %>
+                        <div class="staff-card">
+                            <div class="staff-header">
+                                <img src="<%= member.avatarURL %>" class="staff-avatar" alt="<%= member.username %>">
+                                <div class="staff-info">
+                                    <div class="staff-name"><%= member.username %></div>
+                                    <div class="staff-role">
+                                        <% if (member.role) { %>
+                                            <%= member.role.name %>
+                                        <% } else { %>
+                                            <span style="color: #ff9966;">No Role Assigned</span>
+                                        <% } %>
+                                    </div>
+                                    <div class="staff-since">
+                                        Staff Member since <%= member.date.toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric' 
+                                        }) %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="staff-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">Warns</div>
+                                    <div class="stat-value"><%= member.stats.Warns %></div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Timeouts</div>
+                                    <div class="stat-value"><%= member.stats.Timeouts %></div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Kicks</div>
+                                    <div class="stat-value"><%= member.stats.Kicks %></div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Bans</div>
+                                    <div class="stat-value"><%= member.stats.Bans %></div>
+                                </div>
+                            </div>
+
+                            <form action="/staff/edit" method="POST" class="staff-actions">
+                                <input type="hidden" name="userIdToEdit" value="<%= member.userId %>">
+                                <div class="select">
+                                    <select name="newRoleId" required>
+                                        <% staffRoles.forEach(role => { %>
+                                            <option value="<%= role._id %>" 
+                                                <% if (member.role && role._id.toString() === member.role._id.toString()) { %> selected <% } %>>
+                                                <%= role.name %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                                <button type="submit" class="button is-primary">
+                                    <i class="fas fa-edit"></i>
+                                    <% if (!member.role) { %>Assign Role<% } else { %>Update Role<% } %>
+                                </button>
+                                <button type="submit" formaction="/staff/remove" formmethod="POST" 
+                                        class="button is-danger">
+                                    <i class="fas fa-user-minus"></i>
+                                    Remove Staff
+                                </button>
+                            </form>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                const $notification = $delete.parentNode;
+                $delete.addEventListener('click', () => {
+                    $notification.parentNode.removeChild($notification);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

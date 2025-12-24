@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPTCHA Verification | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="CAPTCHA Verification | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        
+        .verification-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-image {
+            width: 100px;
+            height: 100px;
+            padding: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .brand-name {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .title {
+            color: #ffffff;
+            font-size: 1.75rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        
+        .custom-notification {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+
+        .custom-notification.is-success {
+            background: rgba(72, 199, 142, 0.1);
+            border-color: rgba(72, 199, 142, 0.2);
+            color: #48c78e;
+        }
+
+        .custom-notification.is-danger {
+            background: rgba(241, 70, 104, 0.1);
+            border-color: rgba(241, 70, 104, 0.2);
+            color: #f14668;
+        }
+
+        
+        .verification-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .h-captcha {
+            margin: 0 auto;
+        }
+
+        .verify-button {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .verify-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-2px);
+        }
+
+        .verify-button i {
+            font-size: 1.1rem;
+        }
+
+        
+        .footer {
+            background: transparent;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        
+        @media screen and (max-width: 768px) {
+            .section {
+                padding: 1rem;
+            }
+
+            .verification-card {
+                padding: 1.5rem;
+            }
+
+            .logo-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .captcha-wrapper {
+    width: 100%;
+    max-width: 300px; 
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+.h-captcha {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    transform: scale(0.9);
+    transform-origin: center;
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 480px) {
+    .h-captcha {
+        transform: scale(0.8);
+        -webkit-transform: scale(0.8);
+        transform-origin: center;
+        -webkit-transform-origin: center;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .h-captcha {
+        transform: scale(0.7);
+        -webkit-transform: scale(0.7);
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    <section class="section">
+        <div class="verification-card">
+            <div class="logo-container">
+                <img src="/logo.png" alt="Logo" class="logo-image">
+            </div>
+            
+            <h1 class="title">CAPTCHA Verification</h1>
+            
+            <% if (messages.success && messages.success.length > 0) { %>
+                <div class="custom-notification is-success">
+                    <i class="fas fa-check-circle"></i>
+                    <%= messages.success[0] %>
+                </div>
+            <% } %>
+            
+            <% if (messages.error && messages.error.length > 0) { %>
+                <div class="custom-notification is-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= messages.error[0] %>
+                </div>
+            <% } %>
+
+            <% if (showForm) { %>
+                <p class="subtitle">Complete the CAPTCHA verification below to gain full access to the server.</p>
+            
+                <form class="verification-form" action="/verify" method="post">
+                    <input type="hidden" name="token" value="<%= user.verificationToken %>">
+                    <div class="captcha-wrapper">
+                        <div class="h-captcha" data-sitekey="<%= config.VerificationSettings.hCaptchaSiteKey %>"></div>
+                    </div>
+                    <button type="submit" class="verify-button">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify Account
+                    </button>
+                </form>
+            <% } %>
+        </div>
+    </section>
+</body>
+</html>

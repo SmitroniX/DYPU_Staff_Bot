@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Report System Settings | <%= settings.name %></title>
+        
+        <meta property="og:title" content="Report System Settings | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+:root {
+    --accent-color: <%= settings.accentColor %>;
+    --accent-color-rgb: <%= accentColorRgb %>;
+}
+
+body {
+    background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    color: var(--accent-color) !important;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.section {
+    flex: 1;
+    padding: 1rem;
+    margin: 0;
+}
+
+strong {
+    color: var(--accent-color);
+}
+
+.glass-card {
+    background: #1a1a2e;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.section-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: var(--accent-color);
+}
+
+.form-input, .form-select, .form-textarea {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input, .form-select {
+    height: 42px !important;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.form-input::placeholder, .form-select::placeholder, .form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.select {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.select select {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.3rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    height: 42px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+
+.select select:hover {
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    background: rgba(30, 27, 38, 0.8);
+}
+
+.select select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.select select option {
+    background-color: #1a1a2e;
+    color: #ffffff;
+    padding: 10px;
+}
+
+select:focus-visible {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+@-moz-document url-prefix() {
+    .select select {
+        text-indent: 0.01px;
+        text-overflow: '';
+        padding-right: 1rem;
+    }
+}
+
+.select select::-webkit-scrollbar {
+    width: 8px;
+}
+
+.select select::-webkit-scrollbar-track {
+    background: rgba(30, 31, 38, 0.3);
+}
+
+.select select::-webkit-scrollbar-thumb {
+    background-color: rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 4px;
+}
+
+.select select::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(var(--accent-color-rgb), 0.5);
+}
+
+.settings-card {
+    background: rgba(24, 21, 31, 0.3);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.settings-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-header i {
+    color: var(--accent-color);
+}
+
+.alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert.is-success {
+    background: rgba(72, 199, 116, 0.1);
+    border: 1px solid rgba(72, 199, 116, 0.2);
+    color: #48c774;
+}
+
+.alert.is-danger {
+    background: rgba(241, 70, 104, 0.1);
+    border: 1px solid rgba(241, 70, 104, 0.2);
+    color: #f14668;
+}
+
+.alert i {
+    font-size: 1.1rem;
+}
+
+.save-button {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.save-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.save-button i {
+    font-size: 1.1rem;
+}
+
+.action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(120%);
+}
+
+.action-button.back {
+    background: rgba(var(--accent-color-rgb), 0.15); 
+    color: var(--accent-color); 
+    font-weight: 500; 
+    padding: 0.6rem 1.2rem; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+
+.switch-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.info-notice {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.info-notice strong {
+    color: var(--accent-color) !important;
+}
+
+.info-notice i {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin-top: 0.5rem;
+}
+
+strong {
+    color: var(--accent-color);
+}
+
+.help.has-text-grey-light {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.transition-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-top: 0.75rem;
+}
+
+.duration-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading {
+    animation: spin 1s linear infinite;
+}
+
+@media screen and (max-width: 768px) {
+    .duration-inputs {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .duration-inputs .column {
+        width: 100%;
+        padding: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar', { user: user, currentPage: 'settings', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-flag"></i>
+                        Report System Settings
+                    </div>
+                    <a href="/settings" class="action-button back">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Settings
+                    </a>
+                </div>
+                
+                <div class="info-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="info-content">
+                        <strong>About the Report System</strong>
+                        <p>
+                            The report system allows users to report other members for rule violations directly within Discord or through the dashboard.
+                            Reports are logged and can be reviewed by staff members. The system can also be configured to take automatic actions against
+                            users who receive multiple reports within a specified time frame, helping to maintain your community's safety and standards.
+                        </p>
+                    </div>
+                </div>
+                
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    <div class="alert is-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages && messages.error && messages.error.length > 0) { %>
+                    <div class="alert is-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+                
+                <form id="reportSettingsForm" action="/settings/report-system" method="POST">
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-cog"></i>
+                            General Settings
+                        </div>
+                        
+                        <div class="columns is-multiline">
+                            <div class="column is-6">
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="reportEnabled" <% if (reportSettings.reportEnabled) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Enable Report System</span>
+                                </div>
+                                <p class="help has-text-grey-light mb-4">Toggle the entire report system on or off.</p>
+                                
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="requireReportReason" <% if (reportSettings.requireReportReason) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Require Reason for Reports</span>
+                                </div>
+                                <p class="help has-text-grey-light">When enabled, users must provide a reason when submitting a report.</p>
+                            </div>
+                            
+
+                            
+                            <div class="column is-6">
+                                <div class="field mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-hashtag"></i>
+                                        Reports Channel ID
+                                    </label>
+                                    <input type="text" name="reportChannelId" class="form-input" value="<%= reportSettings.reportChannelId || '' %>" placeholder="Enter channel ID">
+                                    <p class="help has-text-grey-light">The Discord channel where report notifications will be sent.</p>
+                                </div>
+                                
+                                <div class="field">
+                                    <label class="form-label">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        Report Cooldown (Minutes)
+                                    </label>
+                                    <input type="number" name="reportCooldown" class="form-input" value="<%= reportSettings.reportCooldown || 5 %>" min="0" step="1">
+                                    <p class="help has-text-grey-light">Minutes users must wait before submitting another report.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-history"></i>
+                            Transcript Settings
+                        </div>
+                        
+                        <div class="columns is-multiline">
+                            <div class="column is-6">
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="saveTranscript" id="saveTranscriptToggle" <% if (reportSettings.saveTranscript) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Save Channel Transcript</span>
+                                </div>
+                                <p class="help has-text-grey-light">When enabled, a transcript of the channel where the report was made will be saved for context and evidence.</p>
+                            </div>
+                            
+                            <div class="column is-6">
+                                <div id="transcriptOptionsContainer" class="transition-container" style="<% if (reportSettings.saveTranscript) { %>max-height: 500px;<% } %>">
+                                    <div class="field">
+                                        <label class="form-label">Transcript Type</label>
+                                        <div class="select">
+                                            <select name="transcriptType" id="transcriptType">
+                                                <option value="reportedUserOnly" <% if (reportSettings.transcriptType === 'reportedUserOnly') { %>selected<% } %>>Reported User's Messages Only</option>
+                                                <option value="allMessages" <% if (reportSettings.transcriptType === 'allMessages') { %>selected<% } %>>All Messages in Channel</option>
+                                            </select>
+                                        </div>
+                                        <p class="help has-text-grey-light">Choose whether to save only the reported user's messages or all messages in the channel.</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-robot"></i>
+                            Automatic Actions
+                        </div>
+                        
+                        <div class="columns is-multiline">
+                            <div class="column is-6">
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="enableAutoActions" id="enableAutoActionsToggle" <% if (reportSettings.enableAutoActions) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Enable Automatic Actions</span>
+                                </div>
+                                <p class="help has-text-grey-light">When enabled, automatic actions will be taken against users who receive multiple reports within a specified time period.</p>
+                            </div>
+                            
+                            <div class="column is-full">
+                                <div id="autoActionsContainer" class="transition-container" style="<% if (reportSettings.enableAutoActions) { %>max-height: 600px;<% } %>">
+                                    <div class="columns is-multiline">
+                                        <div class="column is-6">
+                                            <div class="field">
+                                                <label class="form-label">Report Threshold</label>
+                                                <input type="number" name="reportThreshold" class="form-input" value="<%= reportSettings.reportThreshold || 5 %>" min="1">
+                                                <p class="help has-text-grey-light">Number of reports required to trigger automatic action.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="column is-6">
+                                            <div class="field">
+                                                <label class="form-label">Time Window (Hours)</label>
+                                                <input type="number" name="reportTimeWindow" class="form-input" value="<%= reportSettings.reportTimeWindow || 24 %>" min="1">
+                                                <p class="help has-text-grey-light">Time period (in hours) during which reports are counted.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="column is-12">
+                                            <div class="field">
+                                                <label class="form-label">Minimum Unique Reporters</label>
+                                                <input type="number" name="minUniqueReporters" class="form-input" value="<%= reportSettings.minUniqueReporters || 3 %>" min="1">
+                                                <p class="help has-text-grey-light">Minimum number of different users who must report the member (prevents abuse).</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="column is-12">
+                                            <div class="field">
+                                                <label class="form-label">Action Type</label>
+                                                <div class="select">
+                                                    <select name="autoActionType" id="autoActionType">
+                                                        <option value="warn" <% if (reportSettings.autoActionType === 'warn') { %>selected<% } %>>Warn User</option>
+                                                        <option value="timeout" <% if (reportSettings.autoActionType === 'timeout') { %>selected<% } %>>Timeout User</option>
+                                                        <option value="kick" <% if (reportSettings.autoActionType === 'kick') { %>selected<% } %>>Kick User</option>
+                                                        <option value="ban" <% if (reportSettings.autoActionType === 'ban') { %>selected<% } %>>Ban User</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="column is-12" id="timeoutDurationContainer" style="<% if (reportSettings.autoActionType === 'timeout') { %>display: block;<% } else { %>display: none;<% } %>">
+                                            <div class="field">
+                                                <label class="form-label">Timeout Duration</label>
+                                                <div class="duration-inputs">
+                                                    <div class="column is-8" style="padding-left: 0;">
+                                                        <input type="number" name="timeoutDuration" class="form-input" value="<%= reportSettings.timeoutDuration || 24 %>" min="1">
+                                                    </div>
+                                                    <div class="column is-4" style="padding-right: 0;">
+                                                        <div class="select is-fullwidth">
+                                                            <select name="timeoutDurationUnit">
+                                                                <option value="h" <% if (reportSettings.timeoutDurationUnit === 'h') { %>selected<% } %>>Hours</option>
+                                                                <option value="d" <% if (reportSettings.timeoutDurationUnit === 'd') { %>selected<% } %>>Days</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="column is-12" id="banDurationContainer" style="<% if (reportSettings.autoActionType === 'ban') { %>display: block;<% } else { %>display: none;<% } %>">
+                                            <div class="switch-container">
+                                                <label class="switch">
+                                                    <input type="checkbox" name="permanentBan" id="permanentBanToggle" <% if (reportSettings.permanentBan) { %>checked<% } %>>
+                                                    <span class="switch-slider"></span>
+                                                </label>
+                                                <span class="switch-label">Permanent Ban</span>
+                                            </div>
+                                            
+                                            <div id="tempBanContainer" style="<% if (reportSettings.autoActionType === 'ban' && !reportSettings.permanentBan) { %>display: block;<% } else { %>display: none;<% } %>">
+                                                <div class="field">
+                                                    <label class="form-label">Ban Duration</label>
+                                                    <div class="duration-inputs">
+                                                        <div class="column is-8" style="padding-left: 0;">
+                                                            <input type="number" name="banDuration" class="form-input" value="<%= reportSettings.banDuration || 7 %>" min="1">
+                                                        </div>
+                                                        <div class="column is-4" style="padding-right: 0;">
+                                                            <div class="select is-fullwidth">
+                                                                <select name="banDurationUnit">
+                                                                    <option value="d" <% if (reportSettings.banDurationUnit === 'd') { %>selected<% } %>>Days</option>
+                                                                    <option value="w" <% if (reportSettings.banDurationUnit === 'w') { %>selected<% } %>>Weeks</option>
+                                                                    <option value="m" <% if (reportSettings.banDurationUnit === 'm') { %>selected<% } %>>Months</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="column is-12">
+                                            <div class="field">
+                                                <label class="form-label">Automatic Action Reason</label>
+                                                <input type="text" name="autoActionReason" class="form-input" value="<%= reportSettings.autoActionReason || 'Automatic action due to multiple user reports' %>" placeholder="Reason for automatic action">
+                                                <p class="help has-text-grey-light">Reason that will be displayed when automatic action is taken.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="has-text-centered mt-5">
+                        <button type="submit" class="save-button">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const saveTranscriptToggle = document.getElementById('saveTranscriptToggle');
+    const transcriptOptionsContainer = document.getElementById('transcriptOptionsContainer');
+    
+    saveTranscriptToggle.addEventListener('change', function() {
+        if (this.checked) {
+            transcriptOptionsContainer.style.maxHeight = '500px';
+        } else {
+            transcriptOptionsContainer.style.maxHeight = '0';
+        }
+    });
+    
+    const enableAutoActionsToggle = document.getElementById('enableAutoActionsToggle');
+    const autoActionsContainer = document.getElementById('autoActionsContainer');
+    
+    enableAutoActionsToggle.addEventListener('change', function() {
+        if (this.checked) {
+            autoActionsContainer.style.maxHeight = '600px';
+        } else {
+            autoActionsContainer.style.maxHeight = '0';
+        }
+    });
+    
+    const autoActionType = document.getElementById('autoActionType');
+    const timeoutDurationContainer = document.getElementById('timeoutDurationContainer');
+    const banDurationContainer = document.getElementById('banDurationContainer');
+    const permanentBanToggle = document.getElementById('permanentBanToggle');
+    const tempBanContainer = document.getElementById('tempBanContainer');
+    
+    function updateDurationContainers() {
+        timeoutDurationContainer.style.display = 'none';
+        banDurationContainer.style.display = 'none';
+        
+        switch (autoActionType.value) {
+            case 'timeout':
+                timeoutDurationContainer.style.display = 'block';
+                break;
+            case 'ban':
+                banDurationContainer.style.display = 'block';
+                updateTempBanVisibility();
+                break;
+        }
+    }
+    
+    function updateTempBanVisibility() {
+        if (autoActionType.value === 'ban') {
+            if (permanentBanToggle.checked) {
+                tempBanContainer.style.display = 'none';
+            } else {
+                tempBanContainer.style.display = 'block';
+            }
+        }
+    }
+    
+    updateDurationContainers();
+    
+    autoActionType.addEventListener('change', updateDurationContainers);
+    
+    permanentBanToggle.addEventListener('change', updateTempBanVisibility);
+    
+    const reportSettingsForm = document.getElementById('reportSettingsForm');
+    
+    reportSettingsForm.addEventListener('submit', function(e) {
+        const reportEnabled = document.querySelector('input[name="reportEnabled"]').checked;
+        const reportChannelId = document.querySelector('input[name="reportChannelId"]').value.trim();
+        
+        if (reportEnabled && !reportChannelId) {
+            if (!confirm('You have enabled the report system but have not specified a logs channel ID. Reports will still be saved in the database but will not be sent to a Discord channel. Continue?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        const enableAutoActions = document.querySelector('input[name="enableAutoActions"]').checked;
+        if (enableAutoActions) {
+            const reportThreshold = parseInt(document.querySelector('input[name="reportThreshold"]').value);
+            const minUniqueReporters = parseInt(document.querySelector('input[name="minUniqueReporters"]').value);
+            
+            if (minUniqueReporters > reportThreshold) {
+                alert('The minimum unique reporters cannot be greater than the report threshold. Please adjust these values.');
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        const saveButton = document.querySelector('.save-button');
+        const originalContent = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="fas fa-spinner loading"></i> Saving...';
+        saveButton.disabled = true;
+        
+        setTimeout(() => {
+            saveButton.innerHTML = originalContent;
+            saveButton.disabled = false;
+        }, 5000);
+    });
+});
+</script>

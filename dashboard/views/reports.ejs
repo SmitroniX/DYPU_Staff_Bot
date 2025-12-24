@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | <%= settings.name %></title>
+    
+    <meta property="og:title" content="Reports | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+    
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        .report-count {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: normal;
+        }
+
+        .section-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+        
+        .reports-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .report-card {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-color: rgba(var(--accent-color-rgb), 0.4);
+        }
+        
+        
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--accent-color), rgba(var(--accent-color-rgb), 0.5));
+        }
+        
+        .report-header {
+    background: rgba(20, 18, 26, 0.8);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+        
+.report-id {
+    font-size: 0.8rem;
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+}
+        
+        .report-id-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+        .report-timestamp {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .report-timestamp i {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+        
+        .report-users {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+        
+        .reporter-info, .reported-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .reporter-info {
+            flex: 1;
+        }
+        
+        .reported-info {
+            flex: 1;
+        }
+        
+        .report-arrow {
+            margin: 0 1rem;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+        
+        .avatar-container {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid rgba(var(--accent-color-rgb), 0.6);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover .user-avatar {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .avatar-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--accent-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .avatar-badge i {
+            color: #fff;
+            font-size: 0.6rem;
+        }
+        
+        .username {
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .user-tag {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .reported-info .user-tag {
+            background: rgba(255, 87, 87, 0.1);
+            color: rgba(255, 87, 87, 0.8);
+        }
+        
+        .report-details {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .report-reason {
+            background: rgba(20, 18, 26, 0.5);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+        
+        .report-reason-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .report-reason-label i {
+            color: var(--accent-color);
+        }
+        
+        .report-reason-text {
+            color: #fff;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-break: break-word;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        
+        .report-reason-text::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .report-reason-text::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+        
+        .report-reason-text::-webkit-scrollbar-thumb {
+            background: rgba(var(--accent-color-rgb), 0.5);
+            border-radius: 2px;
+        }
+        
+        .report-metadata {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+        }
+        
+        .metadata-item i {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .report-actions {
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            padding: 1rem;
+        }
+        
+        .review-button {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .review-button:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: rgba(30, 27, 38, 0.3);
+            border-radius: 12px;
+            border: 1px dashed rgba(var(--accent-color-rgb), 0.2);
+            grid-column: 1 / -1;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: rgba(var(--accent-color-rgb), 0.3);
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-state-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-text {
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 400px;
+        }
+        
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .filter-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .filter-select {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            color: white;
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.9rem;
+            min-width: 130px;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.2);
+        }
+        
+        .pagination {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination-link.is-current {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .pagination-link, 
+        .pagination-previous, 
+        .pagination-next {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-link:hover, 
+        .pagination-previous:hover, 
+        .pagination-next:hover {
+            background-color: rgba(var(--accent-color-rgb), 0.2);
+            border-color: var(--accent-color);
+            color: white;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .reports-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .report-metadata {
+                flex-wrap: wrap;
+            }
+        }
+
+        .view-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    margin-right: 0.5rem;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.report-status-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.report-status-badge i {
+    margin-right: 0.25rem;
+    font-size: 0.7rem;
+}
+
+.report-status-approved {
+    background-color: rgba(72, 199, 116, 0.2);
+    color: #48C774;
+    border: 1px solid rgba(72, 199, 116, 0.3);
+}
+
+.report-status-denied {
+    background-color: rgba(255, 56, 96, 0.2);
+    color: #FF3860;
+    border: 1px solid rgba(255, 56, 96, 0.3);
+}
+
+.report-status-pending {
+    background-color: rgba(255, 221, 87, 0.2);
+    color: #FFD700;
+    border: 1px solid rgba(255, 221, 87, 0.3);
+}
+
+    </style>
+</head>
+
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'reports', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-flag"></i>
+                        <%= viewAll ? 'All' : 'Pending' %> Reports 
+                        <span class="report-count">
+                            (<%= totalReports %>/<%= allCount %>)
+                        </span>
+                    </div>
+                    
+                    <div class="view-controls">
+                        <div class="toggle-container">
+                            <label class="toggle">
+                                <input type="checkbox" id="viewToggle" <%= viewAll ? 'checked' : '' %>>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">View All Reports</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="section-description">
+                    <%= viewAll ? 'Viewing all reports including resolved ones.' : 'Viewing only pending reports that require staff review.' %>
+                    <%= !viewAll && pendingCount === 0 ? 'There are no pending reports at this time.' : '' %>
+                </p>
+                
+                
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <span class="filter-label">Sort by:</span>
+                        <select class="filter-select" id="sort-filter">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </div>
+                
+                </div>
+                
+                <div class="reports-container">
+                    <% if (reports && reports.length > 0) { %>
+                        <% reports.forEach(report => { %>
+                            <div class="report-card" data-report-id="<%= report.reportId %>">
+                                <div class="report-header">
+                                    <div class="report-id-container">
+                                        <div class="report-id">#<%= report.reportId.slice(-8) %></div>
+                                        
+                                        <% if (report.status) { %>
+                                            <div class="report-status-badge report-status-<%= report.status.toLowerCase() %>">
+                                                <i class="fas <%= report.status === 'Approved' ? 'fa-check-circle' : report.status === 'Denied' ? 'fa-times-circle' : 'fa-clock' %>"></i>
+                                                <%= report.status %>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="report-status-badge report-status-pending">
+                                                <i class="fas fa-clock"></i>
+                                                Pending
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="report-timestamp">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <%= getRelativeTime(report.timestamp) %>
+                                    </div>
+                                </div>
+                                
+                                <div class="report-users">
+                                    <div class="reporter-info">
+                                        <div class="avatar-container">
+                                            <img src="<%= report.reporterAvatarURL %>" alt="<%= report.reporterUsername %>" class="user-avatar">
+                                            <div class="avatar-badge">
+                                                <i class="fas fa-flag"></i>
+                                            </div>
+                                        </div>
+                                        <div class="username"><%= report.reporterUsername %></div>
+                                        <div class="user-tag">Reporter</div>
+                                    </div>
+                                    
+                                    <div class="report-arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+                                    
+                                    <div class="reported-info">
+                                        <div class="avatar-container">
+                                            <img src="<%= report.reportedAvatarURL %>" alt="<%= report.reportedUsername %>" class="user-avatar">
+                                            <div class="avatar-badge">
+                                                <i class="fas fa-exclamation"></i>
+                                            </div>
+                                        </div>
+                                        <div class="username"><%= report.reportedUsername %></div>
+                                        <div class="user-tag">Reported</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="report-details">
+                                    <div class="report-metadata">
+                                        <% if (report.channelName) { %>
+                                            <div class="metadata-item">
+                                                <i class="fas fa-hashtag"></i>
+                                                <%= report.channelName %>
+                                            </div>
+                                        <% } %>
+                                        
+                                        <div class="metadata-item">
+                                            <i class="fas fa-file-alt"></i>
+                                            <%= report.transcriptPath ? 'Transcript Available' : 'No Transcript' %>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="report-reason">
+                                        <div class="report-reason-label">
+                                            <i class="fas fa-comment-dots"></i>
+                                            Reason for Report
+                                        </div>
+                                        <div class="report-reason-text">
+                                            <%= report.reason %>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="report-actions">
+                                    <a href="/view-report/<%= report.reportId %>" class="review-button">
+                                        <i class="fas fa-gavel"></i>
+                                        Review Report
+                                    </a>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="empty-state-title">No Active Reports</div>
+                            <div class="empty-state-text">There are currently no pending reports that require staff attention. All reports have been handled.</div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <% if (totalPages > 1) { %>
+                    <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                        <% if (currentPage > 1) { %>
+                            <a href="/reports?page=<%= currentPage - 1 %>&sort=<%= sortOrder %>&viewAll=<%= viewAll ? 'true' : 'false' %>"
+                                class="pagination-previous">Previous</a>
+                        <% } else { %>
+                            <a class="pagination-previous" disabled>Previous</a>
+                        <% } %>
+                    
+                        <% if (currentPage < totalPages) { %>
+                            <a href="/reports?page=<%= currentPage + 1 %>&sort=<%= sortOrder %>&viewAll=<%= viewAll ? 'true' : 'false' %>"
+                                class="pagination-next">Next</a>
+                        <% } else { %>
+                            <a class="pagination-next" disabled>Next</a>
+                        <% } %>
+                    
+                        <ul class="pagination-list">
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li>
+                                    <a href="/reports?page=<%= i %>&sort=<%= sortOrder %>&viewAll=<%= viewAll ? 'true' : 'false' %>"
+                                        class="pagination-link <%= currentPage === i ? 'is-current' : '' %>"
+                                        aria-label="Page <%= i %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reportCards = document.querySelectorAll('.report-card');
+            
+            reportCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px) scale(0.98)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1)';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0) scale(1)';
+        }, 100 + (index * 80));
+    });
+        
+    const viewToggle = document.getElementById('viewToggle');
+        if (viewToggle) {
+            viewToggle.addEventListener('change', function() {
+                const isChecked = this.checked;
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('viewAll', isChecked ? 'true' : 'false');
+                urlParams.set('page', '1');
+                window.location.href = '/reports?' + urlParams.toString();
+            });
+        }        
+
+        function applyFilters() {
+            const sortValue = document.getElementById('sort-filter').value;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            urlParams.set('sort', sortValue);
+            urlParams.set('page', '1');
+            
+            if (!urlParams.has('viewAll')) {
+                urlParams.set('viewAll', '<%= viewAll ? "true" : "false" %>');
+            }
+            
+            window.location.href = '/reports?' + urlParams.toString();
+        }
+        
+        const sortFilter = document.getElementById('sort-filter');
+        if (sortFilter) {
+            sortFilter.value = '<%= sortOrder %>';
+            sortFilter.addEventListener('change', applyFilters);
+        }
+    });
+    </script>
+</body>
+</html>

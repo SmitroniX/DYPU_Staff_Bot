@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Roles | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Staff Roles | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        .section-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        
+        .role-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            transform: translateX(5px);
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .role-card.priority-1 {
+            border-left: 4px solid #ff9a00; 
+        }
+
+        .role-card.priority-2 {
+            border-left: 4px solid #2196f3; 
+        }
+
+        .role-card.priority-3 {
+            border-left: 4px solid #4caf50; 
+        }
+
+        .role-card.priority-4, .role-card.priority-5 {
+            border-left: 4px solid #9c27b0; 
+        }
+
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .role-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .role-priority {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 0.75rem;
+        }
+
+        .role-priority .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        
+        .role-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-button.edit {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+        }
+
+        .action-button.delete2 {
+            background: rgba(217, 83, 79, 0.1);
+            color: #d9534f;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(120%);
+        }
+
+        
+        .accordion {
+            margin-top: 1rem;
+        }
+
+        .accordion-header {
+            background: rgba(30, 27, 38, 0.4);
+            border-radius: 8px;
+            padding: 0;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .accordion-button {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.1);
+        }
+
+        .accordion-button:focus {
+            outline: none;
+        }
+
+        .accordion-button .icon {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-button[aria-expanded="true"] .icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            background: rgba(24, 21, 31, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: none;
+        }
+
+        .accordion-content.is-active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .permission-item {
+    background: rgba(30, 27, 38, 0.6);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    word-break: break-word; 
+    hyphens: auto; 
+}
+
+        .permission-item:hover {
+            background: rgba(var(--accent-color-rgb), 0.1);
+        }
+
+        .permission-item i {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    flex-shrink: 0; 
+}
+
+.permission-item span {
+    flex: 1; 
+}
+
+        
+        .limits-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .limit-item {
+            background: rgba(30, 27, 38, 0.6);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .limit-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .limit-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge.is-success {
+            background: rgba(72, 199, 116, 0.15);
+            color: #48c774;
+        }
+
+        .badge.is-danger {
+            background: rgba(241, 70, 104, 0.15);
+            color: #f14668;
+        }
+
+        
+        .create-role-button {
+            background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.15) 0%, rgba(var(--accent-color-rgb), 0.05) 100%);
+            border: 1px dashed rgba(var(--accent-color-rgb), 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .create-role-button:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.1) 100%);
+            border-color: var(--accent-color);
+        }
+
+        .create-role-button i {
+            font-size: 2rem;
+            color: var(--accent-color);
+            background: rgba(var(--accent-color-rgb), 0.1);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .create-role-button span {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        
+        .modal-background {
+            background: rgba(19, 17, 26, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-card {
+            background: rgba(30, 27, 38, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 16px;
+            max-width: 700px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-card-head {
+            background: rgba(35, 32, 44, 0.6);
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px 16px 0 0;
+            padding: 1.25rem;
+        }
+
+        .modal-card-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-card-title i {
+            color: var(--accent-color);
+        }
+
+        .modal-card-body {
+            background: none;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-height: 70vh;
+        }
+
+        .modal-card-foot {
+            background: rgba(35, 32, 44, 0.6);
+            border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 0 0 16px 16px;
+            padding: 1.25rem;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .modal-delete {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .modal-delete:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-delete::before,
+        .modal-delete::after {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-input, .form-select {
+            background: rgba(24, 21, 31, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+            background: rgba(30, 27, 38, 0.8);
+            outline: none;
+        }
+
+        .form-input::placeholder, .form-select::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+
+        .form-select option {
+            background: #1e1b26;
+            color: #ffffff;
+            padding: 12px;
+        }
+
+        
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .switch-slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .switch-slider:before {
+            transform: translateX(22px);
+        }
+
+        .switch-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        
+        .permission-category {
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: rgba(30, 27, 38, 0.6);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .category-header:hover {
+            background: rgba(var(--accent-color-rgb), 0.1);
+        }
+
+        .category-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .category-header.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .category-content {
+            background: rgba(24, 21, 31, 0.3);
+            padding: 1rem;
+        }
+
+        .permission-checkbox-container {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .permission-checkbox-container:hover {
+            background: rgba(var(--accent-color-rgb), 0.05);
+        }
+
+        .permission-checkbox-container input[type="checkbox"] {
+            margin-right: 0.75rem;
+        }
+
+        .visually-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    z-index: -1;
+}
+
+.checkbox-custom {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+}
+
+        input[type="checkbox"]:checked + .checkbox-custom {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+        .permission-checkbox-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        
+        .modal-button {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-button.primary {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+        }
+
+        .modal-button.primary:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-1px);
+        }
+
+        .modal-button.danger {
+            background: rgba(217, 83, 79, 0.15);
+            color: #d9534f;
+        }
+
+        .modal-button.danger:hover {
+            background: rgba(217, 83, 79, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .modal-button.cancel {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .modal-button.cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .action-limits-card {
+            background: rgba(24, 21, 31, 0.3);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-limits-header {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+
+        .alert {
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert.is-success {
+            background: rgba(72, 199, 116, 0.1);
+            border: 1px solid rgba(72, 199, 116, 0.2);
+            color: #48c774;
+        }
+
+        .alert.is-danger {
+            background: rgba(241, 70, 104, 0.1);
+            border: 1px solid rgba(241, 70, 104, 0.2);
+            color: #f14668;
+        }
+
+        .alert i {
+            font-size: 1.1rem;
+        }
+
+        .info-banner {
+    background: rgba(var(--accent-color-rgb), 0.08);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+}
+
+.info-banner-icon {
+    color: var(--accent-color);
+    font-size: 2rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+.info-banner-content {
+    flex: 1;
+}
+
+.info-banner-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.info-banner-content p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+.info-banner-content p:last-child {
+    margin-bottom: 0;
+}
+
+.info-banner-content ul {
+    list-style: none;
+    padding-left: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.info-banner-content li {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.info-banner-content li i {
+    color: var(--accent-color);
+    font-size: 0.85rem;
+}
+
+.info-banner-content strong {
+    color: var(--accent-color);
+}
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media screen and (max-width: 768px) {
+            .role-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .role-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .limits-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-card {
+                width: 95%;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar', { user: user, currentPage: 'settings' }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-robot"></i>
+                        Staff Roles
+                    </div>
+                    <a href="/settings" class="action-button back" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); font-weight: 500; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Back to Settings
+                    </a>
+                </div>
+                <p class="section-description">Manage staff roles, permissions, and action limits for your moderation team.</p>
+
+                <div class="info-banner">
+                    <div class="info-banner-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="info-banner-content">
+                        <h3 class="info-banner-title">Important Information</h3>
+                        <p>Plex Staff uses a <strong>standalone permission system</strong> that's completely separate from Discord's built-in roles and permissions. For best results:</p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Only use Plex Staff commands and dashboard for all moderation actions</li>
+                            <li><i class="fas fa-check-circle"></i> Disable Discord's moderation permissions for your staff Discord roles</li>
+                            <li><i class="fas fa-check-circle"></i> Take advantage of Plex Staff's logging, history tracking, appeals, and action limits</li>
+                        </ul>
+                        <p>This unified approach ensures all moderation actions are properly tracked and managed in one place.</p>
+                    </div>
+                </div>
+
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    <div class="alert is-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages && messages.error && messages.error.length > 0) { %>
+                    <div class="alert is-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <h2 class="section-title mb-0">
+                        <i class="fas fa-users-cog"></i>
+                        Active Staff Roles
+                    </h2>
+                    <button class="action-button edit" id="create-role-btn">
+                        <i class="fas fa-plus"></i>
+                        Create Role
+                    </button>
+                </div>
+
+                
+                <% staffRoles.forEach(function(role) { %>
+                    <div class="role-card priority-<%= role.priority %>">
+                        <div class="role-header">
+                            <div class="is-flex is-align-items-center">
+                                <span class="role-name">
+                                    <i class="fas fa-user-shield"></i>
+                                    <%= role.name %>
+                                </span>
+                                <span class="role-priority">
+                                    <span class="dot"></span>
+                                    Priority <%= role.priority %>
+                                </span>
+                            </div>
+                            <div class="role-actions">
+                                <button class="action-button edit edit-role-btn" data-role-name="<%= role.name %>">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+                                <button class="action-button delete2 delete-role-btn" data-role-name="<%= role.name %>">
+                                    <i class="fas fa-trash-alt"></i>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="accordion">
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <button class="accordion-button" aria-controls="permissions-<%= role.name.replace(/\s+/g, '') %>" data-target="permissions-<%= role.name.replace(/\s+/g, '') %>">
+                                        <span>
+                                            <i class="fas fa-key"></i>
+                                            Permissions (<%= role.permissions.length %>)
+                                        </span>
+                                        <span class="icon">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div id="permissions-<%= role.name.replace(/\s+/g, '') %>" class="accordion-content">
+                                    <div class="permissions-grid">
+                                        <% role.permissions.forEach(function(permission) { %>
+                                            <div class="permission-item">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span><%= permission %></span>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <button class="accordion-button" aria-controls="action-limits-<%= role.name.replace(/\s+/g, '') %>" data-target="action-limits-<%= role.name.replace(/\s+/g, '') %>">
+                                        <span>
+                                            <i class="fas fa-chart-line"></i>
+                                            Action Limits
+                                        </span>
+                                        <span class="icon">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div id="action-limits-<%= role.name.replace(/\s+/g, '') %>" class="accordion-content">
+                                    <div class="mb-3">
+                                        <span class="badge <%= role.actionLimits.Enabled ? 'is-success' : 'is-danger' %>">
+                                            <i class="fas <%= role.actionLimits.Enabled ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                            <%= role.actionLimits.Enabled ? 'Limits Enabled' : 'Limits Disabled' %>
+                                        </span>
+                                    </div>
+                                    <% if (role.actionLimits.Enabled) { %>
+                                        <div class="limits-container">
+                                            <div class="limit-item">
+                                                <div class="limit-value"><%= role.actionLimits.Limits.Warn %></div>
+                                                <div class="limit-label">Warn Limit</div>
+                                            </div>
+                                            <div class="limit-item">
+                                                <div class="limit-value"><%= role.actionLimits.Limits.Kick %></div>
+                                                <div class="limit-label">Kick Limit</div>
+                                            </div>
+                                            <div class="limit-item">
+                                                <div class="limit-value"><%= role.actionLimits.Limits.Ban %></div>
+                                                <div class="limit-label">Ban Limit</div>
+                                            </div>
+                                            <div class="limit-item">
+                                                <div class="limit-value"><%= role.actionLimits.Limits.TimePeriod %></div>
+                                                <div class="limit-label">Time Period</div>
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <p class="has-text-grey-light">Action limits are disabled for this role.</p>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <button class="accordion-button" aria-controls="discord-role-<%= role.name.replace(/\s+/g, '') %>" data-target="discord-role-<%= role.name.replace(/\s+/g, '') %>">
+                                        <span>
+                                            <i class="fab fa-discord"></i>
+                                            Discord Role
+                                        </span>
+                                        <span class="icon">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div id="discord-role-<%= role.name.replace(/\s+/g, '') %>" class="accordion-content">
+                                    <% if (role.discordRoleToGive && role.discordRoleToGive !== "") { %>
+                                        <div class="permission-item">
+                                            <i class="fas fa-tag"></i>
+                                            <% 
+                                            let roleName = 'Unknown Role';
+                                            const discordRole = guild.roles.cache.get(role.discordRoleToGive);
+                                            if (discordRole) roleName = discordRole.name;
+                                            %>
+                                            <span><%= roleName %> (<%= role.discordRoleToGive %>)</span>
+                                        </div>
+                                    <% } else { %>
+                                        <p class="has-text-grey-light">No Discord role assigned.</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+
+            </div>
+        </div>
+    </section>
+
+    
+    <div class="modal" id="roleModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-plus-circle"></i>
+                    <span id="roleModalLabel">Create Role</span>
+                </p>
+                <button class="modal-delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <form id="roleForm">
+                    <input type="hidden" id="editMode" value="add">
+                    <input type="hidden" id="originalRoleName" value="">
+                    
+                    <div class="field mb-4">
+                        <label class="form-label" for="roleName">Role Name</label>
+                        <div class="control">
+                            <input type="text" class="form-input" id="roleName" placeholder="Enter role name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="field mb-4">
+                        <label class="form-label" for="rolePriority">Priority (1 = highest)</label>
+                        <div class="control">
+                            <input type="number" class="form-input" id="rolePriority" min="1" placeholder="Set priority level" required>
+                        </div>
+                        <p class="help has-text-grey-light">Lower numbers have higher priority. Priority 1 has the most power.</p>
+                    </div>
+                    
+                    <div class="field mb-4">
+                        <label class="form-label" for="discordRoleToGive">Discord Role to Assign (Optional)</label>
+                        <div class="control">
+                            <select class="form-select" id="discordRoleToGive">
+                                <option value="">None</option>
+                                <% guild.roles.cache
+                                    .filter(role => 
+                                        role.position < botHighestRole.position && 
+                                        role.name !== '@everyone' && 
+                                        !role.managed
+                                    )
+                                    .sort((a, b) => b.position - a.position)
+                                    .forEach(role => { %>
+                                        <option value="<%= role.id %>"><%= role.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <p class="help has-text-grey-light">Users with this staff role will automatically receive this Discord role.</p>
+                    </div>
+                    
+                    <div class="switch-container mb-4">
+                        <label class="switch">
+                            <input type="checkbox" id="actionLimitsEnabled">
+                            <span class="switch-slider"></span>
+                        </label>
+                        <span class="switch-label">Enable Action Limits</span>
+                    </div>
+                    
+                    <div id="actionLimitsSection" style="display: none;">
+                        <div class="action-limits-card">
+                            <div class="action-limits-header">
+                                <i class="fas fa-sliders-h"></i>
+                                Action Limits Configuration
+                            </div>
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="warnLimit">Warn Limit</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="warnLimit" min="1" value="5">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="kickLimit">Kick Limit</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="kickLimit" min="1" value="3">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="banLimit">Ban Limit</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="banLimit" min="1" value="3">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="form-label" for="timePeriod">Time Period</label>
+                                        <div class="is-flex" style="gap: 0.5rem;">
+                                            <div class="control" style="flex: 1;">
+                                                <input type="number" class="form-input" id="timePeriodValue" min="1" value="3">
+                                            </div>
+                                            <div class="control" style="width: 120px;">
+                                                <select class="form-select" id="timePeriodUnit">
+                                                    <option value="m">Minutes</option>
+                                                    <option value="h">Hours</option>
+                                                    <option value="d">Days</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="form-label">Permissions</label>
+                        
+                        <div class="permission-category">
+                            <div class="category-header">
+                                <span>
+                                    <i class="fas fa-user-cog"></i>
+                                    Administrative
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-content">
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_ADMINISTRATOR" value="ADMINISTRATOR">
+                                    <label class="checkbox-custom" for="perm_ADMINISTRATOR"></label>
+                                    <label class="permission-checkbox-label" for="perm_ADMINISTRATOR">
+                                        Administrator (All permissions)
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_MANAGE_STAFF_MEMBERS" value="MANAGE_STAFF_MEMBERS">
+                                    <label class="checkbox-custom" for="perm_MANAGE_STAFF_MEMBERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_MANAGE_STAFF_MEMBERS">
+                                        Manage Staff Members
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="permission-category">
+                            <div class="category-header">
+                                <span>
+                                    <i class="fas fa-cog"></i>
+                                    General
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-content">
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_ACCESS_DASHBOARD" value="ACCESS_DASHBOARD">
+                                    <label class="checkbox-custom" for="perm_ACCESS_DASHBOARD"></label>
+                                    <label class="permission-checkbox-label" for="perm_ACCESS_DASHBOARD">
+                                        Access Dashboard
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_USERS" value="VIEW_USERS">
+                                    <label class="checkbox-custom" for="perm_VIEW_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_USERS">
+                                        View Users
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_SET_NOTES" value="SET_NOTES">
+                                    <label class="checkbox-custom" for="perm_SET_NOTES"></label>
+                                    <label class="permission-checkbox-label" for="perm_SET_NOTES">
+                                        Set Notes
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_STATS" value="VIEW_STATS">
+                                    <label class="checkbox-custom" for="perm_VIEW_STATS"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_STATS">
+                                        View Stats
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_DM_USERS" value="DM_USERS">
+                                    <label class="checkbox-custom" for="perm_DM_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_DM_USERS">
+                                        DM Users
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="permission-category">
+                            <div class="category-header">
+                                <span>
+                                    <i class="fas fa-gavel"></i>
+                                    Moderation
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-content">
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_SET_SLOWMODE" value="SET_SLOWMODE">
+                                    <label class="checkbox-custom" for="perm_SET_SLOWMODE"></label>
+                                    <label class="permission-checkbox-label" for="perm_SET_SLOWMODE">
+                                        Set Slowmode
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_PURGE_MESSAGES" value="PURGE_MESSAGES">
+                                    <label class="checkbox-custom" for="perm_PURGE_MESSAGES"></label>
+                                    <label class="permission-checkbox-label" for="perm_PURGE_MESSAGES">
+                                        Purge Messages
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_CLEAR_CHANNEL" value="CLEAR_CHANNEL">
+                                    <label class="checkbox-custom" for="perm_CLEAR_CHANNEL"></label>
+                                    <label class="permission-checkbox-label" for="perm_CLEAR_CHANNEL">
+                                        Clear Channel
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_WARN_USERS" value="WARN_USERS">
+                                    <label class="checkbox-custom" for="perm_WARN_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_WARN_USERS">
+                                        Warn Users
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_TIMEOUT_USERS" value="TIMEOUT_USERS">
+                                    <label class="checkbox-custom" for="perm_TIMEOUT_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_TIMEOUT_USERS">
+                                        Timeout Users
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_KICK_USERS" value="KICK_USERS">
+                                    <label class="checkbox-custom" for="perm_KICK_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_KICK_USERS">
+                                        Kick Users
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_BAN_USERS" value="BAN_USERS">
+                                    <label class="checkbox-custom" for="perm_BAN_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_BAN_USERS">
+                                        Ban Users
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_UNBAN_USERS" value="UNBAN_USERS">
+                                    <label class="checkbox-custom" for="perm_UNBAN_USERS"></label>
+                                    <label class="permission-checkbox-label" for="perm_UNBAN_USERS">
+                                        Unban Users
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="permission-category">
+                            <div class="category-header">
+                                <span>
+                                    <i class="fas fa-history"></i>
+                                    Records & History
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-content">
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_HISTORY" value="VIEW_HISTORY">
+                                    <label class="checkbox-custom" for="perm_VIEW_HISTORY"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_HISTORY">
+                                        View History
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_CLEAR_HISTORY" value="CLEAR_HISTORY">
+                                    <label class="checkbox-custom" for="perm_CLEAR_HISTORY"></label>
+                                    <label class="permission-checkbox-label" for="perm_CLEAR_HISTORY">
+                                        Clear History
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_DELETE_PUNISHMENTS" value="DELETE_PUNISHMENTS">
+                                    <label class="checkbox-custom" for="perm_DELETE_PUNISHMENTS"></label>
+                                    <label class="permission-checkbox-label" for="perm_DELETE_PUNISHMENTS">
+                                        Delete Punishments
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_RECENT_PUNISHMENTS" value="VIEW_RECENT_PUNISHMENTS">
+                                    <label class="checkbox-custom" for="perm_VIEW_RECENT_PUNISHMENTS"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_RECENT_PUNISHMENTS">
+                                        View Recent Punishments
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_RECENT_MESSAGES" value="VIEW_RECENT_MESSAGES">
+                                    <label class="checkbox-custom" for="perm_VIEW_RECENT_MESSAGES"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_RECENT_MESSAGES">
+                                        View Recent Messages
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_CLEAR_RECENT_MESSAGES" value="CLEAR_RECENT_MESSAGES">
+                                    <label class="checkbox-custom" for="perm_CLEAR_RECENT_MESSAGES"></label>
+                                    <label class="permission-checkbox-label" for="perm_CLEAR_RECENT_MESSAGES">
+                                        Clear Recent Messages
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_LOOKUP_PUNISHMENTS" value="LOOKUP_PUNISHMENTS">
+                                    <label class="checkbox-custom" for="perm_LOOKUP_PUNISHMENTS"></label>
+                                    <label class="permission-checkbox-label" for="perm_LOOKUP_PUNISHMENTS">
+                                        Lookup Punishments
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="permission-category">
+                            <div class="category-header">
+                                <span>
+                                    <i class="fas fa-flag"></i>
+                                    Reports
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-content">
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_REPORTS" value="VIEW_REPORTS">
+                                    <label class="checkbox-custom" for="perm_VIEW_REPORTS"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_REPORTS">
+                                        View Reports
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_MANAGE_REPORTS" value="MANAGE_REPORTS">
+                                    <label class="checkbox-custom" for="perm_MANAGE_REPORTS"></label>
+                                    <label class="permission-checkbox-label" for="perm_MANAGE_REPORTS">
+                                        Manage Reports
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="permission-category">
+                            <div class="category-header">
+                                <span>
+                                    <i class="fas fa-hands-helping"></i>
+                                    Appeals
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-content">
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_VIEW_APPEALS" value="VIEW_APPEALS">
+                                    <label class="checkbox-custom" for="perm_VIEW_APPEALS"></label>
+                                    <label class="permission-checkbox-label" for="perm_VIEW_APPEALS">
+                                        View Appeals
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_MANAGE_APPEALS" value="MANAGE_APPEALS">
+                                    <label class="checkbox-custom" for="perm_MANAGE_APPEALS"></label>
+                                    <label class="permission-checkbox-label" for="perm_MANAGE_APPEALS">
+                                        Manage Appeals
+                                    </label>
+                                </div>
+                                <div class="permission-checkbox-container">
+                                    <input class="permission-checkbox visually-hidden" type="checkbox" id="perm_DELETE_APPEALS" value="DELETE_APPEALS">
+                                    <label class="checkbox-custom" for="perm_DELETE_APPEALS"></label>
+                                    <label class="permission-checkbox-label" for="perm_DELETE_APPEALS">
+                                        Delete Appeals
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="button" class="modal-button primary" id="saveRoleBtn">
+                    <i class="fas fa-save"></i>
+                    Save Role
+                </button>
+                <button type="button" class="modal-button cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    
+    <div class="modal" id="deleteRoleModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirm Role Deletion
+                </p>
+                <button class="modal-delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="has-text-centered">
+                    <i class="fas fa-trash-alt has-text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p class="mb-4">Are you sure you want to delete the role <strong id="deleteRoleName" class="has-text-white"></strong>?</p>
+                    <p class="has-text-danger">This action cannot be undone. All staff members with this role will lose their permissions.</p>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="button" class="modal-button danger" id="confirmDeleteRoleBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete Permanently
+                </button>
+                <button type="button" class="modal-button cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    
+
+                    if (targetContent.classList.contains('is-active')) {
+                        targetContent.classList.remove('is-active');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        targetContent.classList.add('is-active');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                    
+
+                    const icon = this.querySelector('.icon i');
+                    icon.style.transform = targetContent.classList.contains('is-active') ? 'rotate(180deg)' : 'rotate(0)';
+                });
+            });
+    
+
+            document.querySelectorAll('.category-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i:last-child');
+                    
+                    if (content.style.display === 'none') {
+                        content.style.display = 'block';
+                        this.classList.remove('collapsed');
+                        icon.style.transform = 'rotate(0)';
+                    } else {
+                        content.style.display = 'none';
+                        this.classList.add('collapsed');
+                        icon.style.transform = 'rotate(-90deg)';
+                    }
+                });
+            });
+    
+
+            function setupModal(modalId) {
+                const modal = document.getElementById(modalId);
+                const closeButtons = modal.querySelectorAll('.modal-delete, .modal-button.cancel, [data-dismiss="modal"]');
+                const background = modal.querySelector('.modal-background');
+    
+                function closeModal() {
+                    modal.classList.remove('is-active');
+
+                    const form = modal.querySelector('form');
+                    if (form) form.reset();
+                    
+
+                    const actionLimitsSection = document.getElementById('actionLimitsSection');
+                    if (actionLimitsSection) actionLimitsSection.style.display = 'none';
+                }
+    
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', closeModal);
+                });
+                
+                background.addEventListener('click', closeModal);
+    
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                        closeModal();
+                    }
+                });
+            }
+    
+
+            setupModal('roleModal');
+            setupModal('deleteRoleModal');
+    
+
+            document.getElementById('actionLimitsEnabled').addEventListener('change', function() {
+                document.getElementById('actionLimitsSection').style.display = this.checked ? 'block' : 'none';
+            });
+
+    
+
+            const addRoleBtns = [
+                document.getElementById('create-role-btn'),
+                document.getElementById('create-role-btn-alt')
+            ];
+            
+            addRoleBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        const modal = document.getElementById('roleModal');
+                        document.getElementById('roleModalLabel').textContent = 'Create Role';
+                        document.getElementById('editMode').value = 'add';
+                        document.getElementById('originalRoleName').value = '';
+                        document.getElementById('roleForm').reset();
+                        document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        document.getElementById('actionLimitsEnabled').checked = false;
+                        document.getElementById('actionLimitsSection').style.display = 'none';
+                        modal.classList.add('is-active');
+                    });
+                }
+            });
+    
+
+            document.querySelectorAll('.edit-role-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const roleName = this.getAttribute('data-role-name');
+                    const modal = document.getElementById('roleModal');
+                    
+                    document.getElementById('roleModalLabel').textContent = `Edit Role: ${roleName}`;
+                    document.getElementById('editMode').value = 'edit';
+                    document.getElementById('originalRoleName').value = roleName;
+                    
+
+                    fetch(`/settings/get-role?roleName=${encodeURIComponent(roleName)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('roleName').value = data.name;
+                            document.getElementById('rolePriority').value = data.priority;
+                            document.getElementById('discordRoleToGive').value = data.discordRoleToGive || '';
+                            
+
+                            const actionLimitsEnabled = document.getElementById('actionLimitsEnabled');
+                            actionLimitsEnabled.checked = data.actionLimits.Enabled;
+                            
+                            if (data.actionLimits.Enabled) {
+                                document.getElementById('actionLimitsSection').style.display = 'block';
+                                document.getElementById('warnLimit').value = data.actionLimits.Limits.Warn;
+                                document.getElementById('kickLimit').value = data.actionLimits.Limits.Kick;
+                                document.getElementById('banLimit').value = data.actionLimits.Limits.Ban;
+                                
+
+                                const timePeriod = data.actionLimits.Limits.TimePeriod;
+                                const value = parseInt(timePeriod);
+                                const unit = timePeriod.replace(/[0-9]/g, '');
+                                document.getElementById('timePeriodValue').value = value;
+                                document.getElementById('timePeriodUnit').value = unit;
+                            } else {
+                                document.getElementById('actionLimitsSection').style.display = 'none';
+                            }
+                            
+
+                            document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                                checkbox.checked = false;
+                            });
+                            
+
+                            data.permissions.forEach(permission => {
+                                const checkbox = document.getElementById(`perm_${permission}`);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching role data:', error);
+                            alert('Error fetching role data. Please try again.');
+                        });
+                    
+                    modal.classList.add('is-active');
+                });
+            });
+    
+
+            document.querySelectorAll('.delete-role-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const roleName = this.getAttribute('data-role-name');
+                    const modal = document.getElementById('deleteRoleModal');
+                    
+                    document.getElementById('deleteRoleName').textContent = roleName;
+                    modal.classList.add('is-active');
+                });
+            });
+    
+
+            document.getElementById('confirmDeleteRoleBtn').addEventListener('click', function() {
+                const roleName = document.getElementById('deleteRoleName').textContent;
+                const modal = document.getElementById('deleteRoleModal');
+                
+
+                fetch('/settings/delete-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ roleName: roleName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+
+                        window.location.reload();
+                    } else {
+                        alert(`Error: ${data.message}`);
+                        modal.classList.remove('is-active');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting role:', error);
+                    alert('Error deleting role. Please try again.');
+                    modal.classList.remove('is-active');
+                });
+            });
+    
+
+            document.getElementById('saveRoleBtn').addEventListener('click', function() {
+                const roleName = document.getElementById('roleName').value;
+                const priority = document.getElementById('rolePriority').value;
+                const discordRoleToGive = document.getElementById('discordRoleToGive').value;
+                const actionLimitsEnabled = document.getElementById('actionLimitsEnabled').checked;
+                
+
+                if (!roleName) {
+                    alert('Please enter a role name');
+                    return;
+                }
+                
+                if (!priority || priority < 1) {
+                    alert('Please enter a valid priority (minimum 1)');
+                    return;
+                }
+                
+
+                const permissions = [];
+                document.querySelectorAll('.permission-checkbox:checked').forEach(checkbox => {
+                    permissions.push(checkbox.value);
+                });
+                
+
+                const actionLimits = {
+                    Enabled: actionLimitsEnabled,
+                    Limits: {
+                        Warn: document.getElementById('warnLimit').value,
+                        Kick: document.getElementById('kickLimit').value,
+                        Ban: document.getElementById('banLimit').value,
+                        TimePeriod: document.getElementById('timePeriodValue').value + document.getElementById('timePeriodUnit').value
+                    }
+                };
+                
+
+                const roleData = {
+                    name: roleName,
+                    priority: priority,
+                    discordRoleToGive: discordRoleToGive,
+                    permissions: permissions,
+                    actionLimits: actionLimits
+                };
+                
+
+                if (document.getElementById('editMode').value === 'edit') {
+                    roleData.originalRoleName = document.getElementById('originalRoleName').value;
+                }
+                
+
+                fetch('/settings/save-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(roleData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+
+                        window.location.reload();
+                    } else {
+                        alert(`Error: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving role:', error);
+                    alert('Error saving role. Please try again.');
+                });
+            });
+        });
+    </script>

@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Report | <%= settings.name %></title>
+    
+    <meta property="og:title" content="View Report | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+    
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        .back-button {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .report-info-card {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .report-info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--accent-color), rgba(var(--accent-color-rgb), 0.5));
+        }
+        
+        .report-header {
+            background: rgba(20, 18, 26, 0.8);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+        
+        .report-id-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .report-id {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .report-id-badge {
+            font-size: 0.8rem;
+            background: rgba(var(--accent-color-rgb), 0.2);
+            color: var(--accent-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+        
+        .report-status {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.report-status.is-pending {
+    background: rgba(255, 152, 0, 0.15);
+    color: #FF9800;
+}
+
+.report-status.is-success {
+    background: rgba(72, 199, 116, 0.15);
+    color: #48C774;
+}
+
+.report-status.is-danger {
+    background: rgba(255, 56, 96, 0.15);
+    color: #FF3860;
+}
+
+.has-text-warning {
+    color: #FFD700 !important;
+}
+        
+        .report-content {
+            padding: 1.5rem;
+        }
+        
+        .report-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .report-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .report-section-title i {
+            color: var(--accent-color);
+        }
+        
+        .user-card {
+            background: rgba(24, 21, 31, 0.6);
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: rgba(24, 21, 31, 0.8);
+        }
+        
+        .user-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid rgba(var(--accent-color-rgb), 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .user-card:hover .user-avatar {
+            border-color: var(--accent-color);
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        strong {
+    color: var(--accent-color);
+}
+
+        .user-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-id {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: monospace;
+        }
+        
+        .user-tag {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 0.75rem;
+        }
+        
+        .reported-tag {
+            background: rgba(255, 87, 87, 0.15);
+            color: #FF5757;
+        }
+        
+        .reporter-tag {
+            background: rgba(72, 199, 116, 0.15);
+            color: #48C774;
+        }
+        
+        .reason-box {
+            background: rgba(24, 21, 31, 0.6);
+            border-radius: 10px;
+            padding: 1.25rem;
+            color: white;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .metadata-item {
+            background: rgba(24, 21, 31, 0.6);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .metadata-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metadata-label i {
+            color: var(--accent-color);
+        }
+        
+        .metadata-value {
+            font-size: 0.95rem;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .transcript-button {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .transcript-button:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .transcript-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: rgba(var(--accent-color-rgb), 0.3);
+            border-radius: 1px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 2px solid rgba(24, 21, 31, 0.8);
+        }
+        
+        .timeline-time {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-text {
+            color: white;
+            font-size: 0.95rem;
+        }
+        
+        .actions-card {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .actions-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #FF9800, rgba(255, 152, 0, 0.5));
+        }
+        
+        .actions-header {
+            background: rgba(20, 18, 26, 0.8);
+            padding: 1.25rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+        
+        .actions-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .actions-title i {
+            color: #FF9800;
+        }
+        
+        .actions-content {
+            padding: 1.5rem;
+        }
+        
+        .actions-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .approve-button {
+            background: rgba(72, 199, 116, 0.15);
+            color: #48C774;
+            border: 1px solid rgba(72, 199, 116, 0.3);
+        }
+        
+        .approve-button:hover {
+            background: rgba(72, 199, 116, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .deny-button {
+            background: rgba(255, 56, 96, 0.15);
+            color: #FF3860;
+            border: 1px solid rgba(255, 56, 96, 0.3);
+        }
+        
+        .deny-button:hover {
+            background: rgba(255, 56, 96, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-background {
+    background: rgba(19, 17, 26, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-card {
+    background: rgba(30, 27, 38, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 16px;
+    max-width: 700px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-card-head {
+    background: rgba(35, 32, 44, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px 16px 0 0;
+    padding: 1.25rem;
+}
+
+.modal-card-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-card-title i {
+    color: var(--accent-color);
+}
+
+.modal-card-body {
+    background: none;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-height: 70vh;
+}
+
+.modal-card-foot {
+    background: rgba(35, 32, 44, 0.6);
+    border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 0 0 16px 16px;
+    padding: 1.25rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.delete {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.delete:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.delete::before,
+.delete::after {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-input, .form-select, .form-textarea {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.form-input::placeholder, .form-select::placeholder, .form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-select {
+    height: auto !important;
+    min-height: 42px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-select option {
+    padding: 8px 12px;
+    min-height: 30px;
+    display: block;
+}
+
+.modal-button {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-button.confirm-button {
+    background: rgba(72, 199, 116, 0.15);
+    color: #48C774;
+    border: 1px solid rgba(72, 199, 116, 0.3);
+}
+
+.modal-button.confirm-button:hover {
+    background: rgba(72, 199, 116, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.delete-button {
+    background: rgba(255, 56, 96, 0.15);
+    color: #FF3860;
+    border: 1px solid rgba(255, 56, 96, 0.3);
+}
+
+.modal-button.delete-button:hover {
+    background: rgba(255, 56, 96, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.cancel-button {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-button.cancel-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.permission-checkbox-container {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.permission-checkbox-container:hover {
+    background: rgba(var(--accent-color-rgb), 0.05);
+}
+
+.visually-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    z-index: -1;
+}
+
+.checkbox-custom {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.permission-checkbox-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.radio-custom {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+input[type="radio"]:checked + .radio-custom {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+input[type="radio"]:checked ~ .permission-checkbox-label {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.permission-checkbox-container:has(input[type="radio"]:checked) {
+    background: rgba(var(--accent-color-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+}
+
+.radio-container {
+    background: rgba(30, 27, 38, 0.3);
+    border-radius: 8px;
+    min-height: 42px;
+    position: relative;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.radio-selected, 
+.radio-container:has(input[type="radio"]:checked) {
+    background: rgba(var(--accent-color-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3) !important;
+}
+
+.radio-container:hover {
+    background: rgba(40, 36, 50, 0.4);
+}
+
+.action-limits-card {
+    background: rgba(24, 21, 31, 0.3);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.action-limits-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+
+.switch-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.duration-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.duration-inputs .form-input {
+    width: 70%;
+    height: 36px !important;
+}
+
+.duration-inputs .form-select {
+    width: 30%;
+    height: 36px !important;
+}
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .actions-buttons {
+                flex-direction: column;
+            }
+            
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-avatar {
+                margin-bottom: 0.5rem;
+            }
+            
+            .user-tag {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+        }
+
+        .punishment-id-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.punishment-id-link:hover {
+    color: #ffffff;
+}
+
+.punishment-id-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: currentColor;
+    transition: width 0.2s ease;
+}
+
+.punishment-id-link:hover::after {
+    width: 100%;
+}
+
+.report-screenshot {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: block;
+    margin: 0 auto;
+    max-height: 400px;
+}
+
+.screenshot-container {
+    background: rgba(24, 21, 31, 0.6);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+}
+
+    </style>
+</head>
+
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'reports', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-flag"></i>
+                        Report Details
+                    </div>
+                    <a href="/reports" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Reports
+                    </a>
+                </div>
+                
+                <div class="report-info-card">
+                    <div class="report-header">
+                        <div class="report-id-container">
+                            <div class="report-id">
+                                <i class="fas fa-hashtag" style="color: var(--accent-color);"></i>
+                                Report <span class="report-id-badge"><%= report.reportId %></span>
+                            </div>
+                            <div class="report-status <%= report.status === 'Approved' ? 'is-success' : report.status === 'Denied' ? 'is-danger' : 'is-pending' %>">
+                                <i class="fas <%= report.status === 'Approved' ? 'fa-check-circle' : report.status === 'Denied' ? 'fa-times-circle' : 'fa-clock' %>"></i>
+                                <%= report.status === 'Approved' ? 'Approved' : report.status === 'Denied' ? 'Denied' : 'Pending Review' %>
+                            </div>
+                        </div>
+                        <div class="report-timestamp">
+                            <i class="fas fa-calendar-alt"></i>
+                            <%= new Date(report.timestamp).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric', 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                            }) %>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <div class="report-content">
+                        <div class="report-section">
+                            <div class="report-section-title">
+                                <i class="fas fa-users"></i>
+                                Involved Users
+                            </div>
+                            
+                            <div class="user-card">
+                                <img class="user-avatar" src="<%= report.reportedAvatarURL %>" alt="<%= report.reportedUsername %>">
+                                <div class="user-info">
+                                    <div class="user-name">
+                                        <%= report.reportedUsername %>
+                                        <span class="user-tag reported-tag">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            Reported User
+                                        </span>
+                                    </div>
+                                    <div class="user-id">ID: <%= report.reportedId %></div>
+                                </div>
+                            </div>
+                            
+                            <div class="user-card">
+                                <img class="user-avatar" src="<%= report.reporterAvatarURL %>" alt="<%= report.reporterUsername %>">
+                                <div class="user-info">
+                                    <div class="user-name">
+                                        <%= report.reporterUsername %>
+                                        <span class="user-tag reporter-tag">
+                                            <i class="fas fa-flag"></i>
+                                            Reporter
+                                        </span>
+                                    </div>
+                                    <div class="user-id">ID: <%= report.reporterId %></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="report-section">
+                            <div class="report-section-title">
+                                <i class="fas fa-comment-dots"></i>
+                                Reason for Report
+                            </div>
+                            <div class="reason-box">
+                                <%= report.reason %>
+                            </div>
+                        </div>
+                        
+                        <div class="report-section">
+                            <div class="report-section-title">
+                                <i class="fas fa-info-circle"></i>
+                                Additional Information
+                            </div>
+                            
+                            <div class="metadata-grid">
+                                <% if (report.channelId) { %>
+                                <div class="metadata-item">
+                                    <div class="metadata-label">
+                                        <i class="fas fa-hashtag"></i>
+                                        Channel
+                                    </div>
+                                    <div class="metadata-value">
+                                        <%= report.channelName %>
+                                    </div>
+                                </div>
+                                <% } %>
+                                
+                                <div class="metadata-item">
+                                    <div class="metadata-label">
+                                        <i class="fas fa-file-alt"></i>
+                                        Transcript
+                                    </div>
+                                    <div class="metadata-value">
+                                        <%= report.transcriptPath ? 'Available' : 'Not Available' %>
+                                    </div>
+                                </div>
+                                
+                                <div class="metadata-item">
+                                    <div class="metadata-label">
+                                        <i class="fas fa-clock"></i>
+                                        Age
+                                    </div>
+                                    <div class="metadata-value">
+                                        <%= getRelativeTime(report.timestamp) %>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <% if (report.transcriptPath) { %>
+                                <div class="mt-4">
+                                    <a href="/view-transcript/<%= report.reportId %>" class="transcript-button" target="_blank">
+                                        <i class="fas fa-file-alt"></i>
+                                        View Transcript
+                                    </a>
+                                    <div class="action-limits-card mt-3">
+                                        <p class="has-text-warning mb-0">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            This transcript was captured in the channel at the exact moment the user was reported. It could be completely unrelated to this report, depending on if the user reported the person in a different channel, or for reasons not related to messages.
+                                        </p>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="mt-4">
+                                    <button class="transcript-button" disabled>
+                                        <i class="fas fa-file-alt"></i>
+                                        No Transcript Available
+                                    </button>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <% if (report.screenshotPath) { %>
+                            <div class="report-section">
+                                <div class="report-section-title">
+                                    <i class="fas fa-camera"></i>
+                                    Screenshot Evidence
+                                </div>
+                                
+                                <div class="screenshot-container">
+                                    <img src="<%= report.screenshotPath %>" alt="Report Screenshot" class="report-screenshot">
+                                </div>
+                                
+                                <div class="mt-2 has-text-centered">
+                                    <a href="<%= report.screenshotPath %>" class="action-button" target="_blank">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        View Full Image
+                                    </a>
+                                </div>
+                            </div>
+                            <% } %>
+
+                        <div class="report-section">
+                            <div class="report-section-title">
+                                <i class="fas fa-history"></i>
+                                Report Timeline
+                            </div>
+                            
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-time">
+                                        <%= new Date(report.timestamp).toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            hour: '2-digit', 
+                                            minute: '2-digit' 
+                                        }) %>
+                                    </div>
+                                    <div class="timeline-text">
+                                        <strong><%= report.reporterUsername %></strong> submitted a report against <strong><%= report.reportedUsername %></strong>
+                                    </div>
+                                </div>
+                                
+                                <% if(report.status === 'Approved' && report.resolvedAt) { %>
+                                <div class="timeline-item">
+                                    <div class="timeline-time">
+                                        <%= new Date(report.resolvedAt).toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            hour: '2-digit', 
+                                            minute: '2-digit' 
+                                        }) %>
+                                    </div>
+                                    <div class="timeline-text">
+                                        <strong><%= report.staffUsername %></strong> approved the report and took action against <strong><%= report.reportedUsername %></strong>
+                                    </div>
+                                </div>
+                                <% } %>
+                                
+                                <% if(report.status === 'Denied' && report.resolvedAt) { %>
+                                <div class="timeline-item">
+                                    <div class="timeline-time">
+                                        <%= new Date(report.resolvedAt).toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            hour: '2-digit', 
+                                            minute: '2-digit' 
+                                        }) %>
+                                    </div>
+                                    <div class="timeline-text">
+                                        <strong><%= report.staffUsername %></strong> denied the report
+                                    </div>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                
+                <% if (report.status === 'Approved' || report.status === 'Rejected' || report.status === 'Auto-Actioned') { %>
+                    <div class="report-info-card resolution-card">
+                        <div class="report-header">
+                            <div class="report-id-container">
+                                <div class="report-id">
+                                    <i class="fas <%= report.status === 'Approved' ? 'fa-check-circle' : report.status === 'Rejected' ? 'fa-times-circle' : 'fa-robot' %>" 
+                                       style="color: <%= report.status === 'Approved' ? '#48C774' : report.status === 'Rejected' ? '#FF3860' : '#3273dc' %>;"></i>
+                                    <%= report.status %> by 
+                                    <% if(report.status === 'Auto-Actioned') { %>
+                                        Automod
+                                    <% } else { %>
+                                        <span class="staff-badge"><%= report.staffUsername %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="report-timestamp">
+                                <i class="fas fa-calendar-check"></i>
+                                <%= new Date(report.resolvedAt).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric', 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                }) %>
+                            </div>
+                        </div>
+                        
+                        <div class="report-content">
+                            <% if (report.staffComment) { %>
+                            <div class="report-section">
+                                <div class="report-section-title">
+                                    <i class="fas fa-comment-dots"></i>
+                                    Staff Comment
+                                </div>
+                                <div class="reason-box">
+                                    <%= report.staffComment %>
+                                </div>
+                            </div>
+                            <% } %>
+                            
+                            <% if (report.status === 'Approved') { %>
+                            <div class="report-section">
+                                <div class="report-section-title">
+                                    <i class="fas fa-gavel"></i>
+                                    Action Taken
+                                </div>
+                                
+                                <div class="metadata-grid">
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">
+                                            <i class="fas fa-user-shield"></i>
+                                            Staff Member
+                                        </div>
+                                        <div class="metadata-value">
+                                            <%= report.staffUsername %>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">
+                                            <i class="fas fa-clock"></i>
+                                            Handled
+                                        </div>
+                                        <div class="metadata-value">
+                                            <%= getRelativeTime(report.resolvedAt) %>
+                                        </div>
+                                    </div>
+                                    
+                                    <% if (report.actionType) { %>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Punishment
+                                        </div>
+                                        <div class="metadata-value">
+                                            <%= report.actionType %> 
+                                            <% if (report.actionDuration) { %>
+                                                for <%= report.actionDuration %>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                    
+                                    <% if (report.punishmentId) { %>
+                                        <div class="metadata-item">
+                                            <div class="metadata-label">
+                                                <i class="fas fa-hashtag"></i>
+                                                Punishment ID
+                                            </div>
+                                            <div class="metadata-value punishment-id">
+                                                <a href="/punishment/lookup/<%= report.punishmentId %>" class="punishment-id-link">
+                                                    <%= report.punishmentId %>
+                                                    <i class="fas fa-external-link-alt" style="font-size: 0.8rem; margin-left: 0.5rem;"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                </div>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% } %>
+        
+                    <% if (report.autoActioned) { %>
+                        <div class="report-section">
+                            <div class="report-section-title">
+                                <i class="fas fa-robot"></i>
+                                Automatic Action Taken
+                            </div>
+                            
+                            <div class="actions-card">
+                                <div class="actions-header">
+                                    <div class="actions-title">
+                                        <i class="fas fa-exclamation-triangle" style="color: #FF9800;"></i>
+                                        Auto-Moderation
+                                    </div>
+                                </div>
+                                
+                                <div class="actions-content">
+                                    <div class="action-limits-card">
+                                        <p class="has-text-warning mb-2">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <strong>This report triggered an automatic action but still requires staff review.</strong>
+                                        </p>
+                                        <p class="has-text-white mb-0">
+                                            The system has already taken action against this user based on the server's auto-moderation settings.
+                                            Please review the details below and make a final decision on this report.
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="metadata-grid mt-4">
+                                        <div class="metadata-item">
+                                            <div class="metadata-label">
+                                                <i class="fas fa-gavel"></i>
+                                                Action Type
+                                            </div>
+                                            <div class="metadata-value">
+                                                <%= report.autoActionType.charAt(0).toUpperCase() + report.autoActionType.slice(1) %>
+                                            </div>
+                                        </div>
+                                        
+                                        <% if (report.autoActionDuration) { %>
+                                        <div class="metadata-item">
+                                            <div class="metadata-label">
+                                                <i class="fas fa-clock"></i>
+                                                Duration
+                                            </div>
+                                            <div class="metadata-value">
+                                                <%= report.autoActionDuration %>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                        
+                                        <div class="metadata-item">
+                                            <div class="metadata-label">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                Actioned On
+                                            </div>
+                                            <div class="metadata-value">
+                                                <%= new Date(report.autoActionTimestamp).toLocaleDateString('en-US', { 
+                                                    year: 'numeric', 
+                                                    month: 'short', 
+                                                    day: 'numeric', 
+                                                    hour: '2-digit', 
+                                                    minute: '2-digit' 
+                                                }) %>
+                                            </div>
+                                        </div>
+                                        
+                                        <% if (report.autoActionPunishmentId) { %>
+                                        <div class="metadata-item">
+                                            <div class="metadata-label">
+                                                <i class="fas fa-hashtag"></i>
+                                                Punishment ID
+                                            </div>
+                                            <div class="metadata-value punishment-id">
+                                                <a href="/punishment/lookup/<%= report.autoActionPunishmentId %>" class="punishment-id-link">
+                                                    <%= report.autoActionPunishmentId %>
+                                                    <i class="fas fa-external-link-alt" style="font-size: 0.8rem; margin-left: 0.5rem;"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <% if (report.autoActionReason) { %>
+                                    <div class="mt-4">
+                                        <div class="report-section-title">
+                                            <i class="fas fa-comment-dots"></i>
+                                            Auto-Action Reason
+                                        </div>
+                                        <div class="reason-box">
+                                            <%= report.autoActionReason %>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                    <% if (report.status !== 'Approved' && report.status !== 'Denied' && permissions && permissions.MANAGE_REPORTS) { %>
+                    <div class="actions-card">
+                        <div class="actions-header">
+                            <div class="actions-title">
+                                <i class="fas fa-gavel"></i>
+                                Staff Actions
+                            </div>
+                        </div>
+                        
+                        <div class="actions-content">
+                            <p class="has-text-light mb-4">Take action on this report by either approving and punishing the reported user, or denying the report.</p>
+                            
+                            <div class="actions-buttons">
+                                <button class="action-button approve-button" id="approveButton">
+                                    <i class="fas fa-check-circle"></i>
+                                    Approve Report
+                                </button>
+                                
+                                <button class="action-button deny-button" id="denyButton">
+                                    <i class="fas fa-times-circle"></i>
+                                    Deny Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </section>
+    
+    <div class="modal" id="approveModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-check-circle" style="color: #48C774;"></i>
+                    Approve Report & Take Action
+                </p>
+                <button class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <form id="approveForm">
+                    <div class="field mb-4">
+                        <label class="form-label"><i class="fas fa-gavel mr-2" style="color: var(--accent-color);"></i>Punishment Type</label>
+                        <div class="action-limits-card">
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_warn" value="warn" checked>
+                                        <label class="radio-custom" for="punishment_warn"></label>
+                                        <label class="permission-checkbox-label" for="punishment_warn">
+                                            <i class="fas fa-exclamation-triangle mr-2" style="color: #f1c40f;"></i>
+                                            Warn User
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_timeout" value="timeout">
+                                        <label class="radio-custom" for="punishment_timeout"></label>
+                                        <label class="permission-checkbox-label" for="punishment_timeout">
+                                            <i class="fas fa-clock mr-2" style="color: #3498db;"></i>
+                                            Timeout User
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="timeoutOptions" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                                        <label class="form-label mb-2">Timeout Duration</label>
+                                        <div class="duration-inputs">
+                                            <input type="number" class="form-input" id="timeoutDuration" min="1" value="5">
+                                            <select class="form-select" id="timeoutUnit">
+                                                <option value="m">Minutes</option>
+                                                <option value="h" selected>Hours</option>
+                                                <option value="d">Days</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_kick" value="kick">
+                                        <label class="radio-custom" for="punishment_kick"></label>
+                                        <label class="permission-checkbox-label" for="punishment_kick">
+                                            <i class="fas fa-shoe-prints mr-2" style="color: #e67e22;"></i>
+                                            Kick User
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="column is-6">
+                                    <div class="permission-checkbox-container radio-container">
+                                        <input class="punishment-radio visually-hidden" type="radio" name="punishment_type" id="punishment_ban" value="ban">
+                                        <label class="radio-custom" for="punishment_ban"></label>
+                                        <label class="permission-checkbox-label" for="punishment_ban">
+                                            <i class="fas fa-gavel mr-2" style="color: #e74c3c;"></i>
+                                            Ban User
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="banOptions" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                                        <div class="switch-container mb-2">
+                                            <label class="switch">
+                                                <input type="checkbox" id="permanentBan">
+                                                <span class="switch-slider"></span>
+                                            </label>
+                                            <span class="switch-label">Permanent Ban</span>
+                                        </div>
+                                        
+                                        <div id="banDurationGroup">
+                                            <label class="form-label mb-2">Ban Duration</label>
+                                            <div class="duration-inputs">
+                                                <input type="number" class="form-input" id="banDuration" min="1" value="7">
+                                                <select class="form-select" id="banUnit">
+                                                    <option value="d" selected>Days</option>
+                                                    <option value="w">Weeks</option>
+                                                    <option value="m">Months</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field mb-4">
+                        <label class="form-label" for="punishmentReason">
+                            <i class="fas fa-comment-alt mr-2" style="color: var(--accent-color);"></i>
+                            Reason for Punishment
+                        </label>
+                        <textarea class="form-textarea" id="punishmentReason" placeholder="Enter reason for punishment"></textarea>
+                    </div>
+                    
+                    <div class="field mb-4">
+                        <label class="form-label" for="staffComment">
+                            <i class="fas fa-clipboard-list mr-2" style="color: var(--accent-color);"></i>
+                            Staff Comment (optional)
+                        </label>
+                        <textarea class="form-textarea" id="staffComment" placeholder="Add any additional notes about this report"></textarea>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="modal-button confirm-button" id="confirmApproveButton">
+                    <i class="fas fa-check"></i>
+                    Confirm Action
+                </button>
+                <button class="modal-button cancel-button closeModal">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+    
+<div class="modal" id="denyModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                <i class="fas fa-times-circle" style="color: #FF3860;"></i>
+                Deny Report
+            </p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="action-limits-card mb-4">
+                <p class="has-text-white">
+                    <i class="fas fa-info-circle mr-2" style="color: var(--accent-color);"></i>
+                    Are you sure you want to deny this report? Denied reports will be permanently deleted from the system.
+                </p>
+            </div>
+            
+            <div class="field mb-4">
+                <label class="form-label" for="denyReason">
+                    <i class="fas fa-comment-alt mr-2" style="color: var(--accent-color);"></i>
+                    Reason for Denial (optional)
+                </label>
+                <textarea class="form-textarea" id="denyReason" placeholder="Why are you denying this report?"></textarea>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="modal-button delete-button" id="confirmDenyButton">
+                <i class="fas fa-trash-alt"></i>
+                Delete Report
+            </button>
+            <button class="modal-button cancel-button closeModal">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </footer>
+    </div>
+</div>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const approveModal = document.getElementById('approveModal');
+    const denyModal = document.getElementById('denyModal');
+    
+    document.getElementById('approveButton').addEventListener('click', function() {
+        approveModal.classList.add('is-active');
+    });
+    
+    document.getElementById('denyButton').addEventListener('click', function() {
+        denyModal.classList.add('is-active');
+    });
+    
+    document.querySelectorAll('.delete, .closeModal').forEach(closeButton => {
+        closeButton.addEventListener('click', function() {
+            approveModal.classList.remove('is-active');
+            denyModal.classList.remove('is-active');
+        });
+    });
+    
+    document.querySelectorAll('.modal-background').forEach(background => {
+        background.addEventListener('click', function() {
+            approveModal.classList.remove('is-active');
+            denyModal.classList.remove('is-active');
+        });
+    });
+    
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            approveModal.classList.remove('is-active');
+            denyModal.classList.remove('is-active');
+        }
+    });
+    
+    const punishmentRadios = document.querySelectorAll('input[name="punishment_type"]');
+    punishmentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('timeoutOptions').style.display = 'none';
+            document.getElementById('banOptions').style.display = 'none';
+            
+            if (this.value === 'timeout') {
+                document.getElementById('timeoutOptions').style.display = 'block';
+            } else if (this.value === 'ban') {
+                document.getElementById('banOptions').style.display = 'block';
+            }
+            
+            document.querySelectorAll('input[name="punishment_type"]').forEach(r => {
+                const container = r.closest('.permission-checkbox-container');
+                if (r.checked) {
+                    container.classList.add('radio-selected');
+                } else {
+                    container.classList.remove('radio-selected');
+                }
+            });
+        });
+    });
+    
+    const checkedRadio = document.querySelector('input[name="punishment_type"]:checked');
+    if (checkedRadio) {
+        checkedRadio.dispatchEvent(new Event('change'));
+    }
+    
+    const permanentBan = document.getElementById('permanentBan');
+    const banDurationGroup = document.getElementById('banDurationGroup');
+    
+    permanentBan.addEventListener('change', function() {
+        if (this.checked) {
+            banDurationGroup.style.display = 'none';
+        } else {
+            banDurationGroup.style.display = 'block';
+        }
+    });
+    
+    document.getElementById('confirmApproveButton').addEventListener('click', async function() {
+    const selectedPunishment = document.querySelector('input[name="punishment_type"]:checked');
+    const punishmentType = selectedPunishment ? selectedPunishment.value : '';
+    const punishmentReason = document.getElementById('punishmentReason').value.trim();
+    const staffComment = document.getElementById('staffComment').value.trim();
+    
+    if (!punishmentType) {
+        showAlert('error', 'Please select a punishment type');
+        return;
+    }
+    
+    if (!punishmentReason) {
+        showAlert('error', 'Please provide a reason for the punishment');
+        return;
+    }
+    
+    const punishmentData = {
+        reportId: '<%= report.reportId %>',
+        type: punishmentType,
+        reason: punishmentReason,
+        staffComment: staffComment
+    };
+    
+    if (punishmentType === 'timeout') {
+        const duration = document.getElementById('timeoutDuration').value;
+        const unit = document.getElementById('timeoutUnit').value;
+        
+        if (!duration || parseInt(duration) < 1) {
+            showAlert('error', 'Please enter a valid timeout duration');
+            return;
+        }
+        
+        punishmentData.duration = parseInt(duration);
+        punishmentData.unit = unit;
+    }
+    
+    if (punishmentType === 'ban') {
+        const isPermanent = document.getElementById('permanentBan').checked;
+        punishmentData.permanent = isPermanent;
+        
+        if (!isPermanent) {
+            const duration = document.getElementById('banDuration').value;
+            const unit = document.getElementById('banUnit').value;
+            
+            if (!duration || parseInt(duration) < 1) {
+                showAlert('error', 'Please enter a valid ban duration');
+                return;
+            }
+            
+            punishmentData.duration = parseInt(duration);
+            punishmentData.unit = unit;
+        }
+    }
+    
+    try {
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+    
+        const response = await fetch('/approve-report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(punishmentData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.href = '/reports?success=report-approved';
+        } else {
+            showAlert('error', result.message || 'Failed to approve report');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-check"></i> Confirm Action';
+        }
+    } catch (error) {
+        console.error('Error approving report:', error);
+        showAlert('error', 'An error occurred while processing your request');
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-check"></i> Confirm Action';
+    }
+});
+    
+    document.getElementById('confirmDenyButton').addEventListener('click', async function() {
+        const denyReason = document.getElementById('denyReason').value.trim();
+        
+        try {
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+            
+            // Send the request
+            const response = await fetch('/deny-report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    reportId: '<%= report.reportId %>',
+                    reason: denyReason
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                window.location.href = '/reports?success=report-denied';
+            } else {
+                showAlert('error', result.message || 'Failed to deny report');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Report';
+            }
+        } catch (error) {
+            console.error('Error denying report:', error);
+            showAlert('error', 'An error occurred while processing your request');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Report';
+        }
+    });
+    
+    function showAlert(type, message) {
+        const alert = document.createElement('div');
+        alert.className = `alert is-${type === 'success' ? 'success' : 'danger'}`; 
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            ${message}
+        `;
+    
+        const container = document.querySelector('.glass-card');
+        container.insertBefore(alert, container.querySelector('.report-info-card'));
+    
+        alert.style.animation = 'fadeIn 0.3s ease';
+    
+        setTimeout(() => {
+            alert.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 5000);
+    }
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Auto Responses | <%= settings.name %></title>
+        
+        
+        <meta property="og:title" content="Auto Responses | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+        <style>
+            :root {
+                --accent-color: <%= settings.accentColor %>;
+                --accent-color-rgb: <%= accentColorRgb %>;
+            }
+            
+            
+            body {
+                background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+                min-height: 100vh;
+                font-family: 'Inter', sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .section {
+                flex: 1;
+                padding: 1rem;
+                margin: 0;
+            }
+            
+            
+            .glass-card {
+                background: #1a1a2e;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                border-radius: 16px;
+                padding: 1.5rem;
+                transition: all 0.3s ease;
+                margin-bottom: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .section-title i {
+                color: var(--accent-color);
+            }
+            
+            .section-description {
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 1.5rem;
+            }
+            
+            
+            .response-card {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                border-radius: 12px;
+                padding: 1.25rem;
+                margin-bottom: 1rem;
+                transition: all 0.3s ease;
+            }
+            
+            .response-card:hover {
+                transform: translateX(5px);
+                border-color: var(--accent-color);
+                background: rgba(255, 255, 255, 0.04);
+            }
+            
+            .response-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            }
+            
+            .response-trigger {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .response-tag {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+                padding: 0.25rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-left: 0.75rem;
+            }
+            
+            .response-actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .action-button {
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .action-button.edit {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+            }
+            
+            .action-button.delete2 {
+                background: rgba(217, 83, 79, 0.1);
+                color: #d9534f;
+            }
+            
+            .action-button:hover {
+                transform: translateY(-2px);
+                filter: brightness(120%);
+            }
+            
+            .response-details {
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 1rem;
+                font-size: 0.95rem;
+            }
+            
+            strong {
+                color: var(--accent-color);
+            }
+
+            .response-settings {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                margin-top: 0.75rem;
+            }
+            
+            .setting-item {
+                background: rgba(30, 27, 38, 0.6);
+                border-radius: 6px;
+                padding: 0.5rem 0.75rem;
+                color: rgba(255, 255, 255, 0.75);
+                font-size: 0.85rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .setting-item i {
+                color: var(--accent-color);
+                font-size: 0.8rem;
+            }
+            
+            
+            .create-response-button {
+                background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.15) 0%, rgba(var(--accent-color-rgb), 0.05) 100%);
+                border: 1px dashed rgba(var(--accent-color-rgb), 0.3);
+                border-radius: 12px;
+                padding: 1.25rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.75rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-top: 1rem;
+            }
+            
+            .create-response-button:hover {
+                transform: translateY(-3px);
+                background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.1) 100%);
+                border-color: var(--accent-color);
+            }
+            
+            .create-response-button i {
+                font-size: 2rem;
+                color: var(--accent-color);
+                background: rgba(var(--accent-color-rgb), 0.1);
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+            
+            .create-response-button span {
+                color: var(--accent-color);
+                font-weight: 500;
+            }
+
+            
+            .empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 1rem;
+                text-align: center;
+            }
+            
+            .empty-state-icon {
+                font-size: 3rem;
+                color: rgba(var(--accent-color-rgb), 0.5);
+                margin-bottom: 1.5rem;
+                background: rgba(var(--accent-color-rgb), 0.05);
+                width: 100px;
+                height: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+            
+            .empty-state-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 0.75rem;
+            }
+            
+            .empty-state-description {
+                color: rgba(255, 255, 255, 0.7);
+                max-width: 500px;
+                margin-bottom: 2rem;
+            }
+            
+            .empty-state-button {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: none;
+            }
+            
+            .empty-state-button:hover {
+                background: rgba(var(--accent-color-rgb), 0.25);
+                transform: translateY(-3px);
+            }
+            
+            
+            .modal-background {
+                background: rgba(19, 17, 26, 0.8);
+                backdrop-filter: blur(8px);
+            }
+            
+            .modal-card {
+                background: rgba(30, 27, 38, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+                border-radius: 16px;
+                max-width: 800px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            
+            .modal-card-head {
+                background: rgba(35, 32, 44, 0.6);
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+                border-radius: 16px 16px 0 0;
+                padding: 1.25rem;
+            }
+            
+            .modal-card-title {
+                color: #ffffff;
+                font-size: 1.1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .modal-card-title i {
+                color: var(--accent-color);
+            }
+            
+            .modal-card-body {
+                background: none;
+                padding: 1.5rem;
+                color: rgba(255, 255, 255, 0.9);
+                max-height: 75vh;
+                overflow-y: auto;
+            }
+            
+            .modal-card-foot {
+                background: rgba(35, 32, 44, 0.6);
+                border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+                border-radius: 0 0 16px 16px;
+                padding: 1.25rem;
+                justify-content: flex-end;
+                gap: 0.75rem;
+            }
+            
+            .modal-delete {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+            }
+            
+            .modal-delete:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            
+            .modal-delete::before,
+            .modal-delete::after {
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+            
+            
+            .form-label {
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                font-size: 0.95rem;
+            }
+            
+            .form-input, .form-select, .form-textarea {
+                background: rgba(24, 21, 31, 0.6);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+                color: #ffffff;
+                border-radius: 8px;
+                padding: 0.75rem 1rem;
+                width: 100%;
+                transition: all 0.3s ease;
+                font-size: 0.95rem;
+            }
+            
+            .form-input:focus, .form-select:focus, .form-textarea:focus {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+                background: rgba(30, 27, 38, 0.8);
+                outline: none;
+            }
+            
+            .form-input::placeholder, .form-select::placeholder, .form-textarea::placeholder {
+                color: rgba(255, 255, 255, 0.4);
+            }
+            
+            .form-input, .form-select {
+                height: 42px;
+            }
+            
+            .form-textarea {
+                min-height: 100px;
+                resize: vertical;
+            }
+            
+            .form-select {
+                appearance: none;
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 1em;
+                padding-right: 2.5rem;
+            }
+            
+            .form-select option {
+                background: #1e1b26;
+                color: #ffffff;
+                padding: 12px;
+            }
+            
+            
+            .switch-container {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 46px;
+                height: 24px;
+            }
+            
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            
+            .switch-slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.1);
+                transition: .4s;
+                border-radius: 24px;
+            }
+            
+            .switch-slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            
+            input:checked + .switch-slider {
+                background-color: var(--accent-color);
+            }
+            
+            input:checked + .switch-slider:before {
+                transform: translateX(22px);
+            }
+            
+            .switch-label {
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 500;
+                font-size: 0.95rem;
+            }
+            
+            
+            .tabs-container {
+                margin-bottom: 1.5rem;
+            }
+            
+            .tabs-header {
+                display: flex;
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                margin-bottom: 1.5rem;
+            }
+            
+            .tab-item {
+                padding: 0.75rem 1.25rem;
+                color: rgba(255, 255, 255, 0.6);
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                position: relative;
+            }
+            
+            .tab-item.active {
+                color: var(--accent-color);
+            }
+            
+            .tab-item.active::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--accent-color);
+            }
+            
+            .tab-item:hover {
+                color: rgba(255, 255, 255, 0.9);
+            }
+            
+            .tab-content {
+                display: none;
+            }
+            
+            .tab-content.active {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            
+            .variables-info {
+                background: rgba(30, 27, 38, 0.6);
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+                border-left: 3px solid var(--accent-color);
+            }
+            
+            .variables-title {
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .variables-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                margin-top: 0.5rem;
+            }
+            
+            .variable-item {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+                padding: 0.4rem 0.75rem;
+                border-radius: 4px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                font-family: 'Courier New', monospace;
+            }
+
+            
+            .channel-list {
+                background: rgba(24, 21, 31, 0.6);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+                border-radius: 8px;
+                max-height: 150px;
+                overflow-y: auto;
+                margin-bottom: 1rem;
+            }
+            
+            .channel-list-empty {
+                padding: 1rem;
+                color: rgba(255, 255, 255, 0.5);
+                text-align: center;
+                font-style: italic;
+            }
+            
+            .channel-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.5rem 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .channel-item:last-child {
+                border-bottom: none;
+            }
+            
+            .channel-name {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: rgba(255, 255, 255, 0.9);
+            }
+            
+            .channel-name i {
+                color: rgba(var(--accent-color-rgb), 0.8);
+                font-size: 0.9rem;
+            }
+            
+            .channel-remove {
+                background: none;
+                border: none;
+                color: rgba(217, 83, 79, 0.8);
+                cursor: pointer;
+                font-size: 0.9rem;
+                transition: all 0.2s ease;
+            }
+            
+            .channel-remove:hover {
+                color: rgba(217, 83, 79, 1);
+            }
+            
+            .channel-select-container {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .channel-select {
+                flex: 1;
+            }
+            
+            .add-channel-btn {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+                border: none;
+                border-radius: 8px;
+                padding: 0 1rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            
+            .add-channel-btn:hover {
+                background: rgba(var(--accent-color-rgb), 0.2);
+            }
+            
+            
+            .preview-card {
+                background: rgba(24, 21, 31, 0.5);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-top: 1rem;
+                border: 1px dashed rgba(var(--accent-color-rgb), 0.2);
+            }
+            
+            .preview-header {
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.6);
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .preview-header i {
+                color: var(--accent-color);
+            }
+            
+            .preview-content {
+                padding: 0.75rem;
+                background: rgba(19, 17, 26, 0.6);
+                border-radius: 8px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 0.95rem;
+                word-break: break-word;
+            }
+            
+            .embed-preview {
+                background: rgba(30, 27, 38, 0.7);
+                border-radius: 8px;
+                padding: 0.75rem 1rem;
+                border-left: 4px solid var(--accent-color);
+                margin-top: 0.5rem;
+            }
+
+            
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.25rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                gap: 0.5rem;
+                margin-left: 0.75rem;
+            }
+            
+            .status-badge.enabled {
+                background: rgba(72, 199, 116, 0.1);
+                color: #48c774;
+            }
+            
+            .status-badge.disabled {
+                background: rgba(241, 70, 104, 0.1);
+                color: #f14668;
+            }
+
+            
+            .alert {
+                padding: 0.75rem 1.25rem;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .alert.is-success {
+                background: rgba(72, 199, 116, 0.1);
+                border: 1px solid rgba(72, 199, 116, 0.2);
+                color: #48c774;
+            }
+            
+            .alert.is-danger {
+                background: rgba(241, 70, 104, 0.1);
+                border: 1px solid rgba(241, 70, 104, 0.2);
+                color: #f14668;
+            }
+            
+            .alert i {
+                font-size: 1.1rem;
+            }
+
+            
+            .modal-button {
+                padding: 0.6rem 1.25rem;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .modal-button.primary {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+            }
+            
+            .modal-button.primary:hover {
+                background: rgba(var(--accent-color-rgb), 0.25);
+                transform: translateY(-1px);
+            }
+            
+            .modal-button.danger {
+                background: rgba(217, 83, 79, 0.15);
+                color: #d9534f;
+            }
+            
+            .modal-button.danger:hover {
+                background: rgba(217, 83, 79, 0.25);
+                transform: translateY(-1px);
+            }
+            
+            .modal-button.cancel {
+                background: rgba(255, 255, 255, 0.05);
+                color: rgba(255, 255, 255, 0.7);
+            }
+            
+            .modal-button.cancel:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-1px);
+            }
+            
+            
+            .match-type-badge {
+                padding: 0.25rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+            }
+
+            
+            .settings-section {
+                background: rgba(24, 21, 31, 0.3);
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+                border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            }
+            
+            .settings-section-title {
+                color: #ffffff;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .settings-section-title i {
+                color: var(--accent-color);
+            }
+
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+            
+
+            .channel-filter-option {
+    background: rgba(30, 27, 38, 0.6);
+    border-radius: 8px;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    display: block;
+    width: 100%;
+    position: relative;
+}
+
+.channel-filter-option:hover {
+    background: rgba(30, 27, 38, 0.8);
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+}
+
+.channel-filter-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.filter-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.radio-custom {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.5);
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.channel-filter-option input[type="radio"]:checked + .filter-content .radio-custom:after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.channel-filter-option input[type="radio"]:checked + .filter-content .filter-label {
+    color: var(--accent-color);
+}
+
+.channel-filter-option input[type="radio"]:checked + .filter-content .radio-custom {
+    border-color: var(--accent-color);
+}
+
+.filter-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-description {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 4px;
+    margin-left: 30px;
+}
+
+.filter-label i {
+    font-size: 0.9rem;
+}
+
+.channel-filter-option input[value="whitelist"]:checked + .filter-content .filter-label i {
+    color: #48c774;
+}
+
+.channel-filter-option input[value="blacklist"]:checked + .filter-content .filter-label i {
+    color: #f14668;
+}
+
+
+.variables-info p {
+    color: rgba(255, 255, 255, 0.9); 
+    margin-bottom: 0.75rem;
+}
+
+            
+            @media screen and (max-width: 768px) {
+                .response-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.75rem;
+                }
+                
+                .response-actions {
+                    width: 100%;
+                    justify-content: flex-end;
+                }
+                
+                .tabs-header {
+                    overflow-x: auto;
+                    white-space: nowrap;
+                    padding-bottom: 0.5rem;
+                }
+                
+                .channel-select-container {
+                    flex-direction: column;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <%- include('../partials/navbar', { user: user, currentPage: 'settings' }) %>
+
+        <section class="section">
+            <div class="container">
+                <div class="glass-card">
+                    <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                        <div class="section-title">
+                            <i class="fas fa-reply-all"></i>
+                            Auto Responses
+                        </div>
+                        <a href="/settings" class="action-button back" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); font-weight: 500; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                            <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                            Back to Settings
+                        </a>
+                    </div>
+                    
+                    <p class="section-description">Configure auto responses for your server. When users mention specific keywords or phrases, the bot will automatically respond with your configured message. Each auto response can have custom settings for maximum flexibility.</p>
+                    
+                    <% if (messages && messages.success && messages.success.length > 0) { %>
+                        <div class="alert is-success">
+                            <i class="fas fa-check-circle"></i>
+                            <%= messages.success[0] %>
+                        </div>
+                    <% } %>
+                    
+                    <% if (messages && messages.error && messages.error.length > 0) { %>
+                        <div class="alert is-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <%= messages.error[0] %>
+                        </div>
+                    <% } %>
+                    
+                    
+                    <div class="variables-info">
+                        <div class="variables-title">
+                            <i class="fas fa-info-circle"></i>
+                            Available Variables
+                        </div>
+                        <p>You can use these variables in your auto responses:</p>
+                        <div class="variables-list">
+                            <div class="variable-item">{user}</div>
+                            <div class="variable-item">{username}</div>
+                            <div class="variable-item">{userID}</div>
+                            <div class="variable-item">{guildName}</div>
+                            <div class="variable-item">{channelName}</div>
+                            <div class="variable-item">{channelID}</div>
+                            <div class="variable-item">{initiator-message}</div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                        <h2 class="section-title mb-0">
+                            <i class="fas fa-list"></i>
+                            Your Auto Responses
+                        </h2>
+                        <button class="action-button edit" id="create-response-btn">
+                            <i class="fas fa-plus"></i>
+                            Create Auto Response
+                        </button>
+                    </div>
+                    
+                    <% if (autoResponses && autoResponses.length > 0) { %>
+                        
+                        <% autoResponses.forEach(function(response) { %>
+                            <div class="response-card">
+                                <div class="response-header">
+                                    <div class="is-flex is-align-items-center">
+                                        <span class="response-trigger">
+                                            <i class="fas fa-reply"></i>
+                                            <%= response.trigger %>
+                                        </span>
+                                        <span class="response-tag">
+                                            <% if (response.type === 'TEXT') { %>
+                                                <i class="fas fa-comment"></i> Text
+                                            <% } else { %>
+                                                <i class="fas fa-image"></i> Embed
+                                            <% } %>
+                                        </span>
+                                        <span class="status-badge <%= response.settings && response.settings.enabled ? 'enabled' : 'disabled' %>">
+                                            <i class="fas <%= response.settings && response.settings.enabled ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                            <%= response.settings && response.settings.enabled ? 'Enabled' : 'Disabled' %>
+                                        </span>
+                                    </div>
+                                    <div class="response-actions">
+                                        <button class="action-button edit edit-response-btn" data-response-id="<%= response._id %>">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </button>
+                                        <button class="action-button delete2 delete-response-btn" data-response-id="<%= response._id %>" data-response-trigger="<%= response.trigger %>">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="response-details">
+                                    <% if (response.type === 'TEXT') { %>
+                                        <%= response.message.substring(0, 100) %><%= response.message.length > 100 ? '...' : '' %>
+                                    <% } else { %>
+                                        <strong>Embed Response</strong>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="response-settings">
+                                    <% if (response.settings && response.settings.exactMatch) { %>
+                                        <div class="setting-item">
+                                            <i class="fas fa-equals"></i>
+                                            <span>Exact Match</span>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <% if (response.settings && response.settings.caseSensitive) { %>
+                                        <div class="setting-item">
+                                            <i class="fas fa-font"></i>
+                                            <span>Case Sensitive</span>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <% if (response.settings && response.settings.replyToUser) { %>
+                                        <div class="setting-item">
+                                            <i class="fas fa-reply"></i>
+                                            <span>Replies to User</span>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <div class="setting-item">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <span>Triggers: <%= response.triggerCount || 0 %> times</span>
+                                    </div>
+                                    
+                                    <div class="setting-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Created: <%= new Date(response.createdAt).toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-reply-all"></i>
+                            </div>
+                            <h3 class="empty-state-title">No Auto Responses Yet</h3>
+                            <p class="empty-state-description">
+                                Create auto responses to automatically reply when users mention specific keywords or phrases. Enhance your server's interaction with automated helpful messages.
+                            </p>
+                            <button class="empty-state-button" id="create-first-response-btn">
+                                <i class="fas fa-plus"></i>
+                                Create Your First Auto Response
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+        
+        
+        <div class="modal" id="responseModal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">
+                        <i class="fas fa-plus-circle"></i>
+                        <span id="responseModalLabel">Create Auto Response</span>
+                    </p>
+                    <button class="modal-delete" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <form id="responseForm">
+                        <input type="hidden" id="responseId" value="">
+                        
+                        <div class="tabs-container">
+                            <div class="tabs-header">
+                                <div class="tab-item active" data-tab="content">Content</div>
+                                <div class="tab-item" data-tab="settings">Settings</div>
+                                <div class="tab-item" data-tab="channels">Channels</div>
+                                <div class="tab-item" data-tab="preview">Preview</div>
+                            </div>
+                            
+                            
+                            <div class="tab-content active" id="content-tab">
+                                <div class="field mb-4">
+                                    <label class="form-label" for="responseTrigger">Trigger Phrase</label>
+                                    <div class="control">
+                                        <input type="text" class="form-input" id="responseTrigger" placeholder="Enter trigger phrase or keyword" required>
+                                    </div>
+                                    <p class="help has-text-grey-light">This is what users will type to trigger the auto response</p>
+                                </div>
+                                
+                                <div class="field mb-4">
+                                    <label class="form-label">Response Type</label>
+                                    <div class="control">
+                                        <label class="radio has-text-white">
+                                            <input type="radio" name="responseType" value="TEXT" checked> 
+                                            <span style="margin-left: 0.5rem;">Text Message</span>
+                                        </label>
+                                        <label class="radio has-text-white" style="margin-left: 1.5rem;">
+                                            <input type="radio" name="responseType" value="EMBED"> 
+                                            <span style="margin-left: 0.5rem;">Embed</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div id="textResponseContainer">
+                                    <div class="field">
+                                        <label class="form-label" for="textResponse">Response Message</label>
+                                        <div class="control">
+                                            <textarea class="form-textarea" id="textResponse" placeholder="Enter response message here..."></textarea>
+                                        </div>
+                                        <p class="help has-text-grey-light">The message that will be sent when the trigger is detected</p>
+                                    </div>
+                                </div>
+                                
+                                <div id="embedResponseContainer" style="display: none;">
+                                    <div class="field mb-3">
+                                        <label class="form-label" for="embedTitle">Embed Title</label>
+                                        <div class="control">
+                                            <input type="text" class="form-input" id="embedTitle" placeholder="Enter embed title">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="field mb-3">
+                                        <label class="form-label" for="embedDescription">Embed Description</label>
+                                        <div class="control">
+                                            <textarea class="form-textarea" id="embedDescription" placeholder="Enter embed description"></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="field mb-3">
+                                        <label class="form-label" for="embedColor">Embed Color</label>
+                                        <div class="color-picker-container">
+                                            <div class="color-preview" id="colorPreview" style="background-color: #7060be;"></div>
+                                            <div class="color-input">
+                                                <input type="color" id="embedColor" value="#7060be">
+                                                <input type="text" class="form-input" id="colorInput" value="#7060be">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="field mb-3">
+                                        <label class="form-label" for="embedFooter">Embed Footer</label>
+                                        <div class="control">
+                                            <input type="text" class="form-input" id="embedFooter" placeholder="Enter embed footer">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="embedTimestamp">
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Include Timestamp</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="tab-content" id="settings-tab">
+                                <div class="settings-section">
+                                    <div class="settings-section-title">
+                                        <i class="fas fa-cog"></i>
+                                        General Settings
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseEnabled" checked>
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Enable this Auto Response</span>
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseReplyToUser" checked>
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Reply to User's Message</span>
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseDeleteUserMessage">
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Delete the Trigger Message</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="settings-section">
+                                    <div class="settings-section-title">
+                                        <i class="fas fa-filter"></i>
+                                        Trigger Options
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseExactMatch">
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Exact Match Only</span>
+                                        <p class="help has-text-grey-light mt-1" style="margin-left: 3.5rem;">Only trigger when the message exactly matches the trigger phrase</p>
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseCaseSensitive">
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Case Sensitive</span>
+                                        <p class="help has-text-grey-light mt-1" style="margin-left: 3.5rem;">Match the exact case of the trigger phrase</p>
+                                    </div>
+                                    
+                                    <div class="switch-container">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseWildcardMatch">
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Enable Wildcard Matching</span>
+                                        <p class="help has-text-grey-light mt-1" style="margin-left: 3.5rem;">Use * as a wildcard in trigger phrases</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="settings-section">
+                                    <div class="settings-section-title">
+                                        <i class="fas fa-clock"></i>
+                                        Cooldown Settings
+                                    </div>
+                                    
+                                    <div class="field">
+                                        <label class="form-label" for="responseCooldown">Cooldown (seconds)</label>
+                                        <div class="control">
+                                            <input type="number" class="form-input" id="responseCooldown" min="0" placeholder="0" value="0">
+                                        </div>
+                                        <p class="help has-text-grey-light">Minimum time between triggers (0 = no cooldown)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="tab-content" id="channels-tab">
+                                <div class="settings-section">
+                                    <div class="settings-section-title">
+                                        <i class="fas fa-hashtag"></i>
+                                        Channel Restrictions
+                                    </div>
+                                    
+                                    <div class="switch-container mb-4">
+                                        <label class="switch">
+                                            <input type="checkbox" id="responseAllChannels" checked>
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                        <span class="switch-label">Apply to all channels</span>
+                                    </div>
+                                    
+                                    <div id="channelsSection" style="display: none;">
+                                        
+
+<div class="columns">
+    <div class="column is-6">
+        <label class="channel-filter-option">
+            <input type="radio" name="channelFilterType" value="whitelist" checked>
+            <div class="filter-content">
+                <div class="filter-header">
+                    <span class="radio-custom"></span>
+                    <span class="filter-label">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Whitelist</span>
+                    </span>
+                </div>
+                <p class="filter-description">Only work in selected channels</p>
+            </div>
+        </label>
+    </div>
+    <div class="column is-6">
+        <label class="channel-filter-option">
+            <input type="radio" name="channelFilterType" value="blacklist">
+            <div class="filter-content">
+                <div class="filter-header">
+                    <span class="radio-custom"></span>
+                    <span class="filter-label">
+                        <i class="fas fa-ban"></i>
+                        <span>Blacklist</span>
+                    </span>
+                </div>
+                <p class="filter-description">Don't work in selected channels</p>
+            </div>
+        </label>
+    </div>
+</div>
+                                        
+                                        <div class="columns">
+                                            <div class="column is-6">
+                                                <h4 class="form-label">Channels</h4>
+                                                <div class="channel-select-container">
+                                                    <div class="channel-select">
+                                                        <select id="channelSelect" class="form-select">
+                                                            <option value="" disabled selected>Select a channel</option>
+                                                            <% guild.channels.cache.filter(channel => channel.type === 0).forEach(channel => { %>
+                                                                <option value="<%= channel.id %>"><%= channel.name %></option>
+                                                            <% }); %>
+                                                        </select>
+                                                    </div>
+                                                    <button type="button" id="addChannel" class="add-channel-btn">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="channel-list" id="channelsList">
+                                                    <div class="channel-list-empty">No channels selected</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="column is-6">
+                                                <h4 class="form-label">Categories</h4>
+                                                <div class="channel-select-container">
+                                                    <div class="channel-select">
+                                                        <select id="categorySelect" class="form-select">
+                                                            <option value="" disabled selected>Select a category</option>
+                                                            <% guild.channels.cache.filter(channel => channel.type === 4).forEach(category => { %>
+                                                                <option value="<%= category.id %>"><%= category.name %></option>
+                                                            <% }); %>
+                                                        </select>
+                                                    </div>
+                                                    <button type="button" id="addCategory" class="add-channel-btn">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="channel-list" id="categoriesList">
+                                                    <div class="channel-list-empty">No categories selected</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="tab-content" id="preview-tab">
+                                <div class="preview-card">
+                                    <div class="preview-header">
+                                        <i class="fas fa-eye"></i>
+                                        Response Preview
+                                    </div>
+                                    
+                                    <div class="preview-content">
+                                        <div class="preview-text-content" id="previewTextContent">
+                                            
+                                        </div>
+                                        
+                                        <div class="embed-preview" id="previewEmbedContent" style="display: none;">
+                                            <div class="embed-title" id="previewEmbedTitle">Embed Title</div>
+                                            <div class="embed-description" id="previewEmbedDescription">This is a preview of how your embed will look.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="button" class="modal-button primary" id="saveResponseBtn">
+                        <i class="fas fa-save"></i>
+                        Save Auto Response
+                    </button>
+                    <button type="button" class="modal-button cancel" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </footer>
+            </div>
+        </div>
+        
+        
+        <div class="modal" id="deleteResponseModal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirm Delete Auto Response
+                    </p>
+                    <button class="modal-delete" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="has-text-centered">
+                        <i class="fas fa-trash-alt has-text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p class="mb-4">Are you sure you want to delete the auto response for <strong id="deleteResponseTrigger" class="has-text-white"></strong>?</p>
+                        <p class="has-text-danger">This action cannot be undone.</p>
+                        <input type="hidden" id="deleteResponseId">
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="button" class="modal-button danger" id="confirmDeleteBtn">
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Permanently
+                    </button>
+                    <button type="button" class="modal-button cancel" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </footer>
+            </div>
+        </div>
+        
+        <%- include('../partials/footer') %>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                document.querySelectorAll('.tab-item').forEach(tab => {
+                    tab.addEventListener('click', function() {
+
+                        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+
+                        this.classList.add('active');
+                        
+
+                        const tabName = this.getAttribute('data-tab');
+                        document.getElementById(tabName + '-tab').classList.add('active');
+                        
+
+                        if (tabName === 'preview') {
+                            updatePreview();
+                        }
+                    });
+                });
+                
+
+                document.querySelectorAll('input[name="responseType"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        if (this.value === 'TEXT') {
+                            document.getElementById('textResponseContainer').style.display = 'block';
+                            document.getElementById('embedResponseContainer').style.display = 'none';
+                            document.getElementById('previewTextContent').style.display = 'block';
+                            document.getElementById('previewEmbedContent').style.display = 'none';
+                        } else {
+                            document.getElementById('textResponseContainer').style.display = 'none';
+                            document.getElementById('embedResponseContainer').style.display = 'block';
+                            document.getElementById('previewTextContent').style.display = 'none';
+                            document.getElementById('previewEmbedContent').style.display = 'block';
+                        }
+                        
+                        updatePreview();
+                    });
+                });
+                
+
+                const allChannelsCheckbox = document.getElementById('responseAllChannels');
+                if (allChannelsCheckbox) {
+                    allChannelsCheckbox.addEventListener('change', function() {
+                        document.getElementById('channelsSection').style.display = this.checked ? 'none' : 'block';
+                    });
+                }
+                
+
+                const replyCheckbox = document.getElementById('responseReplyToUser');
+                const deleteCheckbox = document.getElementById('responseDeleteUserMessage');
+                
+                if (replyCheckbox && deleteCheckbox) {
+                    replyCheckbox.addEventListener('change', function() {
+                        if (this.checked && deleteCheckbox.checked) {
+                            deleteCheckbox.checked = false;
+                            alert('Reply to User and Delete Message cannot be enabled simultaneously.');
+                        }
+                    });
+                    
+                    deleteCheckbox.addEventListener('change', function() {
+                        if (this.checked && replyCheckbox.checked) {
+                            replyCheckbox.checked = false;
+                            alert('Reply to User and Delete Message cannot be enabled simultaneously.');
+                        }
+                    });
+                }
+                
+
+                const colorPicker = document.getElementById('embedColor');
+                const colorInput = document.getElementById('colorInput');
+                const colorPreview = document.getElementById('colorPreview');
+                
+                if (colorPicker && colorInput && colorPreview) {
+                    colorPicker.addEventListener('input', function(e) {
+                        const color = e.target.value;
+                        colorPreview.style.backgroundColor = color;
+                        colorInput.value = color;
+                        updatePreview();
+                    });
+                    
+                    colorInput.addEventListener('input', function(e) {
+                        let color = e.target.value;
+                        
+
+                        if (!color.startsWith('#')) {
+                            color = '#' + color;
+                            colorInput.value = color;
+                        }
+                        
+
+                        if (/^#[0-9A-F]{6}$/i.test(color)) {
+                            colorPicker.value = color;
+                            colorPreview.style.backgroundColor = color;
+                            updatePreview();
+                        }
+                    });
+                    
+                    colorPreview.addEventListener('click', function() {
+                        colorPicker.click();
+                    });
+                }
+                
+
+                function setupChannelListManagement(selectId, addBtnId, listId) {
+                    const select = document.getElementById(selectId);
+                    const addBtn = document.getElementById(addBtnId);
+                    const list = document.getElementById(listId);
+                    
+                    if (!select || !addBtn || !list) return;
+                    
+                    addBtn.addEventListener('click', function() {
+                        const selectedOption = select.options[select.selectedIndex];
+                        if (!selectedOption || !selectedOption.value) return;
+                        
+                        const channelId = selectedOption.value;
+                        const channelName = selectedOption.text;
+                        
+
+                        if (list.querySelector(`.channel-item[data-id="${channelId}"]`)) {
+                            alert('This item is already in the list.');
+                            return;
+                        }
+                        
+
+                        const channelItem = document.createElement('div');
+                        channelItem.className = 'channel-item';
+                        channelItem.dataset.id = channelId;
+                        
+                        const isCategory = selectId.toLowerCase().includes('category');
+                        const icon = isCategory ? 'folder' : 'hashtag';
+                        
+                        channelItem.innerHTML = `
+                            <div class="channel-name">
+                                <i class="fas fa-${icon}"></i>
+                                ${channelName}
+                            </div>
+                            <button type="button" class="channel-remove" data-id="${channelId}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        
+
+                        const emptyState = list.querySelector('.channel-list-empty');
+                        if (emptyState) {
+                            emptyState.remove();
+                        }
+                        
+
+                        list.appendChild(channelItem);
+                        
+
+                        channelItem.querySelector('.channel-remove').addEventListener('click', function() {
+                            channelItem.remove();
+                            
+
+                            if (list.children.length === 0) {
+                                const emptyMessage = document.createElement('div');
+                                emptyMessage.className = 'channel-list-empty';
+                                emptyMessage.textContent = isCategory ? 'No categories selected' : 'No channels selected';
+                                list.appendChild(emptyMessage);
+                            }
+                        });
+                        
+
+                        select.selectedIndex = 0;
+                    });
+                }
+                
+
+                setupChannelListManagement('channelSelect', 'addChannel', 'channelsList');
+                setupChannelListManagement('categorySelect', 'addCategory', 'categoriesList');
+                
+
+                function updatePreview() {
+                    const responseType = document.querySelector('input[name="responseType"]:checked').value;
+                    
+
+                    if (responseType === 'TEXT') {
+                        const textContent = document.getElementById('textResponse').value || 'Your auto response will appear here...';
+                        document.getElementById('previewTextContent').textContent = textContent;
+                    } else {
+
+                        const embedTitle = document.getElementById('embedTitle').value || 'Embed Title';
+                        const embedDescription = document.getElementById('embedDescription').value || 'This is a preview of how your embed will look.';
+                        const embedColor = document.getElementById('embedColor').value || '#7060be';
+                        
+                        document.getElementById('previewEmbedTitle').textContent = embedTitle;
+                        document.getElementById('previewEmbedDescription').textContent = embedDescription;
+                        document.getElementById('previewEmbedContent').style.borderLeftColor = embedColor;
+                    }
+                }
+                
+
+                document.querySelectorAll('#responseForm input, #responseForm textarea').forEach(input => {
+                    input.addEventListener('input', function() {
+
+                        if (document.querySelector('.tab-item[data-tab="preview"]').classList.contains('active')) {
+                            updatePreview();
+                        }
+                    });
+                });
+                
+
+function setupModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    
+    const closeButtons = modal.querySelectorAll('.modal-delete, .modal-button.cancel, [data-dismiss="modal"]');
+    const background = modal.querySelector('.modal-background');
+    
+    function closeModal() {
+        modal.classList.remove('is-active');
+
+        const form = modal.querySelector('form');
+        if (form) form.reset();
+        
+
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('.tab-item[data-tab="content"]').classList.add('active');
+        document.getElementById('content-tab').classList.add('active');
+        
+
+        if (modalId === 'responseModal') {
+            document.querySelector('input[name="responseType"][value="TEXT"]').checked = true;
+            document.getElementById('textResponseContainer').style.display = 'block';
+            document.getElementById('embedResponseContainer').style.display = 'none';
+            document.getElementById('previewTextContent').style.display = 'block';
+            document.getElementById('previewEmbedContent').style.display = 'none';
+            
+
+            document.getElementById('embedColor').value = '#7060be';
+            document.getElementById('colorInput').value = '#7060be';
+            document.getElementById('colorPreview').style.backgroundColor = '#7060be';
+            
+
+            document.getElementById('channelsList').innerHTML = '<div class="channel-list-empty">No channels selected</div>';
+            document.getElementById('categoriesList').innerHTML = '<div class="channel-list-empty">No categories selected</div>';
+            
+
+            document.getElementById('responseAllChannels').checked = true;
+            document.getElementById('channelsSection').style.display = 'none';
+            
+
+            updatePreview();
+        }
+    }
+    
+    closeButtons.forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
+    
+    background.addEventListener('click', closeModal);
+    
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+            closeModal();
+        }
+    });
+    
+    return closeModal;
+}
+
+
+const closeResponseModal = setupModal('responseModal');
+setupModal('deleteResponseModal');
+
+
+const createResponseBtns = [
+    document.getElementById('create-response-btn'),
+    document.getElementById('create-first-response-btn')
+];
+
+createResponseBtns.forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', function() {
+            const modal = document.getElementById('responseModal');
+            document.getElementById('responseModalLabel').textContent = 'Create Auto Response';
+            document.getElementById('responseId').value = '';
+            document.getElementById('responseForm').reset();
+            
+
+            document.getElementById('embedColor').value = '#7060be';
+            document.getElementById('colorInput').value = '#7060be';
+            document.getElementById('colorPreview').style.backgroundColor = '#7060be';
+            document.getElementById('responseEnabled').checked = true;
+            document.getElementById('responseReplyToUser').checked = true;
+            document.getElementById('responseAllChannels').checked = true;
+            document.getElementById('channelsSection').style.display = 'none';
+            
+
+            updatePreview();
+            
+
+            modal.classList.add('is-active');
+        });
+    }
+});
+
+
+document.querySelectorAll('.edit-response-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const responseId = this.getAttribute('data-response-id');
+        const modal = document.getElementById('responseModal');
+        
+        document.getElementById('responseModalLabel').textContent = 'Edit Auto Response';
+        document.getElementById('responseId').value = responseId;
+        
+
+        fetch(`/settings/get-auto-response?id=${responseId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const autoResponse = data.autoResponse;
+                    
+
+                    document.getElementById('responseTrigger').value = autoResponse.trigger;
+                    
+
+                    document.querySelector(`input[name="responseType"][value="${autoResponse.type}"]`).checked = true;
+                    
+                    if (autoResponse.type === 'TEXT') {
+                        document.getElementById('textResponseContainer').style.display = 'block';
+                        document.getElementById('embedResponseContainer').style.display = 'none';
+                        document.getElementById('previewTextContent').style.display = 'block';
+                        document.getElementById('previewEmbedContent').style.display = 'none';
+                        document.getElementById('textResponse').value = autoResponse.message || '';
+                    } else {
+                        document.getElementById('textResponseContainer').style.display = 'none';
+                        document.getElementById('embedResponseContainer').style.display = 'block';
+                        document.getElementById('previewTextContent').style.display = 'none';
+                        document.getElementById('previewEmbedContent').style.display = 'block';
+                        
+
+                        if (autoResponse.embed) {
+                            document.getElementById('embedTitle').value = autoResponse.embed.title || '';
+                            document.getElementById('embedDescription').value = autoResponse.embed.description || '';
+                            document.getElementById('embedFooter').value = autoResponse.embed.footer || '';
+                            document.getElementById('embedTimestamp').checked = autoResponse.embed.timestamp || false;
+                            
+
+                            const embedColor = autoResponse.embed.color || '#7060be';
+                            document.getElementById('embedColor').value = embedColor;
+                            document.getElementById('colorInput').value = embedColor;
+                            document.getElementById('colorPreview').style.backgroundColor = embedColor;
+                        }
+                    }
+                    
+
+                    if (autoResponse.settings) {
+
+                        document.getElementById('responseEnabled').checked = autoResponse.settings.enabled !== false;
+                        document.getElementById('responseReplyToUser').checked = autoResponse.settings.replyToUser !== false;
+                        document.getElementById('responseDeleteUserMessage').checked = autoResponse.settings.deleteUserMessage || false;
+                        
+
+                        document.getElementById('responseExactMatch').checked = autoResponse.settings.exactMatch || false;
+                        document.getElementById('responseCaseSensitive').checked = autoResponse.settings.caseSensitive || false;
+                        document.getElementById('responseWildcardMatch').checked = autoResponse.settings.wildcardMatching || false;
+                        
+
+                        document.getElementById('responseCooldown').value = autoResponse.settings.cooldown || 0;
+                        
+
+                        const hasChannelRestrictions = 
+                            (autoResponse.settings.whitelistedChannels && autoResponse.settings.whitelistedChannels.length > 0) ||
+                            (autoResponse.settings.whitelistedCategories && autoResponse.settings.whitelistedCategories.length > 0) ||
+                            (autoResponse.settings.blacklistedChannels && autoResponse.settings.blacklistedChannels.length > 0) ||
+                            (autoResponse.settings.blacklistedCategories && autoResponse.settings.blacklistedCategories.length > 0);
+                        
+                        document.getElementById('responseAllChannels').checked = !hasChannelRestrictions;
+                        document.getElementById('channelsSection').style.display = hasChannelRestrictions ? 'block' : 'none';
+                        
+                        if (hasChannelRestrictions) {
+
+                            const isWhitelist = 
+                                (autoResponse.settings.whitelistedChannels && autoResponse.settings.whitelistedChannels.length > 0) ||
+                                (autoResponse.settings.whitelistedCategories && autoResponse.settings.whitelistedCategories.length > 0);
+                            
+                            document.querySelector(`input[name="channelFilterType"][value="${isWhitelist ? 'whitelist' : 'blacklist'}"]`).checked = true;
+                            
+
+                            document.getElementById('channelsList').innerHTML = '';
+                            document.getElementById('categoriesList').innerHTML = '';
+                            
+
+                            const channels = isWhitelist ? 
+                                (autoResponse.settings.whitelistedChannels || []) : 
+                                (autoResponse.settings.blacklistedChannels || []);
+                            
+                            const categories = isWhitelist ? 
+                                (autoResponse.settings.whitelistedCategories || []) : 
+                                (autoResponse.settings.blacklistedCategories || []);
+                            
+
+                            if (channels.length > 0) {
+                                channels.forEach(channelId => {
+                                    const channel = window.guild.channels.cache.get(channelId);
+                                    if (channel) {
+                                        const channelInfo = getChannelInfo(channelId);
+                                        const channelItem = document.createElement('div');
+                                        channelItem.className = 'channel-item';
+                                        channelItem.dataset.id = channelId;
+                                        
+                                        channelItem.innerHTML = `
+                                            <div class="channel-name">
+                                                <i class="fas fa-hashtag"></i>
+                                                ${channel.name}
+                                            </div>
+                                            <button type="button" class="channel-remove" data-id="${channelId}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        `;
+                                        
+                                        document.getElementById('channelsList').appendChild(channelItem);
+                                        
+
+                                        channelItem.querySelector('.channel-remove').addEventListener('click', function() {
+                                            channelItem.remove();
+                                            
+
+                                            if (document.getElementById('channelsList').children.length === 0) {
+                                                const emptyMessage = document.createElement('div');
+                                                emptyMessage.className = 'channel-list-empty';
+                                                emptyMessage.textContent = 'No channels selected';
+                                                document.getElementById('channelsList').appendChild(emptyMessage);
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                document.getElementById('channelsList').innerHTML = '<div class="channel-list-empty">No channels selected</div>';
+                            }
+                            
+
+                            if (categories.length > 0) {
+                                categories.forEach(categoryId => {
+                                    const category = window.guild.channels.cache.get(categoryId);
+                                    if (category) {
+                                        const categoryInfo = getChannelInfo(categoryId);
+                                        const categoryItem = document.createElement('div');
+                                        categoryItem.className = 'channel-item';
+                                        categoryItem.dataset.id = categoryId;
+                                        
+                                        categoryItem.innerHTML = `
+                                            <div class="channel-name">
+                                                <i class="fas fa-folder"></i>
+                                                ${category.name}
+                                            </div>
+                                            <button type="button" class="channel-remove" data-id="${categoryId}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        `;
+                                        
+                                        document.getElementById('categoriesList').appendChild(categoryItem);
+                                        
+
+                                        categoryItem.querySelector('.channel-remove').addEventListener('click', function() {
+                                            categoryItem.remove();
+                                            
+
+                                            if (document.getElementById('categoriesList').children.length === 0) {
+                                                const emptyMessage = document.createElement('div');
+                                                emptyMessage.className = 'channel-list-empty';
+                                                emptyMessage.textContent = 'No categories selected';
+                                                document.getElementById('categoriesList').appendChild(emptyMessage);
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                document.getElementById('categoriesList').innerHTML = '<div class="channel-list-empty">No categories selected</div>';
+                            }
+                        }
+                    }
+                    
+
+                    updatePreview();
+                    
+
+                    modal.classList.add('is-active');
+                } else {
+                    alert('Error fetching auto response data: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching auto response:', error);
+                alert('Error fetching auto response data. Please try again.');
+            });
+    });
+});
+
+
+document.querySelectorAll('.delete-response-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const responseId = this.getAttribute('data-response-id');
+        const responseTrigger = this.getAttribute('data-response-trigger');
+        const modal = document.getElementById('deleteResponseModal');
+        
+        document.getElementById('deleteResponseTrigger').textContent = responseTrigger;
+        document.getElementById('deleteResponseId').value = responseId;
+        
+        modal.classList.add('is-active');
+    });
+});
+
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    const responseId = document.getElementById('deleteResponseId').value;
+    
+
+    fetch('/settings/delete-auto-response', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ responseId: responseId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+
+            window.location.href = '/settings/auto-responses?success=Auto response deleted successfully';
+        } else {
+            alert('Error: ' + data.message);
+            document.getElementById('deleteResponseModal').classList.remove('is-active');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting auto response:', error);
+        alert('Error deleting auto response. Please try again.');
+        document.getElementById('deleteResponseModal').classList.remove('is-active');
+    });
+});
+
+
+document.getElementById('saveResponseBtn').addEventListener('click', function() {
+
+    const trigger = document.getElementById('responseTrigger').value;
+    if (!trigger) {
+        alert('Please enter a trigger phrase');
+        return;
+    }
+    
+    const responseType = document.querySelector('input[name="responseType"]:checked').value;
+    let isValid = true;
+    
+    if (responseType === 'TEXT') {
+        const textResponse = document.getElementById('textResponse').value;
+        if (!textResponse) {
+            alert('Please enter a text response');
+            isValid = false;
+        }
+    } else {
+
+
+        const embedTitle = document.getElementById('embedTitle').value;
+        const embedDescription = document.getElementById('embedDescription').value;
+        
+        if (!embedTitle && !embedDescription) {
+            if (!confirm('Your embed has no title or description. Are you sure you want to continue?')) {
+                isValid = false;
+            }
+        }
+    }
+    
+    if (!isValid) return;
+    
+
+    const responseData = {
+        id: document.getElementById('responseId').value,
+        trigger: trigger,
+        type: responseType,
+        settings: {
+            enabled: document.getElementById('responseEnabled').checked,
+            replyToUser: document.getElementById('responseReplyToUser').checked,
+            deleteUserMessage: document.getElementById('responseDeleteUserMessage').checked,
+            exactMatch: document.getElementById('responseExactMatch').checked,
+            caseSensitive: document.getElementById('responseCaseSensitive').checked,
+            wildcardMatching: document.getElementById('responseWildcardMatch').checked,
+            cooldown: parseInt(document.getElementById('responseCooldown').value) || 0
+        }
+    };
+    
+
+    if (!document.getElementById('responseAllChannels').checked) {
+        const isWhitelist = document.querySelector('input[name="channelFilterType"]:checked').value === 'whitelist';
+        
+
+        const channels = Array.from(document.querySelectorAll('#channelsList .channel-item')).map(item => item.dataset.id);
+        const categories = Array.from(document.querySelectorAll('#categoriesList .channel-item')).map(item => item.dataset.id);
+        
+        if (isWhitelist) {
+            responseData.settings.whitelistedChannels = channels;
+            responseData.settings.whitelistedCategories = categories;
+            responseData.settings.blacklistedChannels = [];
+            responseData.settings.blacklistedCategories = [];
+        } else {
+            responseData.settings.blacklistedChannels = channels;
+            responseData.settings.blacklistedCategories = categories;
+            responseData.settings.whitelistedChannels = [];
+            responseData.settings.whitelistedCategories = [];
+        }
+    } else {
+
+        responseData.settings.whitelistedChannels = [];
+        responseData.settings.whitelistedCategories = [];
+        responseData.settings.blacklistedChannels = [];
+        responseData.settings.blacklistedCategories = [];
+    }
+    
+
+    if (responseType === 'TEXT') {
+        responseData.message = document.getElementById('textResponse').value;
+    } else {
+        responseData.embed = {
+            title: document.getElementById('embedTitle').value,
+            description: document.getElementById('embedDescription').value,
+            color: document.getElementById('embedColor').value,
+            footer: document.getElementById('embedFooter').value,
+            timestamp: document.getElementById('embedTimestamp').checked
+        };
+    }
+    
+
+    fetch('/settings/save-auto-response', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(responseData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+
+            window.location.href = '/settings/auto-responses?success=' + 
+                (responseData.id ? 'Auto response updated successfully' : 'Auto response created successfully');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving auto response:', error);
+        alert('Error saving auto response. Please try again.');
+    });
+});
+
+const channelMap = {
+    <% guild.channels.cache.forEach(channel => { %>
+        "<%= channel.id %>": {
+            name: "<%= channel.name.replace(/"/g, '&quot;') %>",
+            type: <%= channel.type %>
+        },
+    <% }); %>
+};
+
+
+function getChannelInfo(channelId) {
+    return channelMap[channelId] || { name: 'Unknown Channel', type: 0 };
+}
+});
+</script>

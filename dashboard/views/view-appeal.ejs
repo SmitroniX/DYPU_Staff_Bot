@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Appeal | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="View Appeal | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+    
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+    
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+    
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+    
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+    
+        .section-title i {
+            color: var(--accent-color);
+        }
+        
+        
+        .back-button-container {
+            padding: 1rem 1rem 0 1rem;
+        }
+    
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            backdrop-filter: blur(8px);
+        }
+    
+        .back-button:hover {
+            transform: translateX(-5px);
+            background: rgba(var(--accent-color-rgb), 0.15);
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            color: var(--accent-color);
+        }
+    
+        .back-button i {
+            font-size: 0.9em;
+            transition: transform 0.3s ease;
+        }
+    
+        .back-button:hover i {
+            transform: translateX(-3px);
+        }
+    
+        
+        .appeal-profile {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+    
+        .appeal-avatar {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+            background: #1a1625;
+            padding: 3px;
+            transition: all 0.3s ease;
+        }
+    
+        .appeal-user-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    
+        .appeal-username {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+    
+        .appeal-userid {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: monospace;
+        }
+    
+        .appeal-server-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    
+        
+        .appeal-status-container {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .appeal-status-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--status-color), transparent);
+            opacity: 0.8;
+        }
+    
+        .status-pending {
+            --status-color: #ffd700;
+        }
+        
+        .status-accepted {
+            --status-color: #48c774;
+        }
+        
+        .status-denied {
+            --status-color: #ff3860;
+        }
+    
+        .appeal-status-badge {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 0.5rem 1.25rem;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+        }
+    
+        .appeal-status-badge.is-pending {
+            background-color: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+    
+        .appeal-status-badge.is-accepted {
+            background-color: rgba(72, 199, 116, 0.15);
+            color: #48c774;
+            border: 1px solid rgba(72, 199, 116, 0.3);
+        }
+    
+        .appeal-status-badge.is-denied {
+            background-color: rgba(255, 56, 96, 0.15);
+            color: #ff3860;
+            border: 1px solid rgba(255, 56, 96, 0.3);
+        }
+    
+        
+        .appeal-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+    
+        .appeal-question {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+    
+        .appeal-question:hover {
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            background: rgba(40, 37, 48, 0.6);
+        }
+    
+        .question-label {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            padding-bottom: 0.5rem;
+        }
+    
+        .question-answer {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+    
+        
+        .history-section {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+    
+        .info-notice {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+        .info-notice i {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-title {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.info-content p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+        .history-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            padding-bottom: 0.75rem;
+        }
+    
+        .history-title i {
+            color: var(--accent-color);
+        }
+    
+        .punishment-item {
+            background: rgba(24, 21, 31, 0.4);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+    
+        .punishment-item:hover {
+            background: rgba(35, 32, 44, 0.5);
+            border-color: var(--accent-color);
+            transform: translateX(5px);
+        }
+    
+        .punishment-item.inactive {
+            opacity: 0.7;
+            background: rgba(24, 21, 31, 0.2);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.05);
+        }
+    
+        .punishment-item.inactive:hover {
+            opacity: 0.9;
+            background: rgba(24, 21, 31, 0.3);
+            border-color: rgba(var(--accent-color-rgb), 0.1);
+        }
+    
+        .punishment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+    
+        .punishment-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: auto;
+    max-width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+    
+        .punishment-badge.ban {
+            background: rgba(217, 83, 79, 0.2);
+            color: #ff6b6b;
+        }
+    
+        .punishment-badge.kick {
+            background: rgba(91, 192, 222, 0.2);
+            color: #5bc0de;
+        }
+    
+        .punishment-badge.timeout {
+            background: rgba(var(--accent-color-rgb), 0.2);
+            color: var(--accent-color);
+        }
+    
+        .punishment-badge.warn {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+    
+        .punishment-details {
+            color: #ffffff;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0.5rem 0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+        }
+    
+        .punishment-details .username {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+    
+        .punishment-details .reason {
+            color: #ffffff;
+            display: inline;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    
+        .punishment-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+    
+        .id-badge {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    
+        .id-badge:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+            color: #ffffff;
+        }
+    
+        .exact-date {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    
+        .inactive-overlay {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ffa500;
+        }
+    
+        .appeal-badge {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.2);
+            color: #ffa500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+    
+        .appeal-badge:hover {
+            background: rgba(255, 170, 0, 0.15);
+            border-color: rgba(255, 170, 0, 0.3);
+            transform: translateY(-2px);
+        }
+    
+        .appeal-badge i {
+            font-size: 1rem;
+        }
+    
+        .appeal-badge a {
+            color: inherit;
+            text-decoration: none;
+        }
+    
+        
+        .messages-section {
+    background: #1a1a2e;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message-item {
+    background: rgba(24, 21, 31, 0.4);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.message-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(26, 24, 38, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.3);
+    object-fit: cover;
+}
+
+.message-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.message-username {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.message-channel {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.message-time {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.message-content {
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.message-text {
+    margin-bottom: 0.5rem;
+}
+
+.message-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    word-break: break-all;
+}
+
+.message-link:hover {
+    text-decoration: underline;
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+.message-link i {
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+    
+
+@media screen and (max-width: 768px) {
+    .message-header {
+        flex-wrap: wrap;
+    }
+    
+    .message-time {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+        margin-left: 2.5rem;
+    }
+}
+        
+        .modal-background {
+            background: rgba(19, 17, 26, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    
+        .modal-card {
+            background: rgba(30, 27, 38, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 16px;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+    
+        .modal-card-head {
+            background: rgba(35, 32, 44, 0.6);
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px 16px 0 0;
+            padding: 1.25rem;
+        }
+    
+        .modal-card-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+    
+        .modal-card-title i {
+            color: var(--accent-color);
+        }
+    
+        .modal-card-body {
+            background: none;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    
+        .modal-card-foot {
+            background: rgba(35, 32, 44, 0.6);
+            border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 0 0 16px 16px;
+            padding: 1.25rem;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+    
+        .modal-textarea {
+            background: rgba(24, 21, 31, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            color: #ffffff;
+            border-radius: 12px;
+            width: 100%;
+            resize: vertical;
+            min-height: 120px;
+            padding: 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+    
+        .modal-textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+            background: rgba(30, 27, 38, 0.8);
+        }
+    
+        .modal-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+    
+        .modal-button {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    
+        .modal-button.primary {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+        }
+    
+        .modal-button.primary:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-1px);
+        }
+    
+        .modal-button.danger {
+            background: rgba(217, 83, 79, 0.15);
+            color: #d9534f;
+        }
+    
+        .modal-button.danger:hover {
+            background: rgba(217, 83, 79, 0.25);
+            transform: translateY(-1px);
+        }
+    
+        .modal-button.cancel {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+        }
+    
+        .modal-button.cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+    
+        
+        .appeal-status-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+    
+        .decision-section {
+            background: rgba(35, 32, 44, 0.4);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+    
+        .punishment-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+    
+        .details-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    
+        .appeal-status-detail {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin: 0;
+        }
+    
+        .appeal-status-detail i {
+            color: var(--accent-color);
+            width: 16px;
+            text-align: center;
+            margin-top: 0.25rem;
+        }
+    
+        .appeal-status-detail strong {
+            color: #ffffff;
+            min-width: 140px;
+            font-weight: 600;
+        }
+    
+        .appeal-status-detail span {
+            color: rgba(255, 255, 255, 0.85);
+            flex: 1;
+        }
+    
+        .user-id {
+            color: var(--accent-color);
+            font-style: normal;
+            margin-left: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    
+        .reason-detail {
+            margin-top: 0.5rem;
+            background: rgba(35, 32, 44, 0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+    
+        .reason-detail span {
+            line-height: 1.5;
+            word-break: break-word;
+        }
+    
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, 
+                        rgba(var(--accent-color-rgb), 0.1), 
+                        rgba(var(--accent-color-rgb), 0.2), 
+                        rgba(var(--accent-color-rgb), 0.1));
+            margin: 0.75rem 0;
+            width: 100%;
+        }
+    
+        .datetime {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    
+        .relative-time {
+            font-weight: 600;
+        }
+    
+        .exact-time {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            opacity: 0.9;
+        }
+    
+        
+        .appeal-actions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+    
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+        }
+    
+        .action-button {
+            width: 100%;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.85rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+        }
+    
+        .action-button.accept {
+            background: rgba(72, 199, 116, 0.15);
+            color: #48c774;
+            border: 1px solid rgba(72, 199, 116, 0.3);
+        }
+    
+        .action-button.deny {
+            background: rgba(255, 56, 96, 0.15);
+            color: #ff3860;
+            border: 1px solid rgba(255, 56, 96, 0.3);
+        }
+    
+        .action-button.delete-appeal {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+    border: 1px solid rgba(217, 83, 79, 0.3);
+}
+    
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+    
+        .action-button.accept:hover {
+            background: #48c774;
+            color: white;
+        }
+    
+        .action-button.deny:hover {
+            background: #ff3860;
+            color: white;
+        }
+    
+        .action-button.delete-appeal:hover {
+    background: #d9534f;
+    color: white;
+}
+    
+        .action-description {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            line-height: 1.4;
+            padding: 0 0.5rem;
+        }
+        
+        
+        @media screen and (max-width: 768px) {
+            .appeal-profile {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .appeal-status-detail {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+            
+            .appeal-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .action-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .punishment-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .punishment-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            
+            .punishment-details-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .appeal-actions-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .appeal-status-detail strong {
+                min-width: auto;
+            }
+            
+            .user-id {
+                display: block;
+                margin-left: 0;
+                margin-top: 0.25rem;
+            }
+        }
+
+        .view-appeal-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.view-appeal-link:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: var(--accent-color);
+}
+
+.view-appeal-link i {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+}
+
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'appeals' }) %>
+
+    <div class="back-button-container">
+        <div class="container">
+            <a href="/appeals" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Appeals
+            </a>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                
+                <div class="section-title">
+                    <i class="fas fa-gavel"></i>
+                    Appeal Details
+                </div>
+                
+                
+                <div class="appeal-profile">
+                    <img src="<%= appeal.avatarURL %>" alt="<%= appeal.username %>" class="appeal-avatar">
+                    <div class="appeal-user-info">
+                        <div class="appeal-username">
+                            <%= appeal.username %>
+                            <a href="/view/<%= appeal.userId %>" target="_blank" class="id-badge">
+                                <i class="fas fa-user"></i>
+                                View Profile
+                            </a>
+                        </div>
+                        <div class="appeal-userid"><%= appeal.userId %></div>
+                        <div class="appeal-server-status">
+                            <i class="fas fa-info-circle" style="color: var(--accent-color);"></i>
+                            <%= appeal.userInServer %>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <div class="appeal-status-container status-<%= appeal.status.toLowerCase() %>">
+                    <div class="appeal-status-badge is-<%= appeal.status.toLowerCase() %>">
+                        <% if (appeal.status.toLowerCase() === 'pending') { %>
+                            <i class="fas fa-hourglass-half"></i>
+                        <% } else if (appeal.status.toLowerCase() === 'accepted') { %>
+                            <i class="fas fa-check-circle"></i>
+                        <% } else { %>
+                            <i class="fas fa-times-circle"></i>
+                        <% } %>
+                        <%= appeal.status.toUpperCase() %>
+                    </div>
+                    
+                    <div class="appeal-status-content">
+                        
+                        <% if (appeal.status.toLowerCase() !== 'pending') { %>
+                            <div class="decision-section">
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-user-shield"></i>
+                                    <strong>Decision By:</strong>
+                                    <span><%= appeal.decisionUser %> <em class="user-id"><%= appeal.decisionUserID %></em></span>
+                                </div>
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-comment-alt"></i>
+                                    <strong>Decision Reason:</strong>
+                                    <span><%= appeal.decisionReason %></span>
+                                </div>
+                                <div class="section-divider"></div>
+                            </div>
+                        <% } %>
+                        
+                        
+                        <div class="punishment-details-grid">
+                            
+                            <div class="details-column">
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-gavel"></i>
+                                    <strong>Punishment Type:</strong>
+                                    <span class="punishment-badge <%= appeal.punishmentType.toLowerCase() %>">
+                                        <i class="fas <%= 
+                                            appeal.punishmentType === 'PERM_BAN' || appeal.punishmentType === 'TEMP_BAN' ? 'fa-ban' : 
+                                            appeal.punishmentType === 'Kick' ? 'fa-shoe-prints' :
+                                            appeal.punishmentType === 'Timeout' ? 'fa-hourglass-start' : 
+                                            'fa-exclamation-triangle' 
+                                        %>"></i>
+                                        <%= 
+                                            appeal.punishmentType === 'PERM_BAN' ? 'Permanent Ban' : 
+                                            appeal.punishmentType === 'TEMP_BAN' ? 'Temporary Ban' : 
+                                            appeal.punishmentType 
+                                        %>
+                                    </span>
+                                </div>
+                                
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-hashtag"></i>
+                                    <strong>Punishment ID:</strong>
+                                    <a href="/punishment/lookup/<%= appeal.punishmentId %>" target="_blank" class="id-badge">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <%= appeal.punishmentId %>
+                                    </a>
+                                </div>
+                                
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-user-shield"></i>
+                                    <strong>Staff Member:</strong>
+                                    <span><%= punishment.staff %></span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="details-column">
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <strong>Punishment Date:</strong>
+                                    <span class="datetime">
+                                        <span class="relative-time"><%= getRelativeTime(punishment.date) %></span>
+                                        <span class="exact-time">
+                                            <%= new Date(punishment.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %> 
+                                            <%= new Date(punishment.date).toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: 'numeric', timeZone: config.Dashboard.Timezone }) %>
+                                        </span>
+                                    </span>
+                                </div>
+                                
+                                <div class="appeal-status-detail">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <strong>Appeal Submitted:</strong>
+                                    <span class="datetime">
+                                        <span class="relative-time"><%= getRelativeTime(appeal.submissionDate) %></span>
+                                        <span class="exact-time">
+                                            <%= new Date(appeal.submissionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %> 
+                                            <%= new Date(appeal.submissionDate).toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: 'numeric', timeZone: config.Dashboard.Timezone }) %>
+                                        </span>
+                                    </span>
+                                </div>
+
+                                <% if (punishment.duration) { %>
+                                    <div class="appeal-status-detail">
+                                        <i class="fas fa-hourglass-end"></i>
+                                        <strong>Duration:</strong>
+                                        <span>
+                                            <%= punishment.duration %>
+                                            <% if (punishment.expiresAt) { %>
+                                                <span class="exact-time">
+                                                    (Expires: <%= new Date(punishment.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>)
+                                                </span>
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <% } %>
+
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="appeal-status-detail reason-detail">
+                            <i class="fas fa-comment"></i>
+                            <strong>Punishment Reason:</strong>
+                            <span><%= punishment.reason %></span>
+                        </div>
+                                
+                        
+                        <% if (appeal.status.toLowerCase() === 'pending' && permissions && permissions.MANAGE_APPEALS) { %>
+                            <div class="section-divider"></div>
+                            
+                            <div class="appeal-actions-container">
+                                <div class="action-group">
+                                    <button class="action-button accept" data-appeal-id="<%= appeal.appealID %>">
+                                        <i class="fas fa-check-circle"></i>
+                                        Accept Appeal
+                                    </button>
+                                    <div class="action-description">
+                                        <i class="fas fa-info-circle"></i>
+                                        By accepting this appeal, the punishment will be automatically lifted and marked as inactive.
+                                    </div>
+                                </div>
+                                
+                                <div class="action-group">
+                                    <button class="action-button deny" data-appeal-id="<%= appeal.appealID %>">
+                                        <i class="fas fa-times-circle"></i>
+                                        Deny Appeal
+                                    </button>
+                                    <div class="action-description">
+                                        <i class="fas fa-info-circle"></i>
+                                        By denying this appeal, the punishment will remain active in the user's history.
+                                    </div>
+                                </div>
+                                
+                                <% if (permissions && permissions.DELETE_APPEALS) { %>
+                                    <div class="action-group">
+                                        <button class="action-button delete-appeal" data-appeal-id="<%= appeal.appealID %>">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete Appeal
+                                        </button>
+                                        <div class="action-description">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Deleting removes this record permanently. It won't be recoverable.
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                                    
+                                    
+                                    <div class="appeal-questions">
+                                        <% Object.keys(appeal.answers).forEach(function(question) { %>
+                                            <div class="appeal-question">
+                                                <div class="question-label"><%= question %></div>
+                                                <div class="question-answer"><%= appeal.answers[question] %></div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                    
+                                    
+                                    <div class="history-section">
+                                        <div class="history-title">
+                                            <i class="fas fa-history"></i>
+                                            Punishment History (<%= punishments?.length || 0 %>)
+                                        </div>
+                                        
+                                        <% if (punishments.length === 0) { %>
+                                            <p style="color: rgba(255, 255, 255, 0.7); text-align: center; font-style: italic;">No punishments found.</p>
+                                        <% } else { %>
+                                            <% punishments.forEach((punishment, index) => { %>
+                                                <% if (punishment.status === 'Appealed' && settings.displayInactivePunishments === false) { return; } %>
+                                                
+                                                <div class="punishment-item <%= punishment.status === 'Appealed' ? 'inactive' : '' %>">
+                                                    <div class="punishment-header">
+                                                        <span class="punishment-badge <%= 
+                                                            punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'ban' : 
+                                                            punishment.punishment.toLowerCase() %>">
+                                                            <i class="fas <%= 
+                                                                punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'fa-ban' : 
+                                                                punishment.punishment === 'Kick' ? 'fa-shoe-prints' :
+                                                                punishment.punishment === 'Timeout' ? 'fa-hourglass-start' : 
+                                                                'fa-exclamation-triangle' 
+                                                            %>"></i>
+                                                            <%= 
+                                                                punishment.punishment === 'PERM_BAN' ? 'Permanent Ban' : 
+                                                                punishment.punishment === 'TEMP_BAN' ? 'Temporary Ban' : 
+                                                                punishment.punishment 
+                                                            %>
+                                                        </span>
+                                                        <span class="exact-date">
+                                                            <i class="fas fa-clock"></i>
+                                                            <%= getRelativeTime(punishment.date) %>
+                                                        </span>
+                                                    </div>
+                                                
+                                                    <div class="punishment-details">
+                                                        <span class="username"><%= appeal.username %></span> was 
+                                                        <%= 
+                                                            punishment.punishment === 'PERM_BAN' ? 'permanently banned' : 
+                                                            punishment.punishment === 'TEMP_BAN' ? 'temporarily banned' : 
+                                                            punishment.punishment === 'Kick' ? 'kicked' : 
+                                                            punishment.punishment === 'Warn' ? 'warned' : 
+                                                            punishment.punishment === 'Timeout' ? 'timed out' : 
+                                                            punishment.punishment.toLowerCase() 
+                                                        %> by 
+                                                        <span class="username"><%= staffUsernames[punishment.staff] || 'Unknown' %></span> for 
+                                                        <span class="reason"><%= punishment.reason %></span>
+                                                        <% if (punishment.duration) { %>
+                                                            <div style="margin-top: 8px;">
+                                                                <span style="display: inline-flex; align-items: center; background: rgba(var(--accent-color-rgb), 0.1); color: var(--accent-color); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">
+                                                                    <i class="fas fa-clock" style="margin-right: 6px;"></i>
+                                                                    Duration: <%= punishment.duration %>
+                                                                </span>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                    
+                                                    <% if (punishment.status === 'Pending') { %>
+                                                        <div class="appeal-badge">
+                                                            <i class="fas fa-gavel"></i>
+                                                            <a href="/view-appeal/<%= punishment.appealID %>" target="_blank">
+                                                                This punishment has an active appeal
+                                                            </a>
+                                                        </div>
+                                                    <% } %>
+                                                    
+                                                    <% if (punishment.status === 'Appealed') { %>
+                                                        <div class="inactive-overlay">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            <span>This punishment has been appealed and is no longer active</span>
+                                                            <% if (punishment.appealID) { %>
+                                                                <a href="/view-appeal/<%= punishment.appealID %>" target="_blank" class="view-appeal-link">
+                                                                    View Appeal
+                                                                </a>
+                                                            <% } %>
+                                                        </div>
+                                                    <% } %>
+                    
+                                                    <div class="punishment-meta">
+                                                        <a href="/punishment/lookup/<%= punishment.punishmentID %>" class="id-badge">
+                                                            <i class="fas fa-hashtag"></i>
+                                                            <%= punishment.punishmentID %>
+                                                        </a>
+                                                        <span class="exact-date">
+                                                            <i class="fas fa-calendar-alt"></i>
+                                                            <%= new Date(punishment.date).toLocaleDateString('en-US', { 
+                                                                year: 'numeric', 
+                                                                month: 'long', 
+                                                                day: 'numeric',
+                                                                hour: 'numeric',
+                                                                minute: 'numeric',
+                                                                hour12: true,
+                                                                timeZone: config.Dashboard.Timezone 
+                                                            }) %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        <% } %>
+                                    </div>
+                                    
+                                    
+                                    <% if (config.GeneralSettings.SaveRecentMessages) { %>
+                                        <div class="messages-section">
+                                            <div class="history-title">
+                                                <i class="fas fa-comments"></i>
+                                                Recent Messages (<%= punishment && punishment.recentMessages ? punishment.recentMessages.length : 0 %>)
+                                            </div>
+                                            
+                                            <div class="info-notice">
+                                                <i class="fas fa-info-circle"></i>
+                                                <div class="info-content">
+                                                    <span class="info-title">About these messages</span>
+                                                    <p>These messages were captured at the time the punishment was issued. They represent a snapshot of the user's recent activity and do not update after the punishment.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <% if (!punishment || !punishment.recentMessages || punishment.recentMessages.length === 0) { %>
+                                                <p style="color: rgba(255, 255, 255, 0.7); text-align: center; font-style: italic;">No messages found.</p>
+                                            <% } else { %>
+                                                <div class="messages-list">
+                                                    <% punishment.recentMessages.reverse().forEach(message => { %>
+                                                        <div class="message-item">
+                                                            <div class="message-header">
+                                                                <img src="<%= appeal.avatarURL %>" alt="<%= appeal.username %>" class="message-avatar">
+                                                                <div class="message-user-info">
+                                                                    <span class="message-username"><%= appeal.username %></span>
+                                                                    <span class="message-channel">#<%= message.channelName %></span>
+                                                                </div>
+                                                                <span class="message-time">
+                                                                    <i class="fas fa-clock"></i>
+                                                                    <%= new Date(message.timestamp).toLocaleString('en-US', { 
+                                                                        year: 'numeric', 
+                                                                        month: 'short', 
+                                                                        day: 'numeric',
+                                                                        hour: 'numeric',
+                                                                        minute: 'numeric',
+                                                                        hour12: true
+                                                                    }) %>
+                                                                </span>
+                                                            </div>
+                                                            
+                                                            <div class="message-content">
+                                                                <div class="message-text">
+                                                                    <% 
+                                                                    // Simple URL detection
+                                                                    let messageText = message.message || '';
+                                                                    if (messageText.match(/^https?:\/\//i)) { 
+                                                                    %>
+                                                                        <a href="<%= messageText %>" target="_blank" class="message-link">
+                                                                            <%= messageText %>
+                                                                            <i class="fas fa-external-link-alt"></i>
+                                                                        </a>
+                                                                    <% } else { %>
+                                                                        <%= messageText %>
+                                                                    <% } %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <% }); %>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                            
+                                                        <%- include('partials/footer') %>
+                        
+                        
+                        <div class="modal" id="reasonModal">
+                            <div class="modal-background"></div>
+                            <div class="modal-card">
+                                <header class="modal-card-head">
+                                    <p class="modal-card-title">
+                                        <i class="fas fa-comment-alt"></i>
+                                        <span id="modalActionTitle">Enter Reason</span>
+                                    </p>
+                                    <button class="delete" aria-label="close"></button>
+                                </header>
+                                <section class="modal-card-body">
+                                    <form id="reasonForm">
+                                        <div class="field">
+                                            <label for="reasonInput" class="label" style="color: #ffffff;">Reason:</label>
+                                            <div class="control">
+                                                <textarea class="modal-textarea" id="reasonInput" rows="3" placeholder="Please provide a reason for this action..."></textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </section>
+                                <footer class="modal-card-foot">
+                                    <button type="button" class="modal-button primary" id="submitReason">
+                                        <i class="fas fa-check"></i>
+                                        Submit
+                                    </button>
+                                    <button type="button" class="modal-button cancel" aria-label="close">
+                                        <i class="fas fa-times"></i>
+                                        Cancel
+                                    </button>
+                                </footer>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="modal" id="confirmDeleteModal">
+                            <div class="modal-background"></div>
+                            <div class="modal-card">
+                                <header class="modal-card-head">
+                                    <p class="modal-card-title">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Confirm Deletion
+                                    </p>
+                                    <button class="delete" aria-label="close"></button>
+                                </header>
+                                <section class="modal-card-body">
+                                    <p>Are you sure you want to delete this appeal? This action cannot be undone.</p>
+                                </section>
+                                <footer class="modal-card-foot">
+                                    <button type="button" class="modal-button danger" id="confirmDelete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        Delete
+                                    </button>
+                                    <button type="button" class="modal-button cancel" aria-label="close">
+                                        <i class="fas fa-times"></i>
+                                        Cancel
+                                    </button>
+                                </footer>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            $(document).ready(function() {
+
+                                function setupModal(modalId) {
+                                    const modal = document.getElementById(modalId);
+                                    if (!modal) return;
+                                    
+                                    const closeButtons = modal.querySelectorAll('.delete, .modal-button.cancel, [aria-label="close"]');
+                                    const background = modal.querySelector('.modal-background');
+                    
+                                    function closeModal() {
+                                        modal.classList.remove('is-active');
+
+                                        const textarea = modal.querySelector('textarea');
+                                        if (textarea) {
+                                            textarea.value = '';
+                                        }
+                                    }
+                    
+                                    closeButtons.forEach(button => {
+                                        button.addEventListener('click', closeModal);
+                                    });
+                                    
+                                    if (background) {
+                                        background.addEventListener('click', closeModal);
+                                    }
+                    
+
+                                    document.addEventListener('keydown', function(e) {
+                                        if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                                            closeModal();
+                                        }
+                                    });
+                                }
+                    
+
+                                setupModal('reasonModal');
+                                setupModal('confirmDeleteModal');
+                                
+
+                                $(document).on('click', '.action-button.accept', function() {
+                                    var appealId = $(this).data('appeal-id');
+                                    handleAction('accept', appealId);
+                                });
+                    
+                                $(document).on('click', '.action-button.deny', function() {
+                                    var appealId = $(this).data('appeal-id');
+                                    handleAction('deny', appealId);
+                                });
+                    
+
+                                function handleAction(action, appealId) {
+
+                                    $('#reasonModal').addClass('is-active');
+
+                                    if (action === 'accept') {
+                                        $('#modalActionTitle').html('<i class="fas fa-check-circle"></i> Accept Appeal');
+                                    } else if (action === 'deny') {
+                                        $('#modalActionTitle').html('<i class="fas fa-times-circle"></i> Deny Appeal');
+                                    }
+
+                                    $('#reasonModal').data('action', action);
+                                    $('#reasonModal').data('appeal-id', appealId);
+                                }
+                    
+
+                                $('#submitReason').click(function() {
+
+                                    var action = $('#reasonModal').data('action');
+                                    var appealId = $('#reasonModal').data('appeal-id');
+
+                                    var reason = $('#reasonInput').val();
+
+                                    switch(action) {
+                                        case 'accept':
+
+                                            $.post('/acceptAppeal', { appealId: appealId, reason: reason })
+                                                .done(function(response) {
+                                                    console.log(response);
+
+                                                    $('#reasonModal').removeClass('is-active');
+
+                                                    location.reload();
+                                                })
+                                                .fail(function(error) {
+                                                    console.error(error.responseJSON.error);
+                                                });
+                                            break;
+                                        case 'deny':
+
+                                            $.post('/denyAppeal', { appealId: appealId, reason: reason })
+                                                .done(function(response) {
+                                                    console.log(response.message);
+
+                                                    $('#reasonModal').removeClass('is-active');
+
+                                                    location.reload();
+                                                })
+                                                .fail(function(error) {
+                                                    console.error(error.responseJSON.error);
+                                                });
+                                            break;
+                                    }
+                                });
+                    
+
+                                $('#confirmDelete').click(function() {
+                                    var appealId = $('#confirmDeleteModal').data('appeal-id');
+                                    $.post('/deleteAppeal', { appealId: appealId })
+                                        .done(function(response) {
+                                            console.log(response.message);
+                                            $('#confirmDeleteModal').removeClass('is-active');
+                                            window.location.href = '/appeals';
+                                        })
+                                        .fail(function(error) {
+                                            console.error(error.responseJSON.error);
+                                        });
+                                });
+                                
+
+                                function animateElements() {
+
+                                    const elements = [
+                                        '.appeal-profile',
+                                        '.appeal-status-container',
+                                        '.appeal-question',
+                                        '.punishment-item',
+                                        '.message-item'
+                                    ];
+                                    
+                                    elements.forEach((selector, index) => {
+                                        const items = document.querySelectorAll(selector);
+                                        items.forEach((item, idx) => {
+                                            item.style.opacity = '0';
+                                            item.style.transform = 'translateY(20px)';
+                                            
+                                            setTimeout(() => {
+                                                item.style.transition = 'all 0.4s ease';
+                                                item.style.opacity = '1';
+                                                item.style.transform = 'translateY(0)';
+                                            }, 100 + (index * 50) + (idx * 80));
+                                        });
+                                    });
+                                }
+                                
+
+                                animateElements();
+                            });
+
+                            document.querySelectorAll('.action-button.delete-appeal').forEach(button => {
+    button.addEventListener('click', function() {
+        const appealId = this.getAttribute('data-appeal-id');
+        if (appealId) {
+            const confirmModal = document.getElementById('confirmDeleteModal');
+            if (confirmModal) {
+                confirmModal.classList.add('is-active');
+                confirmModal.dataset.appealId = appealId;
+            }
+        }
+    });
+});
+
+                        </script>
+                    </body>
+                    </html>

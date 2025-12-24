@@ -1,0 +1,270 @@
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  
+  <style>
+    html,
+    body {
+      font-family: 'Rubik', sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(19, 17, 26, 0.8);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent-color-rgb), 0.3);
+    border: 2px solid rgba(19, 17, 26, 0.8);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--accent-color-rgb), 0.5);
+}
+
+    .navbar {
+        background: #1a1a2e;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(var(--accent-color-rgb), 0.5);
+        margin: 1rem;
+        border-radius: 16px;
+        padding: 0.5rem;
+    }
+
+    .navbar-brand {
+        padding: 0.5rem;
+    }
+
+    .navbar-user-profile {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        margin-right: 1rem;
+    }
+
+    .navbar-user-profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 2px solid var(--accent-color);
+        padding: 2px;
+    }
+
+    .navbar-user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .navbar-user-username {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+
+    .navbar-user-role {
+        color: var(--accent-color);
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+
+    .navbar-item {
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 0 0.2rem;
+    padding: 0.5rem 1rem;
+    background-color: transparent !important;
+}
+
+    .navbar-item:hover {
+        background: rgba(var(--accent-color-rgb), 0.1) !important;
+        color: #ffffff !important;
+    }
+
+    .navbar-item.is-active {
+        background: rgba(var(--accent-color-rgb), 0.15) !important;
+        color: var(--accent-color) !important;
+    }
+
+    .navbar-item .icon {
+        margin-right: 0.5rem;
+        color: var(--accent-color);
+    }
+
+    .navbar-item .icon i {
+    transition: all 0.3s ease;
+}
+
+.navbar-item:hover .icon i {
+    transform: rotate(20deg);
+}
+
+    .navbar-burger {
+        color: #ffffff;
+    }
+
+    .navbar-menu {
+        background: none;
+        box-shadow: none;
+    }
+
+
+    @media screen and (max-width: 1023px) {
+        .navbar-menu {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .navbar-item {
+            margin: 0.2rem 0;
+        }
+
+        .navbar-user-profile {
+            margin: 0.5rem;
+        }
+    }
+
+    .settings-item {
+        background: rgba(var(--accent-color-rgb), 0.15);
+        margin-left: 0.5rem;
+        border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    }
+
+    .settings-item:hover {
+        background: rgba(var(--accent-color-rgb), 0.25) !important;
+        border-color: rgba(var(--accent-color-rgb), 0.5);
+    }
+
+    .settings-item .icon i {
+        transition: all 0.3s ease;
+    }
+    
+    .settings-item:hover .icon i {
+        transform: rotate(30deg);
+    }
+</style>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <div class="navbar-user-profile">
+            <img src="<%= user.displayAvatarURL({ format: 'png', size: 128 }) %>" alt="User Avatar">
+            <div class="navbar-user-info">
+                <span class="navbar-user-username"><%= user.user.username %></span>
+                <span class="navbar-user-role"><%= user.roleName ? user.roleName : 'No Role' %></span>
+            </div>
+        </div>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navMenu" class="navbar-menu">
+        <div class="navbar-start">
+            <a href="/home" class="navbar-item <%= currentPage === 'home' ? 'is-active' : '' %>">
+                <span class="icon">
+                    <i class="fas fa-home"></i>
+                </span>
+                <span>Home</span>
+            </a>
+            
+                <a href="/members" class="navbar-item <%= currentPage === 'members' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-users"></i>
+                    </span>
+                    <span>Members</span>
+                </a>
+            
+            <% if (permissions && permissions.VIEW_STATS) { %>
+                <a href="/stats" class="navbar-item <%= currentPage === 'stats' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </span>
+                    <span>Stats</span>
+                </a>
+            <% } %>
+            
+            <% if (permissions && permissions.VIEW_APPEALS) { %>
+                <a href="/appeals" class="navbar-item <%= currentPage === 'appeals' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-gavel"></i>
+                    </span>
+                    <span>Appeals</span>
+                </a>
+            <% } %>
+            
+            <% if (permissions && permissions.VIEW_REPORTS) { %>
+                <a href="/reports" class="navbar-item <%= currentPage === 'reports' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                    <span>Reports</span>
+                </a>
+            <% } %>
+
+            <% if (permissions && permissions.LOOKUP_PUNISHMENTS) { %>
+                <a href="/punishment/lookup" class="navbar-item <%= currentPage === 'punishmentLookup' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <span>Lookup</span>
+                </a>
+            <% } %>
+            
+            <% if (permissions && permissions.MANAGE_STAFF_MEMBERS) { %>
+                <a href="/staff" class="navbar-item <%= currentPage === 'staff' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-id-card"></i>
+                    </span>
+                    <span>Staff</span>
+                </a>
+            <% } %>
+        </div>
+    
+        <% if (permissions && permissions.ADMINISTRATOR) { %>
+        <div class="navbar-end">
+            <% if (user) { %>
+                <a href="/settings" class="navbar-item settings-item <%= currentPage === 'settings' ? 'is-active' : '' %>">
+                    <span class="icon">
+                        <i class="fas fa-cog"></i>
+                    </span>
+                    <span>Settings</span>
+                </a>
+            <% } %>
+        </div>
+        <% } %>
+    </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+    $navbarBurgers.forEach(el => {
+        el.addEventListener('click', () => {
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+        });
+    });
+});
+
+</script>

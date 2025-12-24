@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punishment Lookup | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Punishment Lookup | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+:root {
+    --accent-color: <%= settings.accentColor %>;
+    --accent-color-rgb: <%= accentColorRgb %>;
+}
+
+
+body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+    flex: 1;
+    padding: 1rem; 
+    margin: 0; 
+}
+
+
+.glass-card {
+    background: #1a1a2e;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 16px;
+    padding: 1.5rem; 
+    transition: all 0.3s ease;
+    width: 100%; 
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.search-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.search-field {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.search-buttons {
+    position: absolute;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-button, .clear-button {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: none;
+    color: var(--accent-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    transform: translateY(-2px);
+}
+
+.clear-button {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+}
+
+.clear-button:hover {
+    background: rgba(255, 59, 48, 0.2);
+    transform: translateY(-2px);
+}
+
+.search-input {
+    background: rgba(30, 27, 38, 0.8);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 1rem 1rem 1rem 3rem;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(35, 32, 44, 0.9);
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(var(--accent-color-rgb), 0.7);
+    font-size: 1.2rem;
+}
+
+
+.notification {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notification.is-danger {
+    background: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+}
+
+.notification.is-success {
+    background: rgba(52, 199, 89, 0.1);
+    border-color: rgba(52, 199, 89, 0.2);
+    color: #34c759;
+}
+
+
+.punishment-details {
+    background: #1a1a2e;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.punishment-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+}
+
+.punishment-type {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.punishment-id {
+    color: rgba(255, 255, 255, 0.7);
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(120%);
+}
+
+.action-button.back {
+    background: rgba(var(--accent-color-rgb), 0.15); 
+    color: var(--accent-color); 
+    font-weight: 500; 
+    padding: 0.6rem 1.2rem; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.history-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+
+.punishment-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    border: 2px solid var(--accent-color);
+    padding: 2px;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.username {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.username a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.username a:hover {
+    color: #ffffff;
+}
+
+.user-id {
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.user-status {
+    margin-top: 0.5rem;
+}
+
+
+.punishment-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.meta-item {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.meta-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.meta-value {
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+
+.messages-section {
+    background: #1a1a2e;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message-item {
+    background: rgba(24, 21, 31, 0.4);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.message-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(26, 24, 38, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.3);
+    object-fit: cover;
+}
+
+.message-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.message-username {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.message-channel {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.message-time {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.message-content {
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.message-text {
+    margin-bottom: 0.5rem;
+}
+
+.message-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    word-break: break-all;
+}
+
+.message-link:hover {
+    text-decoration: underline;
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+.message-link i {
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+
+@media screen and (max-width: 768px) {
+    .message-header {
+        flex-wrap: wrap;
+    }
+    
+    .message-time {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+        margin-left: 2.5rem;
+    }
+}
+
+.info-notice {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.info-notice i {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-title {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.info-content p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+
+.appeal-notice {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-color);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+
+.delete-button {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.delete-button:hover {
+    background: rgba(255, 59, 48, 0.2);
+    transform: translateY(-2px);
+}
+
+.modal-background {
+    background: rgba(19, 17, 26, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-card {
+    background: rgba(30, 27, 38, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 16px;
+    max-width: 500px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-card-head {
+    background: rgba(35, 32, 44, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px 16px 0 0;
+    padding: 1.25rem;
+}
+
+.modal-card-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-card-title i {
+    color: var(--accent-color);
+}
+
+.modal-card-body {
+    background: none;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.modal-card-foot {
+    background: rgba(35, 32, 44, 0.6);
+    border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 0 0 16px 16px;
+    padding: 1.25rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.modal-user-info {
+    background: rgba(24, 21, 31, 0.4);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.modal-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.3);
+}
+
+.modal-user-details {
+    flex: 1;
+}
+
+.modal-username {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.modal-user-id {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-divider {
+    height: 1px;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    margin: 1rem 0;
+}
+
+.modal-button {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-button.danger {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+}
+
+.modal-button.danger:hover {
+    background: rgba(217, 83, 79, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.modal-delete {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.modal-delete:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-delete::before,
+.modal-delete::after {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.recent-punishments-section {
+    margin-top: 2rem;
+}
+
+
+.punishment-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.25rem;
+}
+
+.punishment-item {
+    position: relative;
+    background: rgba(30, 30, 46, 0.7);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.punishment-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(var(--accent-color-rgb), 0.25);
+    border-color: rgba(var(--accent-color-rgb), 0.4);
+}
+
+.punishment-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, 
+        var(--accent-color) 0%, 
+        rgba(var(--accent-color-rgb), 0.7) 100%);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.punishment-item:hover::before {
+    opacity: 1;
+}
+
+.punishment-badge-container {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+}
+
+.punishment-badge {
+    padding: 0.4rem 0.85rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.punishment-badge i {
+    font-size: 0.9rem;
+}
+
+.punishment-badge.ban {
+    background: rgba(255, 75, 75, 0.15);
+    color: #ff4b4b;
+    border: 1px solid rgba(255, 75, 75, 0.3);
+}
+
+.punishment-badge.kick {
+    background: rgba(91, 192, 222, 0.15);
+    color: #5bc0de;
+    border: 1px solid rgba(91, 192, 222, 0.3);
+}
+
+.punishment-badge.timeout {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+}
+
+.punishment-badge.warn {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.punishment-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.punishment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    padding-right: 4rem;
+}
+
+.time {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.time i {
+    margin-right: 0.5rem;
+    opacity: 0.7;
+}
+
+.punishment-user-info-compact {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-avatar-small {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.punishment-item:hover .user-avatar-small {
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.user-details-compact {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+    transition: all 0.3s ease;
+}
+
+.punishment-item:hover .username {
+    color: var(--accent-color);
+}
+
+.user-id-small {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    font-family: 'Roboto Mono', monospace;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.punishment-details {
+    background: rgba(20, 20, 35, 0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.punishment-item:hover .punishment-details {
+    background: rgba(25, 25, 40, 0.6);
+    border-color: rgba(var(--accent-color-rgb), 0.2);
+}
+
+.punishment-reason {
+    margin-bottom: 0.75rem;
+}
+
+.reason-label, .staff-label {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reason {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: block;
+    word-break: break-word;
+}
+
+.punishment-staff {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.staff-label {
+    margin-bottom: 0;
+    margin-right: 0.5rem;
+}
+
+.staff-name {
+    color: var(--accent-color);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.punishment-item:hover .staff-name {
+    filter: brightness(1.2);
+}
+
+.punishment-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.punishment-id-link {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.4rem 0.8rem;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+}
+
+.punishment-id-link i {
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--accent-color);
+}
+
+.punishment-id-link:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.view-details-btn {
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.view-details-btn i {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.view-details-btn:hover {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.view-details-btn:hover i {
+    transform: translateX(3px);
+}
+
+.pagination-container {
+    margin-top: 2.5rem;
+}
+
+.pagination {
+    background: transparent;
+}
+
+.pagination-previous,
+.pagination-next {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
+
+.pagination-previous:hover,
+.pagination-next:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--accent-color-rgb), 0.2);
+}
+
+.pagination-previous i,
+.pagination-next i {
+    transition: transform 0.3s ease;
+}
+
+.pagination-previous:hover i {
+    transform: translateX(-3px);
+}
+
+.pagination-next:hover i {
+    transform: translateX(3px);
+}
+
+.pagination-previous.is-disabled,
+.pagination-next.is-disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+}
+
+.pagination-link {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.pagination-link:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.pagination-link.is-current {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.3);
+}
+
+.pagination-ellipsis {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.pagination-info {
+    margin-top: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+.no-punishments-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: rgba(30, 30, 46, 0.5);
+    border-radius: 16px;
+    border: 1px dashed rgba(var(--accent-color-rgb), 0.2);
+}
+
+.no-punishments-message i {
+    color: rgba(var(--accent-color-rgb), 0.3);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.no-punishments-message p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+}
+
+@media screen and (max-width: 768px) {
+    .punishment-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .punishment-header {
+        flex-direction: row;
+        align-items: center;
+        padding-right: 0;
+    }
+    
+    .punishment-badge-container {
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .pagination-list {
+        display: none;
+    }
+    
+    .punishment-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+    
+    .view-details-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .punishment-user-info {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .punishment-meta {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'punishmentLookup' }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-search"></i>
+                        Punishment Lookup
+                    </div>
+                    <% if (punishment) { %>
+                    <a href="/punishment/lookup" class="action-button back" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); font-weight: 500; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Back to Lookup
+                    </a>
+                    <% } %>
+                </div>
+
+            <form action="/punishment/lookup/find" method="POST" class="search-container">
+                <div class="search-field">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-hashtag search-icon"></i>
+                        <input type="text" class="search-input" name="punishmentId" placeholder="Enter punishment ID..." required>
+                        <div class="search-buttons">
+                            <button type="submit" class="search-button" aria-label="Search">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button type="button" class="clear-button" onclick="clearSearch()" aria-label="Clear search">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            
+                <% if (messages.error && messages.error.length > 0) { %>
+                    <div class="notification is-danger">
+                        <button class="delete"></button>
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+            
+                <% if (successMessages.length > 0) { %>
+                    <div class="notification is-success">
+                        <button class="delete"></button>
+                        <i class="fas fa-check-circle"></i>
+                        <%= successMessages[0] %>
+                    </div>
+                <% } %>
+            </form>
+
+            <% if (punishment) { %>
+                <div class="punishment-details">
+                    <div class="punishment-header">
+                        <div class="punishment-type">
+                            <i class="fas <%= 
+                                punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'fa-ban' : 
+                                punishment.punishment === 'Kick' ? 'fa-user-slash' :
+                                punishment.punishment === 'Timeout' ? 'fa-clock' : 
+                                'fa-exclamation-triangle' 
+                            %>"></i>
+                            <%= 
+                                punishment.punishment === 'PERM_BAN' ? 'Permanent Ban' : 
+                                punishment.punishment === 'TEMP_BAN' ? 'Temporary Ban' : 
+                                punishment.punishment 
+                            %>
+                        </div>
+                        <span class="punishment-id">#<%= punishment.punishmentID %></span>
+                    </div>
+
+                    <div class="punishment-user-info">
+                        <img src="<%= punishment.avatarURL %>" alt="User Avatar" class="user-avatar">
+                        <div class="user-details">
+                            <div class="username">
+                                <a href="/view/<%= punishment.userID %>"><%= punishment.username %></a>
+                            </div>
+                            <div class="user-id"><%= punishment.userID %></div>
+                            <div class="user-status">
+                                <span class="tag"><%= punishment.userInServer %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="punishment-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Staff Member</div>
+                            <div class="meta-value"><%= punishment.staff %></div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">
+                                <%= new Date(punishment.date).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true
+                                }) %>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Reason</div>
+                            <div class="meta-value"><%= punishment.reason %></div>
+                        </div>
+                        <% if (punishment.duration) { %>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value"><%= punishment.duration %></div>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <% if (existingAppeal || punishment.status === 'Appealed') { %>
+                        <div class="appeal-notice">
+                            <i class="fas fa-gavel"></i>
+                            <span>
+                                <%= punishment.status === 'Appealed' ? 
+                                    'This punishment has been appealed and is not active.' : 
+                                    'This punishment has an active appeal.' %>
+                                <a href="/view-appeal/<%= punishment?.appealID %>" style="color: inherit; text-decoration: underline;">View Appeal</a>
+                            </span>
+                        </div>
+                    <% } %>
+
+                    <% if (permissions && permissions.DELETE_PUNISHMENTS) { %>
+                        <button class="delete-button" data-punishment-id="<%= punishment.punishmentID %>">
+                            <i class="fas fa-trash-alt"></i>
+                            Delete Punishment
+                        </button>
+                    <% } %>
+                </div>
+
+                <% if (config.GeneralSettings.SaveRecentMessages) { %>
+                    <div class="messages-section glass-card">
+                        <div class="history-title">
+                            <i class="fas fa-comments"></i>
+                            Recent Messages
+                        </div>
+                
+                        <div class="info-notice">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="info-content">
+                                <span class="info-title">About these messages</span>
+                                <p>These messages were captured at the time the punishment was issued. They represent a snapshot of the user's recent activity and do not update after the punishment.</p>
+                            </div>
+                        </div>
+                
+                        <% if (!punishment.recentMessages || punishment.recentMessages.length === 0) { %>
+                            <div style="text-align: center; color: rgba(255,255,255,0.5);">No messages found.</div>
+                        <% } else { %>
+                            <div class="messages-list">
+                                <% punishment.recentMessages.reverse().forEach(message => { %>
+                                    <div class="message-item">
+                                        <div class="message-header">
+                                            <img src="<%= punishment.avatarURL %>" alt="<%= punishment.username %>" class="message-avatar">
+                                            <div class="message-user-info">
+                                                <span class="message-username"><%= punishment.username %></span>
+                                                <span class="message-channel">#<%= message.channelName %></span>
+                                            </div>
+                                            <span class="message-time">
+                                                <i class="fas fa-clock"></i>
+                                                <%= new Date(message.timestamp).toLocaleString('en-US', { 
+                                                    year: 'numeric', 
+                                                    month: 'short', 
+                                                    day: 'numeric',
+                                                    hour: 'numeric',
+                                                    minute: 'numeric',
+                                                    hour12: true
+                                                }) %>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="message-content">
+                                            <div class="message-text">
+                                                <% 
+                                                let messageText = message.message || '';
+                                                if (messageText.match(/^https?:\/\//i)) { 
+                                                %>
+                                                    <a href="<%= messageText %>" target="_blank" class="message-link">
+                                                        <%= messageText %>
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                <% } else { %>
+                                                    <%= messageText %>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </div>
+                <% } %>
+            <% } else { %>
+
+                <div class="recent-punishments-section">
+    <div class="section-title">
+        <i class="fas fa-history"></i>
+        Recent Punishments
+    </div>
+    
+    <% if (recentPunishments && recentPunishments.length > 0) { %>
+        <div class="punishment-list">
+            <% recentPunishments.forEach((punishment) => { %>
+                <div class="punishment-item">
+    <div class="punishment-badge-container">
+        <span class="punishment-badge <%= 
+            punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'ban' : 
+            punishment.punishment.toLowerCase() %>">
+            <i class="fas <%= 
+                punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'fa-ban' : 
+                punishment.punishment === 'Kick' ? 'fa-user-slash' :
+                punishment.punishment === 'Timeout' ? 'fa-clock' : 
+                'fa-exclamation-triangle' %>"></i>
+            <%= 
+                punishment.punishment === 'PERM_BAN' ? 'Permanent Ban' : 
+                punishment.punishment === 'TEMP_BAN' ? 'Temporary Ban' : 
+                punishment.punishment 
+            %>
+        </span>
+                    </div>
+                    <div class="punishment-content">
+                        <div class="punishment-header">
+                            <div class="time">
+                                <i class="far fa-calendar-alt"></i>
+                                <%= getRelativeTime(punishment.date) %>
+                            </div>
+                        </div>
+                        <div class="punishment-user-info-compact">
+                            <img src="<%= punishment.avatarURL %>" alt="<%= punishment.username %>" class="user-avatar-small">
+                            <div class="user-details-compact">
+                                <span class="username"><%= punishment.username %></span>
+                                <span class="user-id-small"><%= punishment.userID %></span>
+                            </div>
+                        </div>
+                        <div class="punishment-details">
+    <div class="punishment-reason">
+        <span class="reason-label">Reason</span>
+        <span class="reason"><%= punishment.reason.length > 75 ? punishment.reason.slice(0, 75) + '...' : punishment.reason %></span>
+    </div>
+    <% if (punishment.duration) { %>
+    <div class="punishment-reason">
+        <span class="reason-label">Duration</span>
+        <span class="reason"><%= punishment.duration %></span>
+    </div>
+    <% } %>
+    <div class="punishment-reason">
+        <span class="reason-label">Staff</span>
+        <span class="reason staff-name"><%= punishment.staff %></span>
+    </div>
+</div>
+
+                        <div class="punishment-footer">
+                            <a href="/punishment/lookup/<%= punishment.punishmentID %>" class="punishment-id-link">
+                                <i class="fas fa-hashtag"></i>
+                                <%= punishment.punishmentID %>
+                            </a>
+                            <a href="/punishment/lookup/<%= punishment.punishmentID %>" class="view-details-btn">
+                                View Details <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        
+        <div class="pagination-container">
+            <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                <a href="/punishment/lookup?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>" 
+                   class="pagination-previous <%= currentPage <= 1 ? 'is-disabled' : '' %>">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+                <a href="/punishment/lookup?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %>" 
+                   class="pagination-next <%= currentPage >= totalPages ? 'is-disabled' : '' %>">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="pagination-list">
+                    <% if (totalPages <= 5) { %>
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li>
+                                <a href="/punishment/lookup?page=<%= i %>" 
+                                   class="pagination-link <%= i === currentPage ? 'is-current' : '' %>"
+                                   aria-label="Page <%= i %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+                    <% } else { %>
+                        <li>
+                            <a href="/punishment/lookup?page=1" 
+                               class="pagination-link <%= currentPage === 1 ? 'is-current' : '' %>"
+                               aria-label="Page 1">
+                                1
+                            </a>
+                        </li>
+                        
+                        <% if (currentPage > 3) { %>
+                            <li><span class="pagination-ellipsis">&hellip;</span></li>
+                        <% } %>
+                        
+                        <% for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) { %>
+                            <li>
+                                <a href="/punishment/lookup?page=<%= i %>" 
+                                   class="pagination-link <%= i === currentPage ? 'is-current' : '' %>"
+                                   aria-label="Page <%= i %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+                        
+                        <% if (currentPage < totalPages - 2) { %>
+                            <li><span class="pagination-ellipsis">&hellip;</span></li>
+                        <% } %>
+                        
+                        <li>
+                            <a href="/punishment/lookup?page=<%= totalPages %>" 
+                               class="pagination-link <%= currentPage === totalPages ? 'is-current' : '' %>"
+                               aria-label="Page <%= totalPages %>">
+                                <%= totalPages %>
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+            <div class="pagination-info has-text-centered">
+                <span>Page <%= currentPage %> of <%= totalPages %></span>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="no-punishments-message">
+            <i class="fas fa-folder-open"></i>
+            <p>No punishments found</p>
+        </div>
+    <% } %>
+</div>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<% if (punishment) { %>
+    <div class="modal" id="deleteModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Confirm Deletion
+                </p>
+                <button class="modal-delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="modal-user-info">
+                    <img src="<%= punishment.avatarURL %>" class="modal-user-avatar" alt="User Avatar">
+                    <div class="modal-user-details">
+                        <div class="modal-username"><%= punishment.username %></div>
+                        <div class="modal-user-id">
+                            ID: <span id="modalUserId"><%= punishment.userID %></span>
+                            <i class="fas fa-copy copy-id" onclick="copyUserId()" title="Copy ID"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-divider"></div>
+                <p style="color: rgba(255,255,255,0.7);">
+                    Are you sure you want to delete this punishment? This action cannot be undone.
+                </p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="modal-button danger" id="confirmDelete">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                </button>
+                <button class="modal-button cancel" aria-label="close">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+<% } %>
+
+<%- include('partials/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.notification .delete').forEach(button => {
+        button.addEventListener('click', () => {
+            button.parentElement.remove();
+        });
+    });
+
+    function setupModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        const closeButtons = modal.querySelectorAll('.modal-delete, .modal-button.cancel, .modal-button[aria-label="close"]');
+        const background = modal.querySelector('.modal-background');
+
+        function closeModal() {
+            modal.classList.remove('is-active');
+        }
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', closeModal);
+        });
+
+        background.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                closeModal();
+            }
+        });
+    }
+
+    setupModal('deleteModal');
+
+    const deleteBtn = document.querySelector('.delete-button');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            document.getElementById('deleteModal').classList.add('is-active');
+        });
+    }
+
+    document.getElementById('confirmDelete')?.addEventListener('click', async () => {
+        const punishmentId = document.querySelector('.delete-button').dataset.punishmentId;
+        try {
+            const response = await fetch('/delete-punishment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ punishmentID: punishmentId })
+            });
+            
+            if (response.ok) {
+                window.location.href = '/punishment/lookup';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+});
+
+function clearSearch() {
+    document.querySelector('.search-input').value = '';
+    document.querySelector('.search-input').focus();
+}
+</script>
+
+</body>

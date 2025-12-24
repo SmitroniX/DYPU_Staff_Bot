@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Appeal System Settings | <%= settings.name %></title>
+        
+        <meta property="og:title" content="Appeal System Settings | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+:root {
+    --accent-color: <%= settings.accentColor %>;
+    --accent-color-rgb: <%= accentColorRgb %>;
+}
+
+body {
+    background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.section {
+    flex: 1;
+    padding: 1rem;
+    margin: 0;
+}
+
+.glass-card {
+    background: #1a1a2e;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.section-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: var(--accent-color);
+}
+
+.form-input, .form-select, .form-textarea {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input, .form-select {
+    height: 42px !important;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.form-input::placeholder, .form-select::placeholder, .form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.select {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.select select {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.3rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    height: 42px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.select select:hover {
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    background: rgba(30, 27, 38, 0.8);
+}
+
+.select select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.select select option {
+    background-color: #1a1a2e;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.settings-card {
+    background: rgba(24, 21, 31, 0.3);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.settings-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-header i {
+    color: var(--accent-color);
+}
+
+.alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert.is-success {
+    background: rgba(72, 199, 116, 0.1);
+    border: 1px solid rgba(72, 199, 116, 0.2);
+    color: #48c774;
+}
+
+.alert.is-danger {
+    background: rgba(241, 70, 104, 0.1);
+    border: 1px solid rgba(241, 70, 104, 0.2);
+    color: #f14668;
+}
+
+.alert i {
+    font-size: 1.1rem;
+}
+
+.save-button {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.save-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.save-button i {
+    font-size: 1.1rem;
+}
+
+.action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(120%);
+}
+
+.action-button.back {
+    background: rgba(var(--accent-color-rgb), 0.15); 
+    color: var(--accent-color); 
+    font-weight: 500; 
+    padding: 0.6rem 1.2rem; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+
+.switch-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.info-notice {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.info-notice i {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin-top: 0.5rem;
+}
+
+.question-card {
+    background: rgba(30, 27, 38, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.question-card:hover {
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    background: rgba(35, 32, 44, 0.7);
+}
+
+.question-details p {
+    color: rgba(255, 255, 255, 0.7) !important; 
+    font-size: 0.9rem;
+}
+
+.question-header .ml-2 {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+}
+
+.question-details strong {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+
+.help.has-text-grey-light {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.question-number {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.question-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.question-action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.question-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.question-action-btn.remove {
+    background: rgba(241, 70, 104, 0.1);
+    color: #f14668;
+}
+
+.question-action-btn.remove:hover {
+    background: rgba(241, 70, 104, 0.2);
+}
+
+.question-action-btn.move-up, .question-action-btn.move-down {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+}
+
+.question-action-btn.move-up:hover, .question-action-btn.move-down:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+}
+
+.add-question-button {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    border: 1px dashed rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.add-question-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.question-type-badge {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 0.5rem;
+}
+
+.required-badge {
+    background: rgba(241, 70, 104, 0.1);
+    color: #f14668;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 0.5rem;
+}
+
+.optional-badge {
+    background: rgba(72, 199, 116, 0.1);
+    color: #48c774;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 0.5rem;
+}
+
+strong {
+                color: var(--accent-color);
+            }
+
+.modal-background {
+    background: rgba(19, 17, 26, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-card {
+    background: rgba(30, 27, 38, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 16px;
+    max-width: 600px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-card-head {
+    background: rgba(35, 32, 44, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px 16px 0 0;
+    padding: 1.25rem;
+}
+
+.modal-card-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-card-title i {
+    color: var(--accent-color);
+}
+
+.modal-card-body {
+    background: none;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.modal-card-foot {
+    background: rgba(35, 32, 44, 0.6);
+    border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 0 0 16px 16px;
+    padding: 1.25rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.modal-button {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-button.primary {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+}
+
+.modal-button.primary:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.danger {
+    background: rgba(241, 70, 104, 0.15);
+    color: #f14668;
+}
+
+.modal-button.danger:hover {
+    background: rgba(241, 70, 104, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+@media screen and (max-width: 768px) {
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .question-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar', { user: user, currentPage: 'settings', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-gavel"></i>
+                        Appeal System Settings
+                    </div>
+                    <a href="/settings" class="action-button back">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Settings
+                    </a>
+                </div>
+                
+                <div class="info-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="info-content">
+                        <strong>About the Appeal System</strong>
+                        <p>
+                            The appeal system offers an automated, web-based approach to managing user appeals for punishments within your Discord server.
+                            Users receive a direct message with a link to submit an appeal and punishment details. They can then log in to the dashboard, answer predefined questions,
+                            and staff can review the appeal, eliminating the need for external platforms like Google Forms.
+                            Full logs from when the user was punished (chat logs) are also available.
+                            If an appeal is accepted, the user will be automatically unbanned or untimed out from the server by the bot, so you don't have to do anything manually.
+                        </p>
+                    </div>
+                </div>
+                
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    <div class="alert is-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages && messages.error && messages.error.length > 0) { %>
+                    <div class="alert is-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+                
+                <form id="appealSettingsForm" action="/settings/appeal" method="POST">
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-cog"></i>
+                            General Settings
+                        </div>
+                        
+                        <div class="columns is-multiline">
+                            <div class="column is-6">
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="appealEnabled" <% if (settings.appealEnabled) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Enable Appeal System</span>
+                                </div>
+                                <p class="help has-text-grey-light mb-4">Toggle the entire appeal system on or off.</p>
+                                
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="addUsersBackEnabled" <% if (settings.addUsersBackEnabled) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Automatically add user back to server</span>
+                                </div>
+                                <p class="help has-text-grey-light mb-4">Automatically add users back to the server if their appeal gets accepted?</p>
+
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" name="displayInactivePunishments" <% if (settings.displayInactivePunishments) { %>checked<% } %>>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Display Inactive Punishments</span>
+                                </div>
+                                <p class="help has-text-grey-light">When enabled, punishments that have been appealed (and accepted) will still be displayed in the user's punishment history, but with a notice saying it has been appealed.</p>
+                            </div>
+                            
+                            <div class="column is-6">
+                                <div class="field mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-hashtag"></i>
+                                        Appeals Channel ID
+                                    </label>
+                                    <input type="text" name="appealChannelId" class="form-input" value="<%= settings.appealChannelId %>" placeholder="Enter channel ID">
+                                    <p class="help has-text-grey-light">The Discord channel where appeal notifications will be sent.</p>
+                                </div>
+                                
+                                <div class="field">
+                                    <label class="form-label">
+                                        <i class="fas fa-link"></i>
+                                        Custom Appeal Link (Optional)
+                                    </label>
+                                    <input type="text" name="customAppealLink" class="form-input" value="<%= settings.customAppealLink || '' %>" placeholder="Leave blank to use built-in system">
+                                    <p class="help has-text-grey-light">If blank, the built-in web-based appeal system will be used. Add a URL to redirect users to an external appeal form.</p>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="form-label">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        Appeal Cooldown (Hours)
+                                    </label>
+                                    <input type="number" name="appealCooldown" class="form-input" value="<%= settings.appealCooldown !== undefined ? settings.appealCooldown : 24 %>" min="0" step="1">
+                                    <p class="help has-text-grey-light">Hours users must wait before submitting another appeal.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-question-circle"></i>
+                            Appeal Questions
+                        </div>
+                        
+                        <p class="mb-4" style="color: rgba(255, 255, 255, 0.7);">Configure the questions users will answer when submitting an appeal. You can add, edit, and reorder questions as needed.</p>
+                        
+                        <div id="questions-container">
+                            <% if (settings.appealQuestions && settings.appealQuestions.length > 0) { %>
+                                <% settings.appealQuestions.forEach((question, index) => { %>
+                                    <div class="question-card" data-question-index="<%= index %>">
+                                        <div class="question-header">
+                                            <div class="is-flex is-align-items-center">
+                                                <span class="question-number"><%= index + 1 %></span>
+                                                <span class="ml-2"><%= question.text %></span>
+                                                <span class="question-type-badge">
+                                                    <i class="fas <%= question.type === 'paragraph' ? 'fa-paragraph' : 'fa-font' %>"></i>
+                                                    <%= question.type === 'paragraph' ? 'Paragraph' : 'Short Text' %>
+                                                </span>
+                                                <span class="<%= question.required ? 'required-badge' : 'optional-badge' %>">
+                                                    <i class="fas <%= question.required ? 'fa-asterisk' : 'fa-square' %>"></i>
+                                                    <%= question.required ? 'Required' : 'Optional' %>
+                                                </span>
+                                            </div>
+                                            <div class="question-actions">
+                                                <button type="button" class="question-action-btn edit-question" data-index="<%= index %>">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="question-action-btn move-up" data-index="<%= index %>" <%= index === 0 ? 'disabled' : '' %>>
+                                                    <i class="fas fa-arrow-up"></i>
+                                                </button>
+                                                <button type="button" class="question-action-btn move-down" data-index="<%= index %>" <%= index === settings.appealQuestions.length - 1 ? 'disabled' : '' %>>
+                                                    <i class="fas fa-arrow-down"></i>
+                                                </button>
+                                                <button type="button" class="question-action-btn remove" data-index="<%= index %>">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <input type="hidden" name="questions[<%= index %>][text]" value="<%= question.text %>">
+                                        <input type="hidden" name="questions[<%= index %>][type]" value="<%= question.type %>">
+                                        <input type="hidden" name="questions[<%= index %>][required]" value="<%= question.required %>">
+                                        <input type="hidden" name="questions[<%= index %>][characterLimit]" value="<%= question.characterLimit %>">
+                                        
+                                        <div class="question-details">
+                                            <p>Character Limit: <strong><%= question.characterLimit %></strong></p>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p>No questions configured. Add a question to get started.</p>
+                            <% } %>
+                        </div>
+                        
+                        <button type="button" id="add-question-button" class="add-question-button">
+                            <i class="fas fa-plus"></i>
+                            Add Question
+                        </button>
+                    </div>
+                    
+                    
+                    <div class="has-text-centered mt-5">
+                        <button type="submit" class="save-button">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+
+<div class="modal" id="question-modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                <i class="fas fa-question-circle"></i>
+                <span id="modal-title">Add Question</span>
+            </p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <form id="question-form">
+                <input type="hidden" id="edit-question-index" value="-1">
+                
+                <div class="field">
+                    <label class="form-label" for="question-text">
+                        <i class="fas fa-pen"></i>
+                        Question Text
+                    </label>
+                    <input type="text" id="question-text" class="form-input" placeholder="Enter your question" required>
+                </div>
+                
+                <div class="field">
+                    <label class="form-label" for="question-type">
+                        <i class="fas fa-align-left"></i>
+                        Question Type
+                    </label>
+                    <div class="select is-fullwidth">
+                        <select id="question-type" class="form-select">
+                            <option value="paragraph">Paragraph (Long Answer)</option>
+                            <option value="short">Short Text (Brief Answer)</option>
+                        </select>
+                    </div>
+                    <p class="help has-text-grey-light">Select the format for user responses.</p>
+                </div>
+                
+                <div class="field">
+                    <label class="form-label" for="question-character-limit">
+                        <i class="fas fa-text-width"></i>
+                        Character Limit
+                    </label>
+                    <input type="number" id="question-character-limit" class="form-input" value="1000" min="10" max="5000">
+                    <p class="help has-text-grey-light">Maximum characters the user can enter.</p>
+                </div>
+                
+                <div class="field">
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" id="question-required" checked>
+                            <span class="switch-slider"></span>
+                        </label>
+                        <span class="switch-label">Required Question</span>
+                    </div>
+                    <p class="help has-text-grey-light">When enabled, users must answer this question to submit an appeal.</p>
+                </div>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" class="modal-button primary" id="save-question-button">
+                <i class="fas fa-save"></i>
+                Save Question
+            </button>
+            <button type="button" class="modal-button cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </footer>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const questionModal = document.getElementById('question-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const questionForm = document.getElementById('question-form');
+    const editQuestionIndex = document.getElementById('edit-question-index');
+    const questionText = document.getElementById('question-text');
+    const questionType = document.getElementById('question-type');
+    const questionCharacterLimit = document.getElementById('question-character-limit');
+    const questionRequired = document.getElementById('question-required');
+    const saveQuestionButton = document.getElementById('save-question-button');
+    const addQuestionButton = document.getElementById('add-question-button');
+    const questionsContainer = document.getElementById('questions-container');
+    
+
+    addQuestionButton.addEventListener('click', function() {
+        openQuestionModal();
+    });
+    
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-question')) {
+            const button = e.target.closest('.edit-question');
+            const index = button.getAttribute('data-index');
+            const questionCard = document.querySelector(`.question-card[data-question-index="${index}"]`);
+            
+            if (questionCard) {
+                const text = questionCard.querySelector(`input[name="questions[${index}][text]"]`).value;
+                const type = questionCard.querySelector(`input[name="questions[${index}][type]"]`).value;
+                const required = questionCard.querySelector(`input[name="questions[${index}][required]"]`).value === 'true';
+                const characterLimit = questionCard.querySelector(`input[name="questions[${index}][characterLimit]"]`).value;
+                
+                openQuestionModal(index, text, type, required, characterLimit);
+            }
+        }
+    });
+    
+
+    saveQuestionButton.addEventListener('click', function() {
+        saveQuestion();
+    });
+    
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.question-action-btn.remove')) {
+            const button = e.target.closest('.question-action-btn.remove');
+            const index = button.getAttribute('data-index');
+            removeQuestion(index);
+        }
+    });
+    
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.question-action-btn.move-up')) {
+            const button = e.target.closest('.question-action-btn.move-up');
+            const index = parseInt(button.getAttribute('data-index'));
+            if (index > 0) {
+                moveQuestion(index, index - 1);
+            }
+        }
+    });
+    
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.question-action-btn.move-down')) {
+            const button = e.target.closest('.question-action-btn.move-down');
+            const index = parseInt(button.getAttribute('data-index'));
+            const questionCards = document.querySelectorAll('.question-card');
+            if (index < questionCards.length - 1) {
+                moveQuestion(index, index + 1);
+            }
+        }
+    });
+    
+
+    const closeButtons = questionModal.querySelectorAll('.delete, .modal-button.cancel');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            closeQuestionModal();
+        });
+    });
+    
+
+    questionModal.querySelector('.modal-background').addEventListener('click', function() {
+        closeQuestionModal();
+    });
+    
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && questionModal.classList.contains('is-active')) {
+            closeQuestionModal();
+        }
+    });
+    
+
+    function openQuestionModal(index = -1, text = '', type = 'paragraph', required = true, characterLimit = 1000) {
+
+        modalTitle.textContent = index === -1 ? 'Add Question' : 'Edit Question';
+        
+
+        editQuestionIndex.value = index;
+        questionText.value = text;
+        questionType.value = type;
+        questionRequired.checked = required;
+        questionCharacterLimit.value = characterLimit;
+        
+
+        questionModal.classList.add('is-active');
+        questionText.focus();
+    }
+    
+
+    function closeQuestionModal() {
+        questionModal.classList.remove('is-active');
+        questionForm.reset();
+        editQuestionIndex.value = -1;
+    }
+    
+
+
+function saveQuestion() {
+
+    if (!questionText.value.trim()) {
+        alert('Please enter a question text');
+        questionText.focus();
+        return;
+    }
+
+    if (isNaN(questionCharacterLimit.value) || questionCharacterLimit.value < 10) {
+        alert('Character limit must be at least 10');
+        questionCharacterLimit.focus();
+        return;
+    }
+
+    const index = parseInt(editQuestionIndex.value);
+    const isNewQuestion = index === -1;
+    const newIndex = isNewQuestion ? document.querySelectorAll('.question-card').length : index;
+
+
+    const questionData = {
+        text: questionText.value.trim(),
+        type: questionType.value,
+        required: questionRequired.checked,
+        characterLimit: questionCharacterLimit.value
+    };
+
+
+    if (isNewQuestion) {
+
+        const noQuestionsMessage = questionsContainer.querySelector('p:not(.question-details p)');
+        if (noQuestionsMessage) {
+
+            noQuestionsMessage.remove();
+        }
+        
+
+        const questionHtml = createQuestionCard(newIndex, questionData);
+        questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+    } else {
+
+        const questionCard = document.querySelector(`.question-card[data-question-index="${index}"]`);
+
+        if (questionCard) {
+
+            questionCard.querySelector(`input[name="questions[${index}][text]"]`).value = questionData.text;
+            questionCard.querySelector(`input[name="questions[${index}][type]"]`).value = questionData.type;
+            questionCard.querySelector(`input[name="questions[${index}][required]"]`).value = questionData.required;
+            questionCard.querySelector(`input[name="questions[${index}][characterLimit]"]`).value = questionData.characterLimit;
+
+
+            const headerContent = questionCard.querySelector('.question-header');
+            headerContent.querySelector('span.ml-2').textContent = questionData.text;
+
+            const typeBadge = headerContent.querySelector('.question-type-badge');
+            typeBadge.innerHTML = `
+                <i class="fas ${questionData.type === 'paragraph' ? 'fa-paragraph' : 'fa-font'}"></i>
+                ${questionData.type === 'paragraph' ? 'Paragraph' : 'Short Text'}
+            `;
+
+            const requiredBadge = headerContent.querySelector('.required-badge, .optional-badge');
+            requiredBadge.className = questionData.required ? 'required-badge' : 'optional-badge';
+            requiredBadge.innerHTML = `
+                <i class="fas ${questionData.required ? 'fa-asterisk' : 'fa-square'}"></i>
+                ${questionData.required ? 'Required' : 'Optional'}
+            `;
+
+
+            questionCard.querySelector('.question-details').innerHTML = `
+                <p>Character Limit: <strong>${questionData.characterLimit}</strong></p>
+            `;
+        }
+    }
+
+
+    closeQuestionModal();
+
+
+    updateMoveButtons();
+}
+
+
+
+    function createQuestionCard(index, questionData) {
+        return `
+            <div class="question-card" data-question-index="${index}">
+                <div class="question-header">
+                    <div class="is-flex is-align-items-center">
+                        <span class="question-number">${index + 1}</span>
+                        <span class="ml-2">${questionData.text}</span>
+                        <span class="question-type-badge">
+                            <i class="fas ${questionData.type === 'paragraph' ? 'fa-paragraph' : 'fa-font'}"></i>
+                            ${questionData.type === 'paragraph' ? 'Paragraph' : 'Short Text'}
+                        </span>
+                        <span class="${questionData.required ? 'required-badge' : 'optional-badge'}">
+                            <i class="fas ${questionData.required ? 'fa-asterisk' : 'fa-square'}"></i>
+                            ${questionData.required ? 'Required' : 'Optional'}
+                        </span>
+                    </div>
+                    <div class="question-actions">
+                        <button type="button" class="question-action-btn edit-question" data-index="${index}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="question-action-btn move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button type="button" class="question-action-btn move-down" data-index="${index}">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button type="button" class="question-action-btn remove" data-index="${index}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <input type="hidden" name="questions[${index}][text]" value="${questionData.text}">
+                <input type="hidden" name="questions[${index}][type]" value="${questionData.type}">
+                <input type="hidden" name="questions[${index}][required]" value="${questionData.required}">
+                <input type="hidden" name="questions[${index}][characterLimit]" value="${questionData.characterLimit}">
+                
+                <div class="question-details">
+                    <p>Character Limit: <strong>${questionData.characterLimit}</strong></p>
+                </div>
+            </div>
+        `;
+    }
+    
+
+    function removeQuestion(index) {
+        if (confirm('Are you sure you want to remove this question?')) {
+            const questionCard = document.querySelector(`.question-card[data-question-index="${index}"]`);
+            
+            if (questionCard) {
+                questionCard.remove();
+                
+
+                const remainingCards = document.querySelectorAll('.question-card');
+                
+                if (remainingCards.length === 0) {
+
+                    questionsContainer.innerHTML = '<p>No questions configured. Add a question to get started.</p>';
+                } else {
+
+                    remainingCards.forEach((card, i) => {
+
+                        card.setAttribute('data-question-index', i);
+                        
+
+                        card.querySelector('.question-number').textContent = i + 1;
+                        
+
+                        const buttons = card.querySelectorAll('.question-action-btn');
+                        buttons.forEach(button => {
+                            button.setAttribute('data-index', i);
+                        });
+                        
+
+                        const inputs = card.querySelectorAll('input[type="hidden"]');
+                        inputs.forEach(input => {
+                            const name = input.getAttribute('name');
+                            const newName = name.replace(/questions\[\d+\]/, `questions[${i}]`);
+                            input.setAttribute('name', newName);
+                        });
+                    });
+                    
+
+                    updateMoveButtons();
+                }
+            }
+        }
+    }
+    
+    function updateFormHiddenInputs() {
+    const questionCards = document.querySelectorAll('.question-card');
+    
+
+    const existingQuestionInputs = document.querySelectorAll('input[name^="questions["]');
+    existingQuestionInputs.forEach(input => {
+        if (!input.closest('.question-card')) {
+            input.remove();
+        }
+    });
+    
+
+    questionCards.forEach((card, index) => {
+
+        const text = card.querySelector(`input[name^="questions["][name$="[text]"]`).value;
+        const type = card.querySelector(`input[name^="questions["][name$="[type]"]`).value;
+        const required = card.querySelector(`input[name^="questions["][name$="[required]"]`).value;
+        const characterLimit = card.querySelector(`input[name^="questions["][name$="[characterLimit]"]`).value;
+
+
+        card.querySelector(`input[name^="questions["][name$="[text]"]`).name = `questions[${index}][text]`;
+        card.querySelector(`input[name^="questions["][name$="[type]"]`).name = `questions[${index}][type]`;
+        card.querySelector(`input[name^="questions["][name$="[required]"]`).name = `questions[${index}][required]`;
+        card.querySelector(`input[name^="questions["][name$="[characterLimit]"]`).name = `questions[${index}][characterLimit]`;
+        
+
+        card.querySelector(`input[name="questions[${index}][text]"]`).value = text;
+        card.querySelector(`input[name="questions[${index}][type]"]`).value = type;
+        card.querySelector(`input[name="questions[${index}][required]"]`).value = required;
+        card.querySelector(`input[name="questions[${index}][characterLimit]"]`).value = characterLimit;
+    });
+}
+
+
+    function moveQuestion(fromIndex, toIndex) {
+        const questionCards = Array.from(document.querySelectorAll('.question-card'));
+        
+        if (fromIndex >= 0 && fromIndex < questionCards.length && toIndex >= 0 && toIndex < questionCards.length) {
+
+            const cardToMove = questionCards[fromIndex];
+            const cardAtTarget = questionCards[toIndex];
+            
+
+            if (fromIndex < toIndex) {
+
+                cardAtTarget.parentNode.insertBefore(cardToMove, cardAtTarget.nextSibling);
+            } else {
+
+                cardAtTarget.parentNode.insertBefore(cardToMove, cardAtTarget);
+            }
+            
+
+            const updatedCards = document.querySelectorAll('.question-card');
+            updatedCards.forEach((card, i) => {
+
+                card.setAttribute('data-question-index', i);
+                
+
+                card.querySelector('.question-number').textContent = i + 1;
+                
+                const buttons = card.querySelectorAll('.question-action-btn');
+                buttons.forEach(button => {
+                    button.setAttribute('data-index', i);
+                });
+                
+                const inputs = card.querySelectorAll('input[type="hidden"]');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    const newName = name.replace(/questions\[\d+\]/, `questions[${i}]`);
+                    input.setAttribute('name', newName);
+                });
+            });
+            
+            updateMoveButtons();
+        }
+    }
+    
+    function updateMoveButtons() {
+        const questionCards = document.querySelectorAll('.question-card');
+        
+        questionCards.forEach((card, index) => {
+            const moveUpBtn = card.querySelector('.question-action-btn.move-up');
+            const moveDownBtn = card.querySelector('.question-action-btn.move-down');
+            
+            if (moveUpBtn) {
+                moveUpBtn.disabled = index === 0;
+            }
+            
+            if (moveDownBtn) {
+                moveDownBtn.disabled = index === questionCards.length - 1;
+            }
+        });
+    }
+    
+    const appealSettingsForm = document.getElementById('appealSettingsForm');
+if (appealSettingsForm) {
+    appealSettingsForm.addEventListener('submit', function(e) {
+        updateFormHiddenInputs();
+        
+        const questions = document.querySelectorAll('.question-card');
+        if (questions.length === 0 && document.querySelector('input[name="appealEnabled"]').checked) {
+            if (!confirm('No questions are configured. Users will not be able to submit any information with their appeal. Continue?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+}
+    
+    updateMoveButtons();
+});
+</script>

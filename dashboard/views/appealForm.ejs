@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punishment Appeal | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Punishment Appeal | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="Appeal Form" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor || '#6d5ca5' %>;
+            --accent-color-rgb: <%= accentColorRgb || '109, 92, 165' %>;
+        }
+        
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section {
+            flex: 1;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            padding-bottom: 0.75rem;
+        }
+        
+        .section-title i {
+            color: var(--accent-color);
+        }
+        
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+            padding: 2px;
+            background: #1a1625;
+            transition: all 0.3s ease;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .username {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+        
+        .logout-button {
+            padding: 0.6rem 1.2rem;
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logout-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        
+        .punishment-details {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .punishment-details:hover {
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .punishment-id {
+            color: var(--accent-color);
+            font-weight: 600;
+            background: rgba(var(--accent-color-rgb), 0.1);
+            padding: 0.3rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .punishment-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .punishment-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .punishment-info-item i {
+            color: var(--accent-color);
+            margin-top: 0.2rem;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .punishment-info-item strong {
+            color: #ffffff;
+            min-width: 70px;
+        }
+        
+        .punishment-info-item span {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        
+        .appeal-form {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .appeal-form:hover {
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .field {
+            margin-bottom: 1.5rem;
+        }
+        
+        .label {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .required-text {
+            color: #ff3860;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+        
+        .input, .textarea {
+            background: rgba(24, 21, 31, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input:focus, .textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 1px var(--accent-color);
+            background: rgba(30, 27, 38, 0.8);
+        }
+        
+        .input::placeholder, .textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .submit-button {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            border-radius: 10px;
+            padding: 0.85rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .submit-button:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        
+        .find-punishment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .punishment-input-container {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .punishment-input {
+            background: rgba(24, 21, 31, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            flex: 1;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .punishment-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 1px var(--accent-color);
+            background: rgba(30, 27, 38, 0.8);
+        }
+        
+        .find-button {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            border-radius: 8px;
+            padding: 0 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .find-button:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        
+        .user-appeals-section {
+            margin-top: 2rem;
+        }
+        
+        .appeals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .appeal-card {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .appeal-card:hover {
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .appeal-card-header {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .appeal-type {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            width: 100%;
+        }
+        
+        .appeal-id {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.25rem;
+        }
+        
+        .appeal-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .appeal-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+        
+        .appeal-status.pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        .appeal-status.accepted {
+            background: rgba(72, 199, 116, 0.2);
+            color: #48c774;
+            border: 1px solid rgba(72, 199, 116, 0.3);
+        }
+        
+        .appeal-status.denied {
+            background: rgba(255, 56, 96, 0.2);
+            color: #ff3860;
+            border: 1px solid rgba(255, 56, 96, 0.3);
+        }
+        
+        .appeal-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .appeal-card-footer {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+        
+        .view-reason-button {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .view-reason-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        
+        .alert {
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .alert-success {
+            background: rgba(72, 199, 116, 0.15);
+            border: 1px solid rgba(72, 199, 116, 0.3);
+            color: #48c774;
+        }
+        
+        .alert-danger {
+            background: rgba(255, 56, 96, 0.15);
+            border: 1px solid rgba(255, 56, 96, 0.3);
+            color: #ff3860;
+        }
+        
+        .alert i {
+            font-size: 1.2rem;
+            margin-top: 0.2rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, 
+                rgba(var(--accent-color-rgb), 0.1), 
+                rgba(var(--accent-color-rgb), 0.2), 
+                rgba(var(--accent-color-rgb), 0.1));
+            margin: 1.5rem 0;
+            width: 100%;
+        }
+        
+        
+        .modal-background {
+            background: rgba(19, 17, 26, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal-card {
+            background: rgba(30, 27, 38, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 16px;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-card-head {
+            background: rgba(35, 32, 44, 0.6);
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px 16px 0 0;
+            padding: 1.25rem;
+        }
+        
+        .modal-card-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .modal-card-title i {
+            color: var(--accent-color);
+        }
+        
+        .modal-card-body {
+            background: none;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .modal-card-foot {
+            background: rgba(35, 32, 44, 0.6);
+            border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 0 0 16px 16px;
+            padding: 1.25rem;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .modal-button {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modal-button.primary {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+        }
+        
+        .modal-button.primary:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            transform: translateY(-1px);
+        }
+        
+        
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        
+        @media screen and (max-width: 768px) {
+            .section {
+                padding: 1rem;
+            }
+            
+            .glass-card {
+                padding: 1.25rem;
+            }
+            
+            .user-profile {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            
+            .appeals-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .punishment-input-container {
+                flex-direction: column;
+            }
+            
+            .find-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card fade-in">
+                
+                <div class="user-profile">
+                    <img src="<%= user.displayAvatarURL({ format: 'png', size: 128 }) %>" alt="Profile Picture" class="user-avatar">
+                    <div class="user-info">
+                        <div class="username"><%= user.username %></div>
+                    </div>
+                    <a href="/logout" class="logout-button">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+
+                
+                <div class="section-title">
+                    <i class="fas fa-gavel"></i>
+                    Punishment Appeal
+                </div>
+                
+                
+                <% if (messages.error && messages.error.length > 0) { %>
+                    <div class="alert alert-danger fade-in">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="alert-content">
+                            <%= messages.error[0] %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <% if (successMessages.length > 0) { %>
+                    <div class="alert alert-success fade-in">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="alert-content">
+                            <%= successMessages[0] %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                
+                <% if (!punishment && successMessages.length === 0) { %>
+                    <div class="find-punishment-form fade-in">
+                        <div class="section-title" style="font-size: 1.2rem; margin-bottom: 1rem;">
+                            <i class="fas fa-search"></i>
+                            Find Your Punishment
+                        </div>
+                        
+                        <form id="manual-punishment-form" action="/findPunishment" method="post">
+                            <div class="punishment-input-container">
+                                <input type="text" id="punishment-id-input" name="punishmentId" placeholder="Enter Punishment ID" class="punishment-input" required>
+                                <button type="submit" class="find-button">
+                                    <i class="fas fa-search"></i>
+                                    Find Punishment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    
+                    <% if (appeals.length > 0) { %>
+                        <div class="divider"></div>
+                        
+                        <div class="user-appeals-section fade-in">
+                            <div class="section-title">
+                                <i class="fas fa-history"></i>
+                                Your Appeals
+                            </div>
+                            
+                            <div class="appeals-grid">
+                                <% appeals.forEach(function(appeal) { %>
+                                    <div class="appeal-card">
+                                        <div class="appeal-card-header">
+                                            <div>
+                                                <div class="appeal-type"><%= appeal.punishmentType %></div>
+                                                <div class="appeal-id">
+                                                    <i class="fas fa-hashtag"></i>
+                                                    <%= appeal.punishmentId %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="appeal-card-content">
+                                            <div class="appeal-status <%= appeal.status.toLowerCase() %>">
+                                                <i class="fas <%= 
+                                                    appeal.status.toLowerCase() === 'pending' ? 'fa-hourglass-half' : 
+                                                    appeal.status.toLowerCase() === 'accepted' ? 'fa-check-circle' : 
+                                                    'fa-times-circle' 
+                                                %>"></i>
+                                                <%= appeal.status %>
+                                            </div>
+                                            
+                                            <div class="appeal-date">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                <%= appeal.submissionDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                            </div>
+                                        </div>
+                                        
+                                        <% if (appeal.status.toLowerCase() === 'accepted' || appeal.status.toLowerCase() === 'denied') { %>
+                                            <div class="appeal-card-footer">
+                                                <button type="button" class="view-reason-button" data-bs-toggle="modal" data-bs-target="#reasonModal<%= appeal.punishmentId %>">
+                                                    <i class="fas fa-comment-alt"></i>
+                                                    View Decision Reason
+                                                </button>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } %>
+                
+                
+                <% if (punishment) { %>
+                    <div class="punishment-details fade-in">
+                        <div class="section-title" style="font-size: 1.2rem; margin-bottom: 1rem; border-bottom: none; padding-bottom: 0;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Punishment Details
+                        </div>
+                        
+                        <div class="punishment-id">
+                            <i class="fas fa-hashtag"></i>
+                            <%= punishment.punishmentID %>
+                        </div>
+                        
+                        <div class="punishment-info">
+                            <div class="punishment-info-item">
+                                <i class="fas fa-gavel"></i>
+                                <strong>Type:</strong>
+                                <span>
+                                    <% if (punishment.punishment === 'PERM_BAN') { %>
+                                        Permanent Ban
+                                    <% } else if (punishment.punishment === 'TEMP_BAN') { %>
+                                        Temporary Ban
+                                    <% } else { %>
+                                        <%= punishment.punishment %>
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+                            
+                            <div class="punishment-info-item">
+                                <i class="fas fa-comment"></i>
+                                <strong>Reason:</strong>
+                                <span><%= punishment.reason %></span>
+                            </div>
+                            
+                            <div class="punishment-info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <strong>Date:</strong>
+                                <span>
+                                    <%= punishment.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %> 
+                                    <%= new Date(punishment.date).toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: 'numeric', timeZone: config.Dashboard.Timezone }) %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+<div class="appeal-form fade-in">
+    <div class="section-title" style="font-size: 1.2rem; margin-bottom: 1.5rem; border-bottom: none; padding-bottom: 0;">
+        <i class="fas fa-paper-plane"></i>
+        Submit Your Appeal
+    </div>
+    
+    <form action="/submitAppeal" method="post">
+        <input type="hidden" name="userId" value="<%= user.id %>">
+        <input type="hidden" name="punishmentId" value="<%= punishment.punishmentID %>">
+        
+        <% if (appealQuestions && appealQuestions.length > 0) { %>
+            <% appealQuestions.forEach(function(question) { %>
+                <div class="field">
+                    <label class="label">
+                        <%= question.text %>
+                        <% if(question.required) { %>
+                            <span class="required-text">Required</span>
+                        <% } %>
+                    </label>
+                    
+                    <div class="control">
+                        <% if (question.type === 'paragraph') { %>
+                            <textarea 
+                                class="textarea" 
+                                name="answers[<%= question.text %>]" 
+                                placeholder="Enter your response here..." 
+                                rows="4" 
+                                <% if(question.required) { %>required<% } %> 
+                                maxlength="<%= question.characterLimit %>"></textarea>
+                        <% } else if (question.type === 'short') { %>
+                            <input 
+                                type="text" 
+                                class="input" 
+                                name="answers[<%= question.text %>]" 
+                                placeholder="Enter your response here..." 
+                                <% if(question.required) { %>required<% } %> 
+                                maxlength="<%= question.characterLimit %>"/>
+                        <% } %>
+                    </div>
+                    
+                    <p class="help" style="color: rgba(255, 255, 255, 0.5);">
+                        Maximum <%= question.characterLimit %> characters
+                    </p>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="alert-content">
+                    No appeal questions have been configured. Please contact an administrator.
+                </div>
+            </div>
+        <% } %>
+        
+        <% if (appealQuestions && appealQuestions.length > 0) { %>
+            <div class="field">
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Appeal
+                </button>
+            </div>
+        <% } %>
+    </form>
+</div>
+<% } %>
+
+</div>
+</div>
+</section>
+
+
+<% if (!punishment && successMessages.length === 0) { %>
+    <% appeals.forEach(function(appeal) { %>
+        <div class="modal" id="reasonModal<%= appeal.punishmentId %>">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">
+                        <i class="fas <%= appeal.status.toLowerCase() === 'accepted' ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                        <%= appeal.status %> Appeal Reason
+                    </p>
+                    <button class="delete" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p><%= appeal.decisionReason %></p>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="modal-button primary close-modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </footer>
+            </div>
+        </div>
+    <% }); %>
+<% } %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.delete, .close-modal, .modal-background');
+        
+
+        function closeModal(modal) {
+            modal.classList.remove('is-active');
+        }
+        
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal');
+                if (modal) {
+                    closeModal(modal);
+                }
+            });
+        });
+        
+
+        const reasonButtons = document.querySelectorAll('.view-reason-button');
+        reasonButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-bs-target');
+                if (targetId) {
+                    const modal = document.querySelector(targetId);
+                    if (modal) {
+                        modal.classList.add('is-active');
+                    }
+                }
+            });
+        });
+        
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                modals.forEach(modal => {
+                    if (modal.classList.contains('is-active')) {
+                        closeModal(modal);
+                    }
+                });
+            }
+        });
+        
+
+        function animateElements() {
+            const fadeInElements = document.querySelectorAll('.fade-in');
+            fadeInElements.forEach((element, index) => {
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                }, 100 * index);
+            });
+        }
+        
+
+        animateElements();
+        
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const invalidPunishment = urlParams.get('invalidPunishment');
+        if (invalidPunishment) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger fade-in';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="alert-content">
+                    The punishment ID you entered is invalid or not found.
+                </div>
+            `;
+            
+            const glassCard = document.querySelector('.glass-card');
+            if (glassCard) {
+                const sectionTitle = glassCard.querySelector('.section-title');
+                if (sectionTitle) {
+                    glassCard.insertBefore(alertDiv, sectionTitle.nextSibling);
+                } else {
+                    glassCard.prepend(alertDiv);
+                }
+            }
+        }
+
+        const appealForm = document.querySelector('.appeal-form form');
+    if (appealForm) {
+      appealForm.addEventListener('submit', function(e) {
+
+
+        
+
+        const submitButton = appealForm.querySelector('.submit-button');
+        if (submitButton) {
+          submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+          submitButton.disabled = true;
+        }
+        
+
+      });
+    }
+
+    });
+</script>
+
+</body>
+</html>

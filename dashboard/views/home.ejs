@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Home | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+    
+    background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(var(--accent-color-rgb), 0.15);
+            border-color: var(--accent-color);
+        }
+
+        
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(var(--accent-color-rgb), 0.03));
+            z-index: 0;
+        }
+
+        .stat-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .last-24h {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.5rem;
+        }
+
+        
+        .chart-container {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 1.5rem 1.5rem 4rem;  
+    margin: 2rem 0;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    height: 450px;  
+}
+
+        
+        .punishment-list {
+            padding-right: 1rem;
+        }
+
+        .punishment-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+
+        .punishment-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--accent-color);
+            transform: translateX(5px);
+        }
+        
+        .punishment-item .username {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .punishment-item .time {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .punishment-item .reason {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .punishment-id {
+            font-family: 'Roboto Mono', monospace;
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .punishment-id:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+    color: #ffffff;  
+}
+        
+        .punishment-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .punishment-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .punishment-details {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .punishment-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .time {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .username {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .reason {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .punishment-badge i {
+            font-size: 0.9rem;
+        }
+        
+        .punishment-badge.ban {
+            background: rgba(217, 83, 79, 0.2);
+            color: #ff6b6b;
+        }
+        
+        .punishment-badge.kick {
+            background: rgba(91, 192, 222, 0.2);
+            color: #5bc0de;
+        }
+        
+        .punishment-badge.timeout {
+            background: rgba(var(--accent-color-rgb), 0.2);
+            color: var(--accent-color);
+        }
+        
+        .punishment-badge.warn {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+        .punishment-id {
+            font-family: 'Roboto Mono', monospace;
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+            box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .punishment-id:hover {
+            background: rgba(var(--accent-color-rgb), 0.25);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+        }
+
+        
+        .tag {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        
+        .server-info {
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    background: #1a1a2e;
+    border-radius: 12px;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.server-info-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.server-main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.server-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 2px solid var(--accent-color);
+    padding: 2px;
+}
+
+.server-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.member-status-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(var(--accent-color-rgb), 0.2);
+}
+
+.status-label {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: -0.25rem;
+}
+
+.status-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.status-items {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.status-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+}
+
+.status-text {
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-icon.online {
+    background-color: #43b581;
+    box-shadow: 0 0 8px rgba(67, 181, 129, 0.3);
+}
+
+.status-icon.idle {
+    background-color: #faa61a;
+    box-shadow: 0 0 8px rgba(250, 166, 26, 0.3);
+}
+
+.status-icon.dnd {
+    background-color: #f04747;
+    box-shadow: 0 0 8px rgba(240, 71, 71, 0.3);
+}
+
+.status-icon.offline {
+    background-color: #747f8d;
+    box-shadow: 0 0 8px rgba(116, 127, 141, 0.3);
+}
+
+.status-count {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        @media screen and (max-width: 768px) {
+    .server-info-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .member-status-container {
+        padding-left: 0;
+        border-left: none;
+        padding-top: 0.5rem;
+        border-top: 1px solid rgba(var(--accent-color-rgb), 0.2);
+        width: 100%;
+    }
+
+    .status-label {
+        text-align: center;
+    }
+
+    .status-items {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .status-item {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .server-name {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .server-main {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .status-items {
+        grid-template-columns: repeat(1, 1fr);
+        width: 100%;
+    }
+
+    .status-item {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .status-text {
+        flex: 1;
+        text-align: center;
+    }
+
+    .status-count {
+        min-width: 30px;
+        text-align: right;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'home', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            
+            <div class="server-info">
+                <div class="server-info-content">
+                    <div class="server-main">
+                        <% if (guild.iconURL()) { %>
+                            <img src="<%= guild.iconURL() %>" alt="Server Icon" class="server-icon">
+                        <% } %>
+                        <h1 class="server-name"><%= guild.name %></h1>
+                    </div>
+                    <div class="member-status-container">
+                        <div class="status-group">
+                            <div class="status-label">Members</div>
+                            <div class="status-items">
+                                <div class="status-item" title="Online Members">
+                                    <div class="status-icon online"></div>
+                                    <span class="status-text">Online</span>
+                                    <span class="status-count"><%= memberCounts.online %></span>
+                                </div>
+                                <div class="status-item" title="Idle Members">
+                                    <div class="status-icon idle"></div>
+                                    <span class="status-text">Idle</span>
+                                    <span class="status-count"><%= memberCounts.idle %></span>
+                                </div>
+                                <div class="status-item" title="Do Not Disturb Members">
+                                    <div class="status-icon dnd"></div>
+                                    <span class="status-text">DND</span>
+                                    <span class="status-count"><%= memberCounts.dnd %></span>
+                                </div>
+                                <div class="status-item" title="Offline Members">
+                                    <div class="status-icon offline"></div>
+                                    <span class="status-text">Offline</span>
+                                    <span class="status-count"><%= memberCounts.offline %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="columns is-multiline">
+                <!-- Kicks -->
+                <div class="column is-one-fifth">
+                    <div class="glass-card stat-card">
+                        <div class="stat-content has-text-centered">
+                            <span class="icon stat-icon">
+                                <i class="fas fa-shoe-prints"></i>
+                            </span>
+                            <p class="stat-value"><%= guildData && guildData.totalKicks !== undefined ? guildData.totalKicks.toLocaleString('en-US') : '0' %></p>
+                            <p class="stat-label">Total Kicks</p>
+                            <p class="last-24h">+<span><%= last24Hours.kicks || 0 %></span> in 24h</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bans -->
+                <div class="column is-one-fifth">
+                    <div class="glass-card stat-card">
+                        <div class="stat-content has-text-centered">
+                            <span class="icon stat-icon">
+                                <i class="fas fa-ban"></i>
+                            </span>
+                            <p class="stat-value"><%= guildData && guildData.totalBans !== undefined ? guildData.totalBans.toLocaleString('en-US') : '0' %></p>
+                            <p class="stat-label">Total Bans</p>
+                            <p class="last-24h">+<span><%= last24Hours.bans || 0 %></span> in 24h</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Warnings -->
+                <div class="column is-one-fifth">
+                    <div class="glass-card stat-card">
+                        <div class="stat-content has-text-centered">
+                            <span class="icon stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                            <p class="stat-value"><%= guildData && guildData.totalWarns !== undefined ? guildData.totalWarns.toLocaleString('en-US') : '0' %></p>
+                            <p class="stat-label">Total Warnings</p>
+                            <p class="last-24h">+<span><%= last24Hours.warns || 0 %></span> in 24h</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeouts (NEW) -->
+                <div class="column is-one-fifth">
+                    <div class="glass-card stat-card">
+                        <div class="stat-content has-text-centered">
+                            <span class="icon stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                            <p class="stat-value"><%= guildData && guildData.totalTimeouts !== undefined ? guildData.totalTimeouts.toLocaleString('en-US') : '0' %></p>
+                            <p class="stat-label">Total Timeouts</p>
+                            <p class="last-24h">+<span><%= last24Hours.timeouts || 0 %></span> in 24h</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Messages -->
+                <div class="column is-one-fifth">
+                    <div class="glass-card stat-card">
+                        <div class="stat-content has-text-centered">
+                            <span class="icon stat-icon">
+                                <i class="fas fa-comment-alt"></i>
+                            </span>
+                            <p class="stat-value"><%= guildData && guildData.totalMessages !== undefined ? guildData.totalMessages.toLocaleString('en-US') : '0' %></p>
+                            <p class="stat-label">Total Messages</p>
+                            <p class="last-24h">+<span><%= last24Hours.messagesSent || 0 %></span> in 24h</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="glass-card chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Weekly Activity Overview
+                </h3>
+                <canvas id="dailyHistoricChart"></canvas>
+            </div>
+
+            
+            <div class="glass-card">
+                <h3 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Recent Punishments
+                </h3>
+                <% if (permissions && permissions.VIEW_RECENT_PUNISHMENTS) { %>
+                    <div class="punishment-list">
+                        <% recentPunishments.slice(0, 3).forEach((punishment) => { %>
+                            <div class="punishment-item">
+                                <div class="punishment-content">
+                                    <div class="punishment-header">
+                                        <span class="punishment-badge <%= 
+                                            punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'ban' : 
+                                            punishment.punishment.toLowerCase() %>">
+                                            <i class="fas <%= 
+                                                punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'fa-ban' : 
+                                                punishment.punishment === 'Kick' ? 'fa-shoe-prints' :
+                                                punishment.punishment === 'Timeout' ? 'fa-hourglass-start' : 
+                                                'fa-exclamation-triangle' %>"></i>
+                                            <%= 
+                                                punishment.punishment === 'PERM_BAN' ? 'Permanent Ban' : 
+                                                punishment.punishment === 'TEMP_BAN' ? 'Temporary Ban' : 
+                                                punishment.punishment 
+                                            %>
+                                        </span>
+                                        <span class="time"><%= getRelativeTime(punishment.date) %></span>
+                                    </div>
+                                    <div class="punishment-details">
+                                        <span class="username"><%= punishment.userID %></span> was 
+                                        <%= 
+                                            punishment.punishment === 'PERM_BAN' ? 'permanently banned' : 
+                                            punishment.punishment === 'TEMP_BAN' ? 'temporarily banned' : 
+                                            punishment.punishment === 'Kick' ? 'kicked' : 
+                                            punishment.punishment === 'Warn' ? 'warned' : 
+                                            punishment.punishment === 'Timeout' ? 'timed out' : 
+                                            punishment.punishment.toLowerCase() 
+                                        %> by 
+                                        <span class="username"><%= punishment.staff %></span> for 
+                                        <span class="reason"><%= punishment.reason.length > 45 ? punishment.reason.slice(0, 35) + '...' : punishment.reason %></span>
+                                        <% if (punishment.duration) { %>
+                                            <div style="margin-top: 8px;">
+                                                <span style="display: inline-flex; align-items: center; background: rgba(var(--accent-color-rgb), 0.1); color: var(--accent-color); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">
+                                                    <i class="fas fa-clock" style="margin-right: 6px;"></i>
+                                                    Duration: <%= punishment.duration %>
+                                                </span>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <div class="mt-2">
+                                        <a href="/punishment/lookup/<%= punishment.punishmentID %>" class="punishment-id">
+                                            <i class="fas fa-hashtag" style="font-size: 0.8rem; margin-right: 0.3rem;"></i>
+                                            <%= punishment.punishmentID %>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p class="has-text-grey-lighter is-italic">You don't have permission to view recent punishments.</p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+
+    <script>
+
+        const weeklyActivityData = <%- weeklyActivityData %>;
+        
+
+        function adjustLabelsForScreenSize(data) {
+            if (!data || !data.labels) return data;
+            
+            const screenWidth = window.innerWidth;
+            const adjustedData = { ...data };
+            
+
+            if (screenWidth <= 768) {
+
+                adjustedData.labels = data.labels.map(label => {
+                    return label.split(' ')[0]; // Extract just the day name
+                });
+            } else if (screenWidth <= 1024) {
+
+                adjustedData.labels = data.labels.map(label => {
+                    const parts = label.match(/([A-Za-z]+) \(([A-Za-z]+) (\d+)\)/);
+                    if (parts && parts.length >= 4) {
+                        return `${parts[1]} (${parts[2]} ${parts[3]})`;
+                    }
+                    return label;
+                });
+            }
+
+            
+            return adjustedData;
+        }
+        
+
+        const responsiveData = adjustLabelsForScreenSize(weeklyActivityData);
+        
+
+        const options = {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: false,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 11
+                        },
+                        maxRotation: 0,
+                        minRotation: 0,
+                        padding: 10,
+                        autoSkip: true,
+                        maxTicksLimit: 7
+                    }
+                },
+                y: {
+                    stacked: false,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 11
+                        }
+                    },
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 11
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                }
+            }
+        };
+        
+        let activityChart;
+
+
+        const ctx = document.getElementById('dailyHistoricChart').getContext('2d');
+activityChart = new Chart(ctx, {
+    type: 'line', // Change to line chart
+    data: responsiveData,
+    options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    drawBorder: false,
+                    display: true
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    font: {
+                        size: 11
+                    },
+                    maxRotation: 0,
+                    minRotation: 0,
+                    padding: 10,
+                    autoSkip: true,
+                    maxTicksLimit: 7
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    drawBorder: false,
+                    drawTicks: false
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    font: {
+                        size: 11
+                    },
+                    padding: 10
+                },
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    font: {
+                        size: 11
+                    },
+                    padding: 15,
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                borderColor: 'rgba(var(--accent-color-rgb), 0.3)',
+                borderWidth: 1,
+                titleColor: 'rgba(255, 255, 255, 0.9)',
+                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                padding: 10,
+                cornerRadius: 8,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                displayColors: true,
+                boxWidth: 10,
+                boxHeight: 10,
+                usePointStyle: true
+            }
+        },
+        elements: {
+            line: {
+                tension: 0.4,
+                borderWidth: 3,
+                fill: 'start',
+            },
+            point: {
+                radius: 3,
+                hoverRadius: 5,
+                borderWidth: 2
+            }
+        }
+    }
+});
+
+
+window.addEventListener('resize', () => {
+    if (activityChart) {
+        activityChart.destroy();
+    }
+    
+    const responsiveData = adjustLabelsForScreenSize(weeklyActivityData);
+    
+    activityChart = new Chart(ctx, {
+        type: 'line',
+        data: responsiveData,
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        drawBorder: false,
+                        display: true
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 11
+                        },
+                        maxRotation: 0,
+                        minRotation: 0,
+                        padding: 10,
+                        autoSkip: true,
+                        maxTicksLimit: 7
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        drawBorder: false,
+                        drawTicks: false
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 11
+                        },
+                        padding: 10
+                    },
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: {
+                            size: 11
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                    borderColor: 'rgba(var(--accent-color-rgb), 0.3)',
+                    borderWidth: 1,
+                    titleColor: 'rgba(255, 255, 255, 0.9)',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    padding: 10,
+                    cornerRadius: 8,
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    displayColors: true,
+                    boxWidth: 10,
+                    boxHeight: 10,
+                    usePointStyle: true
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.4,
+                    borderWidth: 3,
+                    fill: 'start',
+                },
+                point: {
+                    radius: 3,
+                    hoverRadius: 5,
+                    borderWidth: 2
+                }
+            }
+        }
+    });
+});
+
+
+
+    </script>
+</body>
+</html>

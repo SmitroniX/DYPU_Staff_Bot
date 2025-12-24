@@ -1,0 +1,780 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Members | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        .member-count {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: normal;
+        }
+
+        
+        .control-container {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 200px;
+            width: 100%;
+        }
+
+        .search-field {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            color: rgba(255, 255, 255, 0.4);
+            z-index: 1;
+        }
+
+        .search-input {
+            background: rgba(30, 27, 38, 0.8);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            font-size: 0.95rem;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+            background: rgba(35, 32, 44, 0.9);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 400;
+        }
+
+        .search-buttons {
+            position: absolute;
+            right: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-button, .clear-button {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            border: none;
+            color: var(--accent-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.2);
+            transform: translateY(-2px);
+        }
+
+        .clear-button {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+        }
+
+        .clear-button:hover {
+            background: rgba(255, 59, 48, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .filter-container {
+            flex: 0 1 300px;
+        }
+
+        .filter-select {
+            background: rgba(30, 27, 38, 0.8);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            width: 100%;
+            max-width: 300px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            font-size: 0.95rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+            background-color: rgba(35, 32, 44, 0.9);
+        }
+
+        .filter-select:hover {
+            background-color: rgba(35, 32, 44, 0.9);
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+        }
+
+        .filter-select option {
+            background: #1e1b26;
+            color: #ffffff;
+            padding: 12px;
+            font-size: 0.95rem;
+        }
+
+        
+        .member-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            transition: all 0.3s ease;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-color), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .member-card:hover {
+            transform: translateX(5px);
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+        
+        .member-card:hover::before {
+            opacity: 1;
+        }
+
+        .member-avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .member-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            border: 3px solid var(--accent-color);
+            padding: 2px;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .member-card:hover .member-avatar {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .staff-badge {
+            background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.3) 0%, rgba(var(--accent-color-rgb), 0.15) 100%);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.4);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(var(--accent-color-rgb), 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            animation: badge-glow 3s infinite alternate;
+        }
+
+        .staff-badge i {
+            font-size: 0.9rem;
+        }
+        
+        @keyframes badge-glow {
+            0% {
+                box-shadow: 0 2px 6px rgba(var(--accent-color-rgb), 0.2);
+            }
+            100% {
+                box-shadow: 0 2px 12px rgba(var(--accent-color-rgb), 0.5);
+            }
+        }
+
+        .status-indicator {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 2px solid #1a1625;
+            z-index: 2;
+        }
+
+        .status-online {
+            background-color: #43b581;
+            box-shadow: 0 0 0 rgba(67, 181, 129, 0.4);
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-idle {
+            background-color: #faa61a;
+            box-shadow: 0 0 0 rgba(250, 166, 26, 0.4);
+            animation: pulse-yellow 2s infinite;
+        }
+
+        .status-dnd {
+            background-color: #f04747;
+            box-shadow: 0 0 0 rgba(240, 71, 71, 0.4);
+            animation: pulse-red 2s infinite;
+        }
+
+        .status-offline {
+            background-color: #747f8d;
+            border: 2px solid #1a1625;
+        }
+
+        
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(67, 181, 129, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(67, 181, 129, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(67, 181, 129, 0);
+            }
+        }
+
+        @keyframes pulse-yellow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(250, 166, 26, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(250, 166, 26, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(250, 166, 26, 0);
+            }
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(240, 71, 71, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(240, 71, 71, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(240, 71, 71, 0);
+            }
+        }
+
+        .member-info {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .member-name {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.02em;
+        }
+
+        .member-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .member-role {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            padding: 0.3rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            align-self: flex-start;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .member-card:hover .member-role {
+            background: rgba(var(--accent-color-rgb), 0.2);
+        }
+
+        .member-role .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 6px rgba(var(--accent-color-rgb), 0.4);
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            padding: 0.65rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 120px;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-button.view {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(120%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        
+.pagination-container {
+    margin-top: 2.5rem;
+}
+
+.pagination {
+    background: transparent;
+}
+
+.pagination-previous,
+.pagination-next {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
+
+.pagination-previous:hover,
+.pagination-next:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--accent-color-rgb), 0.2);
+}
+
+.pagination-previous i,
+.pagination-next i {
+    transition: transform 0.3s ease;
+}
+
+.pagination-previous:hover i {
+    transform: translateX(-3px);
+}
+
+.pagination-next:hover i {
+    transform: translateX(3px);
+}
+
+.pagination-previous.is-disabled,
+.pagination-next.is-disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+}
+
+.pagination-link {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.pagination-link:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.pagination-link.is-current {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.3);
+}
+
+.pagination-ellipsis {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.pagination-info {
+    margin-top: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+        @media screen and (max-width: 768px) {
+            .control-container {
+                flex-direction: column;
+            }
+
+            .search-container, .filter-container {
+                width: 100%;
+                flex: none;
+            }
+
+            .search-input {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem 0.6rem 2.5rem;
+            }
+
+            .search-buttons button {
+                padding: 0.4rem;
+            }
+
+            .member-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+
+            .member-info {
+                width: 100%;
+            }
+
+            .member-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .action-button {
+                width: 100%;
+                padding: 0.5rem;
+                font-size: 0.85rem;
+                justify-content: center;
+            }
+
+            .member-details {
+                flex-direction: row;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .member-role {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'members' }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="section-title">
+                    <i class="fas fa-users"></i>
+                    Member List
+                    <span class="member-count">(<%= memberCount %>)</span>
+                </div>
+
+                <div class="control-container">
+                    <div class="search-container">
+                        <div class="search-field">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="userSearch" class="search-input" placeholder="Search by username or ID...">
+                                <div class="search-buttons">
+                                    <button class="search-button" onclick="submitSearch()" aria-label="Search">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                    <button class="clear-button" onclick="clearSearch()" aria-label="Clear search">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="filter-container">
+                        <select id="userFilter" class="filter-select" onchange="applyFilter()">
+                            <option value="highestRole">Sort by highest role</option>
+                            <option value="creationDateNewest">Newest accounts</option>
+                            <option value="creationDateOldest">Oldest accounts</option>
+                            <option value="joinDateNewest">Recently joined</option>
+                            <option value="joinDateOldest">First to join</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="members-list">
+                    <% members.forEach(member => { %>
+                        <div class="member-card" data-user-id="<%= member.user.id %>">
+                            <div class="member-avatar-container">
+                                <img src="<%= member.user.displayAvatarURL({ format: 'png', size: 128 }) %>" class="member-avatar" alt="<%= member.user.username %>">
+                                <div class="status-indicator status-<%= member.presence?.status || 'offline' %>"></div>
+                            </div>
+                            
+                            <div class="member-info">
+                                <div class="member-details">
+                                    <div class="member-name">
+                                        <%= member.user.username %>
+                                        <% if (staffMembers.some(staffMember => staffMember.userId === member.user.id)) { %>
+                                            <span class="staff-badge">
+                                                <i class="fas fa-shield-alt"></i>
+                                                Staff
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <% if (member.roles.highest.name !== '@everyone') { %>
+                                        <div class="member-role" style="color: <%= member.roles.highest.color ? `#${member.roles.highest.color.toString(16).padStart(6, '0')}` : '#ccc' %>;">
+                                            <span class="dot"></span>
+                                            <%= member.roles.highest.name %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="member-actions">
+                                <button class="action-button view" data-action="view">
+                                    <i class="fas fa-eye"></i>
+                                    View Profile
+                                </button>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                
+<div class="pagination-container">
+    <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+        <a href="/members?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>&sort=<%= sortOption %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+           class="pagination-previous <%= currentPage <= 1 ? 'is-disabled' : '' %>">
+            <i class="fas fa-chevron-left"></i> Previous
+        </a>
+        <a href="/members?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %>&sort=<%= sortOption %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+           class="pagination-next <%= currentPage >= totalPages ? 'is-disabled' : '' %>">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>
+        <ul class="pagination-list">
+            <% if (totalPages <= 5) { %>
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li>
+                        <a href="/members?page=<%= i %>&sort=<%= sortOption %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+                           class="pagination-link <%= i === currentPage ? 'is-current' : '' %>"
+                           aria-label="Page <%= i %>"
+                           aria-current="<%= i === currentPage ? 'page' : undefined %>">
+                            <%= i %>
+                        </a>
+                    </li>
+                <% } %>
+            <% } else { %>
+                <li>
+                    <a href="/members?page=1&sort=<%= sortOption %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+                       class="pagination-link <%= currentPage === 1 ? 'is-current' : '' %>"
+                       aria-label="Page 1"
+                       aria-current="<%= currentPage === 1 ? 'page' : undefined %>">
+                        1
+                    </a>
+                </li>
+                
+                <% if (currentPage > 3) { %>
+                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                <% } %>
+                
+                <% for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) { %>
+                    <li>
+                        <a href="/members?page=<%= i %>&sort=<%= sortOption %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+                           class="pagination-link <%= i === currentPage ? 'is-current' : '' %>"
+                           aria-label="Page <%= i %>"
+                           aria-current="<%= i === currentPage ? 'page' : undefined %>">
+                            <%= i %>
+                        </a>
+                    </li>
+                <% } %>
+                
+                <% if (currentPage < totalPages - 2) { %>
+                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                <% } %>
+                
+                <li>
+                    <a href="/members?page=<%= totalPages %>&sort=<%= sortOption %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+                       class="pagination-link <%= currentPage === totalPages ? 'is-current' : '' %>"
+                       aria-label="Page <%= totalPages %>"
+                       aria-current="<%= currentPage === totalPages ? 'page' : undefined %>">
+                        <%= totalPages %>
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+    <div class="pagination-info has-text-centered">
+        <span>Page <%= currentPage %> of <%= totalPages %></span>
+    </div>
+</div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            document.querySelectorAll('.action-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    const userId = this.closest('.member-card').dataset.userId;
+
+                    if (action === 'view') {
+                        window.location.href = '/view/' + userId;
+                    }
+                });
+            });
+        });
+
+        function submitSearch() {
+            const query = document.getElementById('userSearch').value;
+            window.location.href = '/members?page=1&search=' + encodeURIComponent(query);
+        }
+
+        function clearSearch() {
+            document.getElementById('userSearch').value = '';
+            submitSearch();
+        }
+
+        function applyFilter() {
+            const selectedValue = document.getElementById('userFilter').value;
+            window.location.href = '/members?sort=' + selectedValue;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appeals | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Appeals | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+    
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        .appeal-count {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: normal;
+        }
+
+        .section-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        
+        .appeals-section {
+            margin-bottom: 2rem;
+        }
+
+        .appeals-box {
+            background-color: rgba(24, 21, 31, 0.3);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .appeals-header {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .appeals-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .appeals-header i {
+            color: var(--accent-color);
+        }
+        
+        .appeals-header-count {
+            background-color: rgba(var(--status-bg), 0.15);
+            color: var(--status-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+        
+        .collapse-icon {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .appeals-content {
+            border-top: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .appeals-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            opacity: 0;
+            margin-top: 0;
+            border-top: none;
+        }
+
+        .appeal-card {
+            background: rgba(30, 27, 38, 0.6);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .appeal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--status-color), transparent);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .appeal-card:hover {
+            transform: translateX(5px);
+            border-color: var(--status-color);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+        
+        .appeal-card:hover::before {
+            opacity: 1;
+        }
+        
+        .status-pending {
+            --status-color: #ffd700;
+            --status-bg: 255, 221, 87;
+        }
+        
+        .status-accepted {
+            --status-color: #48c774;
+            --status-bg: 72, 199, 116;
+        }
+        
+        .status-denied {
+            --status-color: #ff3860;
+            --status-bg: 255, 56, 96;
+        }
+
+        .appeal-avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .appeal-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 2px solid var(--status-color);
+            padding: 2px;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .appeal-card:hover .appeal-avatar {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .appeal-info {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .appeal-user {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .appeal-details {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .appeal-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .appeal-details i {
+            color: var(--status-color);
+            font-size: 0.9rem;
+        }
+
+        .appeal-status {
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            margin: 0 1rem;
+            background-color: rgba(var(--status-bg), 0.15);
+            color: var(--status-color);
+        }
+        
+        .status-badge-pending {
+            --status-bg: 255, 221, 87;
+        }
+        
+        .status-badge-accepted {
+            --status-bg: 72, 199, 116;
+        }
+        
+        .status-badge-denied {
+            --status-bg: 255, 56, 96;
+        }
+
+        .appeal-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .action-button {
+            background-color: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-button.is-pending {
+            background-color: rgba(255, 221, 87, 0.15);
+            color: #ffd700;
+            border-color: rgba(255, 221, 87, 0.3);
+        }
+        
+        .action-button.is-pending:hover {
+            background-color: #ffd700;
+            color: #000;
+        }
+        
+        .action-button.is-accepted {
+            background-color: rgba(72, 199, 116, 0.15);
+            color: #48c774;
+            border-color: rgba(72, 199, 116, 0.3);
+        }
+        
+        .action-button.is-accepted:hover {
+            background-color: #48c774;
+            color: #fff;
+        }
+        
+        .action-button.is-denied {
+            background-color: rgba(255, 56, 96, 0.15);
+            color: #ff3860;
+            border-color: rgba(255, 56, 96, 0.3);
+        }
+        
+        .action-button.is-denied:hover {
+            background-color: #ff3860;
+            color: #fff;
+        }
+
+        
+        .pagination {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination-link.is-current {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .pagination-link, 
+        .pagination-previous, 
+        .pagination-next {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-link:hover, 
+        .pagination-previous:hover, 
+        .pagination-next:hover {
+            background-color: rgba(var(--accent-color-rgb), 0.2);
+            border-color: var(--accent-color);
+            color: white;
+        }
+        
+        
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: rgba(var(--accent-color-rgb), 0.3);
+        }
+
+        @media screen and (max-width: 768px) {
+            .appeal-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .appeal-info {
+                width: 100%;
+            }
+            
+            .appeal-details {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .appeal-actions {
+                width: 100%;
+                justify-content: flex-start;
+                margin-top: 0.5rem;
+            }
+            
+            .appeal-status {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'appeals', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-gavel"></i>
+                        Appeals <span class="appeal-count">(<%= Object.values(categoryData).reduce((total, category) => total + category.totalCount, 0) %>)</span>
+                    </div>
+                </div>
+                
+                <p class="section-description">Review and manage user appeals for various punishments. Take appropriate actions based on appeal content and user history.</p>
+                
+                <% ['pending', 'accepted', 'denied'].forEach(status => { %>
+                    <% const category = categoryData[status]; %>
+                    <% const totalCount = category ? category.totalCount : 0; %>
+                    <div class="appeals-section status-<%= status %>">
+                        <div class="appeals-box">
+                            <div class="appeals-header" data-section="<%= status %>-section">
+                                <div class="appeals-header-left">
+                                    <% if (status === 'pending') { %>
+                                        <i class="fas fa-hourglass-half"></i> Pending Appeals
+                                    <% } else if (status === 'accepted') { %>
+                                        <i class="fas fa-check-circle"></i> Accepted Appeals
+                                    <% } else { %>
+                                        <i class="fas fa-times-circle"></i> Denied Appeals
+                                    <% } %>
+                                    
+                                    <div class="appeals-header-count">
+                                        <%= totalCount %>
+                                    </div>
+                                </div>
+                                
+                                <i class="fas fa-chevron-down collapse-icon" id="<%= status %>-icon"></i>
+                            </div>
+                            
+                            <div class="appeals-content" id="<%= status %>-section">
+                                <% if (category && category.appeals && category.appeals.length > 0) { %>
+                                    <div class="appeal-list">
+                                        <% category.appeals.forEach(appeal => { %>
+                                            <div class="appeal-card status-<%= status %>">
+                                                <div class="appeal-avatar-container">
+                                                    <img src="<%= appeal.avatarURL %>" alt="<%= appeal.username %>" class="appeal-avatar">
+                                                </div>
+                                                
+                                                <div class="appeal-info">
+                                                    <div class="appeal-user">
+                                                        <%= appeal.username %>
+                                                    </div>
+                                                    
+                                                    <div class="appeal-details">
+                                                        <span>
+                                                            <% if (appeal.punishmentType === 'PERM_BAN' || appeal.punishmentType === 'TEMP_BAN') { %>
+                                                                <i class="fas fa-ban"></i>
+                                                                <% if (appeal.punishmentType === 'TEMP_BAN') { %>
+                                                                    Appealing Temporary Ban
+                                                                <% } else { %>
+                                                                    Appealing Permanent Ban
+                                                                <% } %>
+                                                            <% } else if (appeal.punishmentType === 'Timeout') { %>
+                                                                <i class="fas fa-hourglass-start"></i>
+                                                                Appealing <%= appeal.punishmentType %>
+                                                            <% } else if (appeal.punishmentType === 'Kick') { %>
+                                                                <i class="fas fa-shoe-prints"></i>
+                                                                Appealing <%= appeal.punishmentType %>
+                                                            <% } else if (appeal.punishmentType === 'Warn') { %>
+                                                                <i class="fas fa-exclamation-triangle"></i>
+                                                                Appealing <%= appeal.punishmentType %>
+                                                            <% } else { %>
+                                                                <i class="fas fa-exclamation-circle"></i>
+                                                                Appealing <%= appeal.punishmentType %>
+                                                            <% } %>
+                                                        </span>
+                                                        <span>
+                                                            <i class="fas fa-clock"></i>
+                                                            <%= getRelativeTime(appeal.submissionDate) %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="appeal-status status-badge-<%= status %>">
+                                                    <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                                                </div>
+                                                
+                                                <div class="appeal-actions">
+                                                    <a href="/view-appeal/<%= appeal.appealID %>" class="action-button is-<%= status %>">
+                                                        <i class="fas fa-<%= status === 'pending' ? 'gavel' : 'eye' %>"></i>
+                                                        <%= status === 'pending' ? 'Review' : 'View' %>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                    
+                                    
+                                    <% if (category.totalPages > 1) { %>
+                                        <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                                            <% if (category.currentPage > 1) { %>
+                                                <a href="/appeals?pendingPage=<%= status === 'pending' ? category.currentPage - 1 : pendingPage %>&acceptedPage=<%= status === 'accepted' ? category.currentPage - 1 : acceptedPage %>&deniedPage=<%= status === 'denied' ? category.currentPage - 1 : deniedPage %>"
+                                                    class="pagination-previous">Previous</a>
+                                            <% } else { %>
+                                                <a class="pagination-previous" disabled>Previous</a>
+                                            <% } %>
+                    
+                                            <% if (category.currentPage < category.totalPages) { %>
+                                                <a href="/appeals?pendingPage=<%= status === 'pending' ? category.currentPage + 1 : pendingPage %>&acceptedPage=<%= status === 'accepted' ? category.currentPage + 1 : acceptedPage %>&deniedPage=<%= status === 'denied' ? category.currentPage + 1 : deniedPage %>"
+                                                    class="pagination-next">Next</a>
+                                            <% } else { %>
+                                                <a class="pagination-next" disabled>Next</a>
+                                            <% } %>
+                    
+                                            <ul class="pagination-list">
+                                                <% for (let i = 1; i <= category.totalPages; i++) { %>
+                                                    <li>
+                                                        <a href="/appeals?pendingPage=<%= status === 'pending' ? i : pendingPage %>&acceptedPage=<%= status === 'accepted' ? i : acceptedPage %>&deniedPage=<%= status === 'denied' ? i : deniedPage %>"
+                                                            class="pagination-link <%= category.currentPage === i ? 'is-current' : '' %>"
+                                                            aria-label="Page <%= i %>">
+                                                            <%= i %>
+                                                        </a>
+                                                    </li>
+                                                <% } %>
+                                            </ul>
+                                        </nav>
+                                    <% } %>
+                                <% } else { %>
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No <%= status %> appeals found.</p>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const appealCards = document.querySelectorAll('.appeal-card');
+            
+            appealCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 + (index * 80)); // Staggered animation
+            });
+            
+
+            const headers = document.querySelectorAll('.appeals-header');
+            
+
+
+            const defaultOpen = ['pending-section'];
+            
+            document.querySelectorAll('.appeals-content').forEach(content => {
+                const id = content.id;
+                if (!defaultOpen.includes(id)) {
+                    content.classList.add('collapsed');
+                    const iconId = id.replace('-section', '-icon');
+                    const icon = document.getElementById(iconId);
+                    if (icon) {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-right');
+                    }
+                }
+            });
+            
+            headers.forEach(header => {
+                header.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    const content = document.getElementById(sectionId);
+                    const iconId = sectionId.replace('-section', '-icon');
+                    const icon = document.getElementById(iconId);
+                    
+                    if (content) {
+                        content.classList.toggle('collapsed');
+                        
+
+                        if (icon) {
+                            if (content.classList.contains('collapsed')) {
+                                icon.classList.remove('fa-chevron-down');
+                                icon.classList.add('fa-chevron-right');
+                            } else {
+                                icon.classList.remove('fa-chevron-right');
+                                icon.classList.add('fa-chevron-down');
+                            }
+                        }
+                    }
+                });
+            });
+            
+
+            function rememberSectionStates() {
+                const sections = document.querySelectorAll('.appeals-content');
+                const states = {};
+                
+                sections.forEach(section => {
+                    states[section.id] = section.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+                });
+                
+                localStorage.setItem('appealSectionStates', JSON.stringify(states));
+            }
+            
+
+            function applySavedStates() {
+                const savedStates = localStorage.getItem('appealSectionStates');
+                
+                if (savedStates) {
+                    const states = JSON.parse(savedStates);
+                    
+                    Object.keys(states).forEach(sectionId => {
+                        const section = document.getElementById(sectionId);
+                        const iconId = sectionId.replace('-section', '-icon');
+                        const icon = document.getElementById(iconId);
+                        
+                        if (section) {
+                            if (states[sectionId] === 'collapsed') {
+                                section.classList.add('collapsed');
+                                if (icon) {
+                                    icon.classList.remove('fa-chevron-down');
+                                    icon.classList.add('fa-chevron-right');
+                                }
+                            } else {
+                                section.classList.remove('collapsed');
+                                if (icon) {
+                                    icon.classList.remove('fa-chevron-right');
+                                    icon.classList.add('fa-chevron-down');
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+
+            applySavedStates();
+            
+
+            headers.forEach(header => {
+                header.addEventListener('click', rememberSectionStates);
+            });
+        });
+    </script>
+</body>
+</html>

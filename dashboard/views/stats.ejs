@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Statistics | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        
+        .stat-boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-box {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+        }
+
+        .stat-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            color: #908d96;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info p {
+            color: #ffffff;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-info .value {
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        
+        .leaderboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .leaderboard-card {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .leaderboard-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .leaderboard-title i {
+            color: var(--accent-color);
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: auto 32px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(var(--accent-color-rgb), 0.1);
+        }
+
+        .leaderboard-rank {
+            font-weight: 600;
+            color: var(--accent-color);
+            min-width: 25px;
+        }
+        .leaderboard-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .leaderboard-username {
+            color: #ffffff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .leaderboard-value {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        
+        .chart-container {
+    background: #1a1a2e;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    width: 100%;
+}
+
+        .chart-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+        .chart-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chart-title i {
+            color: var(--accent-color);
+        }
+
+        .chart-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.half-width {
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: 300px;
+    margin-bottom: 0;
+}
+
+
+        canvas {
+    max-width: 100%;
+    margin-top: 1rem;
+    height: 400px !important;
+}
+
+        
+        .time-selector {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        background: #1a1a2e;
+        border-radius: 12px;
+        padding: 0.75rem;
+        width: fit-content;
+        margin: 0 auto 1.5rem;
+    }
+
+    .time-option {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: 0 0.25rem;
+        min-width: 80px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .time-option:hover {
+        color: #ffffff;
+        background: rgba(var(--accent-color-rgb), 0.1);
+    }
+
+    .time-option.active {
+        color: #ffffff;
+        background: rgba(var(--accent-color-rgb), 0.2);
+    }
+
+        
+    @media screen and (max-width: 768px) {
+    .half-width {
+        flex: 1 1 100%;
+    }
+    
+    .chart-row {
+        gap: 1.5rem;
+    }
+}
+
+        @media screen and (max-width: 640px) {
+            .stat-boxes {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .stat-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .stat-icon {
+                margin: 0 auto;
+            }
+
+            .stat-info {
+                text-align: center;
+            }
+
+            .leaderboard-item {
+                grid-template-columns: auto 32px minmax(0, 1fr);
+            }
+
+            .leaderboard-value {
+                grid-column: 2 / -1;
+                grid-row: 2;
+                padding-left: calc(25px + 0.75rem); 
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            
+        }
+
+        @media screen and (max-width: 480px) {
+            .stat-boxes {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .leaderboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-selector {
+                flex-wrap: wrap;
+            }
+            
+            .time-option {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<%- include('partials/navbar', { user: user, currentPage: 'stats' }) %>
+
+<section class="section">
+    <div class="container">
+        
+        <div class="glass-card">
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Advanced Statistics
+            </div>
+        
+            
+            <div class="time-selector">
+                <div class="time-option active" data-period="weekly">Weekly</div>
+                <div class="time-option" data-period="monthly">Monthly</div>
+                <div class="time-option" data-period="yearly">Yearly</div>
+            </div>
+        
+            
+            <div class="chart-grid">
+                <div class="chart-row">
+                    <div class="chart-container half-width">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Server Activity
+                        </div>
+                        <canvas id="serverActivityChart"></canvas>
+                    </div>
+                
+                    <div class="chart-container half-width">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Moderation Trends
+                        </div>
+                        <canvas id="moderationTrendsChart"></canvas>
+                    </div>
+                </div>
+            
+                <div class="chart-row">
+                    <div class="chart-container half-width">
+                        <div class="chart-title">
+                            <i class="fas fa-gavel"></i>
+                            Punishment Appeals
+                        </div>
+                        <canvas id="appealsChart"></canvas>
+                    </div>
+                
+                    <div class="chart-container half-width">
+                        <div class="chart-title">
+                            <i class="fas fa-flag"></i>
+                            Reports
+                        </div>
+                        <canvas id="reportsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container" style="margin-top: 1.5rem;">
+                <div class="chart-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Moderation Breakdown
+                </div>
+                <canvas id="moderationPieChart"></canvas>
+            </div>
+
+        <div class="glass-card">
+            <div class="section-title">
+                <i class="fas fa-server"></i>
+                Server Statistics
+            </div>
+            <div class="stat-boxes">
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-users stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Members</p>
+                            <div class="value"><%= guild ? guild.members.cache.filter(member => !member.user.bot).size : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-rocket stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Server Boosts</p>
+                            <div class="value"><%= guild ? guild.premiumSubscriptionCount : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-robot stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Bots</p>
+                            <div class="value"><%= guild ? guild.members.cache.filter(member => member.user.bot).size : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-tags stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Roles</p>
+                            <div class="value"><%= guild ? guild.roles.cache.size : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-hashtag stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Channels</p>
+                            <div class="value"><%= guild ? guild.channels.cache.size : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-smile stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Emojis</p>
+                            <div class="value"><%= guild ? guild.emojis.cache.size : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="glass-card">
+            <div class="section-title">
+                <i class="fas fa-shield-alt"></i>
+                Moderation Statistics
+            </div>
+            <div class="stat-boxes">
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-gavel stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Actions</p>
+                            <div class="value"><%= guildData ? guildData.totalActions.toLocaleString('en-US') : 'N/A' %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-comment-dots stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Messages</p>
+                            <div class="value"><%= allTimeStats ? allTimeStats.messagesSent.toLocaleString('en-US') : guildData.totalMessages.toLocaleString('en-US') %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-exclamation-triangle stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Warns</p>
+                            <div class="value"><%= allTimeStats ? allTimeStats.warns.toLocaleString('en-US') : guildData.totalWarns.toLocaleString('en-US') %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-clock stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Timeouts</p>
+                            <div class="value"><%= allTimeStats ? allTimeStats.timeouts.toLocaleString('en-US') : guildData.totalTimeouts.toLocaleString('en-US') %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-user-slash stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Kicks</p>
+                            <div class="value"><%= allTimeStats ? allTimeStats.kicks.toLocaleString('en-US') : guildData.totalKicks.toLocaleString('en-US') %></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content">
+                        <i class="fas fa-ban stat-icon"></i>
+                        <div class="stat-info">
+                            <p>Total Bans</p>
+                            <div class="value"><%= allTimeStats ? allTimeStats.bans.toLocaleString('en-US') : guildData.totalBans.toLocaleString('en-US') %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <div class="glass-card">
+            <div class="section-title">
+                <i class="fas fa-trophy"></i>
+                Leaderboards
+            </div>
+            <div class="leaderboard-container">
+                
+                <div class="leaderboard-card">
+                    <div class="leaderboard-title">
+                        <i class="fas fa-comment-dots"></i>
+                        Most Messages
+                    </div>
+                    <% if (topUsers.length === 0) { %>
+                        <p class="has-text-centered has-text-grey-light">No data found.</p>
+                    <% } else { %>
+                        <% topUsers.forEach((user, index) => { %>
+                            <div class="leaderboard-item">
+                                <span class="leaderboard-rank">#<%= index + 1 %></span>
+                                <img src="<%= user.avatarURL %>" alt="User Avatar" class="leaderboard-avatar">
+                                <span class="leaderboard-username"><%= user.username %></span>
+                                <span class="leaderboard-value"><%= user.totalMessages.toLocaleString('en-US') %> messages</span>
+                            </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+
+                
+                <div class="leaderboard-card">
+                    <div class="leaderboard-title">
+                        <i class="fas fa-smile"></i>
+                        Most Emojis Used
+                    </div>
+                    <% if (topEmojisUsed.length === 0) { %>
+                        <p class="has-text-centered has-text-grey-light">No data found.</p>
+                    <% } else { %>
+                        <% topEmojisUsed.forEach((user, index) => { %>
+                            <div class="leaderboard-item">
+                                <span class="leaderboard-rank">#<%= index + 1 %></span>
+                                <img src="<%= user.avatarURL %>" alt="User Avatar" class="leaderboard-avatar">
+                                <span class="leaderboard-username"><%= user.username %></span>
+                                <span class="leaderboard-value"><%= user.totalEmojisUsed.toLocaleString('en-US') %> emojis</span>
+                            </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<script>
+    const weeklyChartData = <%- weeklyChartData %>;
+    const monthlyChartData = <%- monthlyChartData %>;
+    const yearlyChartData = <%- yearlyChartData %>;
+    
+    const weeklyModerationData = <%- weeklyModerationTrendsData %>;
+    const monthlyModerationData = <%- monthlyModerationTrendsData %>;
+    const yearlyModerationData = <%- yearlyModerationTrendsData %>;
+    
+    const weeklyAppealsData = <%- weeklyAppealsData %>;
+    const monthlyAppealsData = <%- monthlyAppealsData %>;
+    const yearlyAppealsData = <%- yearlyAppealsData %>;
+    
+    const weeklyReportsData = <%- weeklyReportsData %>;
+    const monthlyReportsData = <%- monthlyReportsData %>;
+    const yearlyReportsData = <%- yearlyReportsData %>;
+    
+    const pieChartData = <%- pieChartData %>;
+
+    Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    padding: 15,
+                    font: {
+                        size: 11
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                borderColor: 'rgba(var(--accent-color-rgb), 0.3)',
+                borderWidth: 1,
+                titleColor: 'rgba(255, 255, 255, 0.9)',
+                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                padding: 10,
+                cornerRadius: 8,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                displayColors: true,
+                boxWidth: 10,
+                boxHeight: 10,
+                usePointStyle: true
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    drawBorder: false,
+                    drawTicks: false
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    font: {
+                        size: 11
+                    },
+                    padding: 10
+                }
+            },
+            x: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    drawBorder: false,
+                    display: true
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    font: {
+                        size: 11
+                    },
+                    maxRotation: 0,
+                    minRotation: 0,
+                    padding: 10,
+                    autoSkip: true,
+                    maxTicksLimit: 7
+                }
+            }
+        },
+        elements: {
+            line: {
+                tension: 0.4,
+                borderWidth: 3,
+                fill: 'start',
+            },
+            point: {
+                radius: 3,
+                hoverRadius: 5,
+                borderWidth: 2
+            }
+        }
+    };
+
+    const pieChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    padding: 15,
+                    font: {
+                        size: 11
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                borderColor: 'rgba(var(--accent-color-rgb), 0.3)',
+                borderWidth: 1,
+                titleColor: 'rgba(255, 255, 255, 0.9)',
+                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                padding: 10,
+                cornerRadius: 8,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        const percentage = Math.round((value / total) * 100);
+                        return `${label}: ${value} (${percentage}%)`;
+                    }
+                }
+            }
+        }
+    };
+    
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function generateAllMonths() {
+        const displayLabels = [...monthNames];
+        const messagesData = Array(12).fill(0);
+        const joinsData = Array(12).fill(0);
+        const leavesData = Array(12).fill(0);
+        
+        if (monthlyChartData && monthlyChartData.labels) {
+            monthlyChartData.labels.forEach((label, index) => {
+                const monthPart = label.split(' ')[0];
+                const position = monthNames.indexOf(monthPart);
+                
+                if (position !== -1) {
+                    if (monthlyChartData.datasets[0] && monthlyChartData.datasets[0].data) {
+                        messagesData[position] = monthlyChartData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (monthlyChartData.datasets[1] && monthlyChartData.datasets[1].data) {
+                        joinsData[position] = monthlyChartData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (monthlyChartData.datasets[2] && monthlyChartData.datasets[2].data) {
+                        leavesData[position] = monthlyChartData.datasets[2].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: displayLabels,
+            datasets: [
+                {
+                    label: 'Messages',
+                    data: messagesData,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Member Joins',
+                    data: joinsData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Member Leaves',
+                    data: leavesData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    function generateAllMonthsModeration() {
+        const warnsData = Array(12).fill(0);
+        const timeoutsData = Array(12).fill(0);
+        const kicksData = Array(12).fill(0);
+        const bansData = Array(12).fill(0);
+        
+        if (monthlyModerationData && monthlyModerationData.labels) {
+            monthlyModerationData.labels.forEach((label, index) => {
+                const monthPart = label.split(' ')[0];
+                const position = monthNames.indexOf(monthPart);
+                
+                if (position !== -1) {
+                    if (monthlyModerationData.datasets[0] && monthlyModerationData.datasets[0].data) {
+                        warnsData[position] = monthlyModerationData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (monthlyModerationData.datasets[1] && monthlyModerationData.datasets[1].data) {
+                        timeoutsData[position] = monthlyModerationData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (monthlyModerationData.datasets[2] && monthlyModerationData.datasets[2].data) {
+                        kicksData[position] = monthlyModerationData.datasets[2].data[index] || 0;
+                    }
+                    
+                    if (monthlyModerationData.datasets[3] && monthlyModerationData.datasets[3].data) {
+                        bansData[position] = monthlyModerationData.datasets[3].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: monthNames,
+            datasets: [
+                {
+                    label: 'Warns',
+                    data: warnsData,
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Timeouts',
+                    data: timeoutsData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Kicks',
+                    data: kicksData,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Bans',
+                    data: bansData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    function generateAllMonthsAppeals() {
+        const submittedData = Array(12).fill(0);
+        const acceptedData = Array(12).fill(0);
+        const deniedData = Array(12).fill(0);
+        
+        if (monthlyAppealsData && monthlyAppealsData.labels) {
+            monthlyAppealsData.labels.forEach((label, index) => {
+                const monthPart = label.split(' ')[0];
+                const position = monthNames.indexOf(monthPart);
+                
+                if (position !== -1) {
+                    if (monthlyAppealsData.datasets[0] && monthlyAppealsData.datasets[0].data) {
+                        submittedData[position] = monthlyAppealsData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (monthlyAppealsData.datasets[1] && monthlyAppealsData.datasets[1].data) {
+                        acceptedData[position] = monthlyAppealsData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (monthlyAppealsData.datasets[2] && monthlyAppealsData.datasets[2].data) {
+                        deniedData[position] = monthlyAppealsData.datasets[2].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: monthNames,
+            datasets: [
+                {
+                    label: 'Appeals Submitted',
+                    data: submittedData,
+                    borderColor: 'rgba(142, 68, 173, 1)',
+                    backgroundColor: 'rgba(142, 68, 173, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Appeals Accepted',
+                    data: acceptedData,
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Appeals Denied',
+                    data: deniedData,
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    function generateAllMonthsReports() {
+        const receivedData = Array(12).fill(0);
+        const approvedData = Array(12).fill(0);
+        const declinedData = Array(12).fill(0);
+        
+        if (monthlyReportsData && monthlyReportsData.labels) {
+            monthlyReportsData.labels.forEach((label, index) => {
+                const monthPart = label.split(' ')[0];
+                const position = monthNames.indexOf(monthPart);
+                
+                if (position !== -1) {
+                    if (monthlyReportsData.datasets[0] && monthlyReportsData.datasets[0].data) {
+                        receivedData[position] = monthlyReportsData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (monthlyReportsData.datasets[1] && monthlyReportsData.datasets[1].data) {
+                        approvedData[position] = monthlyReportsData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (monthlyReportsData.datasets[2] && monthlyReportsData.datasets[2].data) {
+                        declinedData[position] = monthlyReportsData.datasets[2].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: monthNames,
+            datasets: [
+                {
+                    label: 'Reports Received',
+                    data: receivedData,
+                    borderColor: 'rgba(41, 128, 185, 1)',
+                    backgroundColor: 'rgba(41, 128, 185, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Reports Approved',
+                    data: approvedData,
+                    borderColor: 'rgba(39, 174, 96, 1)',
+                    backgroundColor: 'rgba(39, 174, 96, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Reports Declined',
+                    data: declinedData,
+                    borderColor: 'rgba(192, 57, 43, 1)',
+                    backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    function generateYearlyStats() {
+        const years = [];
+        
+        for (let i = 0; i < 5; i++) {
+            years.push(currentYear - i);
+        }
+        
+        const messagesData = Array(5).fill(0);
+        const joinsData = Array(5).fill(0);
+        const leavesData = Array(5).fill(0);
+        
+        if (yearlyChartData && yearlyChartData.labels) {
+            yearlyChartData.labels.forEach((label, index) => {
+                const year = parseInt(label);
+                const position = years.indexOf(year);
+                
+                if (position !== -1) {
+                    if (yearlyChartData.datasets[0] && yearlyChartData.datasets[0].data) {
+                        messagesData[position] = yearlyChartData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (yearlyChartData.datasets[1] && yearlyChartData.datasets[1].data) {
+                        joinsData[position] = yearlyChartData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (yearlyChartData.datasets[2] && yearlyChartData.datasets[2].data) {
+                        leavesData[position] = yearlyChartData.datasets[2].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: years.map(year => year.toString()),
+            datasets: [
+                {
+                    label: 'Messages',
+                    data: messagesData,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Member Joins',
+                    data: joinsData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Member Leaves',
+                    data: leavesData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+
+    function generateYearlyModerationStats() {
+        const years = [];
+        
+        for (let i = 0; i < 5; i++) {
+            years.push(currentYear - i);
+        }
+        
+        const warnsData = Array(5).fill(0);
+        const timeoutsData = Array(5).fill(0);
+        const kicksData = Array(5).fill(0);
+        const bansData = Array(5).fill(0);
+        
+        if (yearlyModerationData && yearlyModerationData.labels) {
+            yearlyModerationData.labels.forEach((label, index) => {
+                const year = parseInt(label);
+                const position = years.indexOf(year);
+                
+                if (position !== -1) {
+                    if (yearlyModerationData.datasets[0] && yearlyModerationData.datasets[0].data) {
+                        warnsData[position] = yearlyModerationData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (yearlyModerationData.datasets[1] && yearlyModerationData.datasets[1].data) {
+                        timeoutsData[position] = yearlyModerationData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (yearlyModerationData.datasets[2] && yearlyModerationData.datasets[2].data) {
+                        kicksData[position] = yearlyModerationData.datasets[2].data[index] || 0;
+                    }
+                    
+                    if (yearlyModerationData.datasets[3] && yearlyModerationData.datasets[3].data) {
+                        bansData[position] = yearlyModerationData.datasets[3].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: years.map(year => year.toString()),
+            datasets: [
+                {
+                    label: 'Warns',
+                    data: warnsData,
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Timeouts',
+                    data: timeoutsData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Kicks',
+                    data: kicksData,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Bans',
+                    data: bansData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    function generateYearlyAppealsStats() {
+        const years = [];
+        
+        for (let i = 0; i < 5; i++) {
+            years.push(currentYear - i);
+        }
+        
+        const submittedData = Array(5).fill(0);
+        const acceptedData = Array(5).fill(0);
+        const deniedData = Array(5).fill(0);
+        
+        if (yearlyAppealsData && yearlyAppealsData.labels) {
+            yearlyAppealsData.labels.forEach((label, index) => {
+                const year = parseInt(label);
+                const position = years.indexOf(year);
+                
+                if (position !== -1) {
+                    if (yearlyAppealsData.datasets[0] && yearlyAppealsData.datasets[0].data) {
+                        submittedData[position] = yearlyAppealsData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (yearlyAppealsData.datasets[1] && yearlyAppealsData.datasets[1].data) {
+                        acceptedData[position] = yearlyAppealsData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (yearlyAppealsData.datasets[2] && yearlyAppealsData.datasets[2].data) {
+                        deniedData[position] = yearlyAppealsData.datasets[2].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: years.map(year => year.toString()),
+            datasets: [
+                {
+                    label: 'Appeals Submitted',
+                    data: submittedData,
+                    borderColor: 'rgba(142, 68, 173, 1)',
+                    backgroundColor: 'rgba(142, 68, 173, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Appeals Accepted',
+                    data: acceptedData,
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Appeals Denied',
+                    data: deniedData,
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    function generateYearlyReportsStats() {
+        const years = [];
+        
+        for (let i = 0; i < 5; i++) {
+            years.push(currentYear - i);
+        }
+        
+        const receivedData = Array(5).fill(0);
+        const approvedData = Array(5).fill(0);
+        const declinedData = Array(5).fill(0);
+        
+        if (yearlyReportsData && yearlyReportsData.labels) {
+            yearlyReportsData.labels.forEach((label, index) => {
+                const year = parseInt(label);
+                const position = years.indexOf(year);
+                
+                if (position !== -1) {
+                    if (yearlyReportsData.datasets[0] && yearlyReportsData.datasets[0].data) {
+                        receivedData[position] = yearlyReportsData.datasets[0].data[index] || 0;
+                    }
+                    
+                    if (yearlyReportsData.datasets[1] && yearlyReportsData.datasets[1].data) {
+                        approvedData[position] = yearlyReportsData.datasets[1].data[index] || 0;
+                    }
+                    
+                    if (yearlyReportsData.datasets[2] && yearlyReportsData.datasets[2].data) {
+                        declinedData[position] = yearlyReportsData.datasets[2].data[index] || 0;
+                    }
+                }
+            });
+        }
+        
+        return {
+            labels: years.map(year => year.toString()),
+            datasets: [
+                {
+                    label: 'Reports Received',
+                    data: receivedData,
+                    borderColor: 'rgba(41, 128, 185, 1)',
+                    backgroundColor: 'rgba(41, 128, 185, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Reports Approved',
+                    data: approvedData,
+                    borderColor: 'rgba(39, 174, 96, 1)',
+                    backgroundColor: 'rgba(39, 174, 96, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Reports Declined',
+                    data: declinedData,
+                    borderColor: 'rgba(192, 57, 43, 1)',
+                    backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        };
+    }
+    
+    const processedMonthlyChartData = generateAllMonths();
+    const processedMonthlyModerationData = generateAllMonthsModeration();
+    const processedYearlyChartData = generateYearlyStats();
+    const processedYearlyModerationData = generateYearlyModerationStats();
+    const processedMonthlyAppealsData = generateAllMonthsAppeals();
+    const processedMonthlyReportsData = generateAllMonthsReports();
+    const processedYearlyAppealsData = generateYearlyAppealsStats();
+    const processedYearlyReportsData = generateYearlyReportsStats();
+
+    const serverActivityCtx = document.getElementById('serverActivityChart').getContext('2d');
+    const serverActivityChart = new Chart(serverActivityCtx, {
+        type: 'bar',
+        data: weeklyChartData,
+        options: chartOptions
+    });
+    
+    const moderationTrendsCtx = document.getElementById('moderationTrendsChart').getContext('2d');
+    const moderationTrendsChart = new Chart(moderationTrendsCtx, {
+        type: 'bar',
+        data: weeklyModerationData,
+        options: chartOptions
+    });
+    
+    const appealsCtx = document.getElementById('appealsChart').getContext('2d');
+    const appealsChart = new Chart(appealsCtx, {
+        type: 'bar',
+        data: weeklyAppealsData || {
+            labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [
+                {
+                    label: 'Appeals Submitted',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: 'rgba(142, 68, 173, 1)',
+                    backgroundColor: 'rgba(142, 68, 173, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Appeals Accepted',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Appeals Denied',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: chartOptions
+    });
+    
+    const reportsCtx = document.getElementById('reportsChart').getContext('2d');
+const reportsChart = new Chart(reportsCtx, {
+    type: 'bar',
+    data: weeklyReportsData || {
+        labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        datasets: [
+            {
+                label: 'Reports Received',
+                data: [0, 0, 0, 0, 0, 0, 0],
+                borderColor: 'rgba(41, 128, 185, 1)',
+                backgroundColor: 'rgba(41, 128, 185, 0.5)',
+                borderWidth: 2
+            },
+            {
+                label: 'Reports Approved',
+                data: [0, 0, 0, 0, 0, 0, 0],
+                borderColor: 'rgba(39, 174, 96, 1)',
+                backgroundColor: 'rgba(39, 174, 96, 0.5)',
+                borderWidth: 2
+            },
+            {
+                label: 'Reports Declined',
+                data: [0, 0, 0, 0, 0, 0, 0],
+                borderColor: 'rgba(192, 57, 43, 1)',
+                backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                borderWidth: 2
+            }
+        ]
+    },
+    options: chartOptions
+});
+
+const moderationPieCtx = document.getElementById('moderationPieChart').getContext('2d');
+const moderationPieChart = new Chart(moderationPieCtx, {
+    type: 'doughnut',
+    data: pieChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    padding: 15,
+                    font: {
+                        size: 11
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                borderColor: 'rgba(var(--accent-color-rgb), 0.3)',
+                borderWidth: 1,
+                titleColor: 'rgba(255, 255, 255, 0.9)',
+                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                padding: 10,
+                cornerRadius: 8,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        const percentage = Math.round((value / total) * 100);
+                        return `${label}: ${value} (${percentage}%)`;
+                    }
+                }
+            }
+        }
+    }
+});
+
+document.querySelectorAll('.time-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const period = this.getAttribute('data-period');
+        
+        document.querySelectorAll('.time-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        if (period === 'weekly') {
+            serverActivityChart.data = weeklyChartData;
+            moderationTrendsChart.data = weeklyModerationData;
+            appealsChart.data = weeklyAppealsData || {
+                labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                datasets: [
+                    {
+                        label: 'Appeals Submitted',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(142, 68, 173, 1)',
+                        backgroundColor: 'rgba(142, 68, 173, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Appeals Accepted',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Appeals Denied',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                        borderWidth: 2
+                    }
+                ]
+            };
+            reportsChart.data = weeklyReportsData || {
+                labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                datasets: [
+                    {
+                        label: 'Reports Received',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(41, 128, 185, 1)',
+                        backgroundColor: 'rgba(41, 128, 185, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reports Approved',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        backgroundColor: 'rgba(39, 174, 96, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reports Declined',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(192, 57, 43, 1)',
+                        backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                        borderWidth: 2
+                    }
+                ]
+            };
+        } else if (period === 'monthly') {
+            serverActivityChart.data = processedMonthlyChartData;
+            moderationTrendsChart.data = processedMonthlyModerationData;
+            appealsChart.data = processedMonthlyAppealsData || {
+                labels: monthNames,
+                datasets: [
+                    {
+                        label: 'Appeals Submitted',
+                        data: Array(12).fill(0),
+                        borderColor: 'rgba(142, 68, 173, 1)',
+                        backgroundColor: 'rgba(142, 68, 173, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Appeals Accepted',
+                        data: Array(12).fill(0),
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Appeals Denied',
+                        data: Array(12).fill(0),
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                        borderWidth: 2
+                    }
+                ]
+            };
+            reportsChart.data = processedMonthlyReportsData || {
+                labels: monthNames,
+                datasets: [
+                    {
+                        label: 'Reports Received',
+                        data: Array(12).fill(0),
+                        borderColor: 'rgba(41, 128, 185, 1)',
+                        backgroundColor: 'rgba(41, 128, 185, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reports Approved',
+                        data: Array(12).fill(0),
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        backgroundColor: 'rgba(39, 174, 96, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reports Declined',
+                        data: Array(12).fill(0),
+                        borderColor: 'rgba(192, 57, 43, 1)',
+                        backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                        borderWidth: 2
+                    }
+                ]
+            };
+        } else if (period === 'yearly') {
+            serverActivityChart.data = processedYearlyChartData;
+            moderationTrendsChart.data = processedYearlyModerationData;
+            appealsChart.data = processedYearlyAppealsData || {
+                labels: generateYearLabels(),
+                datasets: [
+                    {
+                        label: 'Appeals Submitted',
+                        data: Array(5).fill(0),
+                        borderColor: 'rgba(142, 68, 173, 1)',
+                        backgroundColor: 'rgba(142, 68, 173, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Appeals Accepted',
+                        data: Array(5).fill(0),
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Appeals Denied',
+                        data: Array(5).fill(0),
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                        borderWidth: 2
+                    }
+                ]
+            };
+            reportsChart.data = processedYearlyReportsData || {
+                labels: generateYearLabels(),
+                datasets: [
+                    {
+                        label: 'Reports Received',
+                        data: Array(5).fill(0),
+                        borderColor: 'rgba(41, 128, 185, 1)',
+                        backgroundColor: 'rgba(41, 128, 185, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reports Approved',
+                        data: Array(5).fill(0),
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        backgroundColor: 'rgba(39, 174, 96, 0.5)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reports Declined',
+                        data: Array(5).fill(0),
+                        borderColor: 'rgba(192, 57, 43, 1)',
+                        backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                        borderWidth: 2
+                    }
+                ]
+            };
+        }
+        
+        serverActivityChart.update();
+        moderationTrendsChart.update();
+        appealsChart.update();
+        reportsChart.update();
+    });
+});
+
+function generateYearLabels() {
+    const years = [];
+    const currentYear = new Date().getFullYear();
+    
+    for (let i = 0; i < 5; i++) {
+        years.push((currentYear - i).toString());
+    }
+    
+    return years;
+}
+</script>

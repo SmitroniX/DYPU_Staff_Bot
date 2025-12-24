@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= username %>'s Profile | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="<%= username %>'s Profile" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>/view/<%= userId %>" />
+    <meta property="og:image" content="<%= profilePicture %>" />
+    <meta property="og:description" content="Viewing user profile for <%= username %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        
+        body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            flex: 1;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        
+        .glass-card {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+            position: relative;
+            background: #1a1a2e;
+            border-radius: 16px;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            margin-bottom: 2rem;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: -50px;
+            z-index: 2;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-color);
+            background: #1a1625;
+            padding: 3px;
+        }
+
+        .profile-name {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .profile-username {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
+        .profile-id {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        
+        .notice-box {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .notice-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .notice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notice-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 0;
+        }
+
+        .notice-item i {
+            color: var(--accent-color);
+        }
+
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(35, 32, 44, 0.9);
+            border-color: var(--accent-color);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        
+        .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+        .action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-button.delete-btn {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+}
+
+.action-button.clear-history-button {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+    width: auto;
+    margin: 0 auto;
+}
+
+.action-button.clear-messages-button{
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+    width: auto;
+    margin: 0 auto;
+}
+
+        .action-button.note {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .action-button.kick {
+            background: rgba(240, 173, 78, 0.15);
+            color: #f0ad4e;
+        }
+
+        .action-button.ban {
+            background: rgba(217, 83, 79, 0.15);
+            color: #d9534f;
+        }
+
+        .action-button.message {
+            background: rgba(var(--accent-color-rgb), 0.15);
+            color: var(--accent-color);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(120%);
+        }
+
+        
+        .history-section {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .history-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .history-item {
+            background: #1a1a2e;
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(35, 32, 44, 0.5);
+            border-color: var(--accent-color);
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .history-badge {
+            background: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .history-content {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .id-badge {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    box-shadow: 0 0 10px rgba(var(--accent-color-rgb), 0.2);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.id-badge:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.3);
+    color: #ffffff;
+}
+
+.punishment-details {
+    color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0.5rem 0;
+    
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.punishment-details .username {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.punishment-details .reason {
+    color: #ffffff;
+    
+    display: inline;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.appeal-badge {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    color: #ffa500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.appeal-badge:hover {
+    background: rgba(255, 170, 0, 0.15);
+    border-color: rgba(255, 170, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.appeal-badge i {
+    font-size: 1rem;
+}
+
+.appeal-badge a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+.punishment-item.inactive {
+    opacity: 0.7;
+    background: rgba(24, 21, 31, 0.2);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.05);
+}
+
+.punishment-item.inactive:hover {
+    opacity: 0.9;
+    background: rgba(24, 21, 31, 0.3);
+    border-color: rgba(var(--accent-color-rgb), 0.1);
+}
+
+.punishment-item.inactive .punishment-badge {
+    background: rgba(128, 128, 128, 0.2);
+    color: #808080;
+}
+
+.punishment-item.inactive .punishment-content {
+    position: relative;
+}
+
+.inactive-overlay {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ffa500;
+}
+
+.punishment-item {
+    background: rgba(24, 21, 31, 0.4);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.punishment-content {
+    width: 100%;
+    
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.punishment-item:hover {
+    background: rgba(35, 32, 44, 0.5);
+    border-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.punishment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap; 
+    gap: 0.75rem;
+}
+
+.punishment-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.punishment-badge.ban {
+    background: rgba(217, 83, 79, 0.2);
+    color: #ff6b6b;
+}
+
+.punishment-badge.kick {
+    background: rgba(91, 192, 222, 0.2);
+    color: #5bc0de;
+}
+
+.punishment-badge.timeout {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-color);
+}
+
+.punishment-badge.warn {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.punishment-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.exact-date {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+        .profile-staff-badge {
+    background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.1) 100%);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-staff-badge i {
+    font-size: 1rem;
+}
+
+
+.profile-info.is-staff .profile-avatar {
+    border: 4px solid var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.5);
+}
+
+        .modal-background {
+    background: rgba(19, 17, 26, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-card {
+    background: rgba(30, 27, 38, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 16px;
+    max-width: 500px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-card-head {
+    background: rgba(35, 32, 44, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 16px 16px 0 0;
+    padding: 1.25rem;
+}
+
+.modal-card-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-card-title i {
+    color: var(--accent-color);
+}
+
+.modal-card-body {
+    background: none;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.modal-card-foot {
+    background: rgba(35, 32, 44, 0.6);
+    border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 0 0 16px 16px;
+    padding: 1.25rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.modal-textarea {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    resize: vertical;
+    min-height: 120px;
+    padding: 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.modal-textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+}
+
+.modal-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-user-info {
+    background: rgba(24, 21, 31, 0.4);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.modal-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.3);
+}
+
+.modal-user-details {
+    flex: 1;
+}
+
+.modal-username {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.modal-user-id {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-user-id .copy-id {
+    color: rgba(var(--accent-color-rgb), 0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-user-id .copy-id:hover {
+    color: var(--accent-color);
+}
+
+.modal-divider {
+    height: 1px;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    margin: 1rem 0;
+}
+
+.modal-button {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-button.primary {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+}
+
+.modal-button.primary:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.danger {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+}
+
+.modal-button.danger:hover {
+    background: rgba(217, 83, 79, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.modal-delete {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.modal-delete:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-delete::before,
+.modal-delete::after {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.user-timestamps {
+    margin: 1rem auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    width: 100%;
+    max-width: 700px;
+    padding: 0 1rem;
+}
+
+.timestamp-box {
+    width: 100%;
+}
+
+.timestamp-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.timestamp-item:hover {
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.timestamp-item i {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    min-width: 24px;
+    text-align: center;
+}
+
+.timestamp-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0; 
+}
+
+.timestamp-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+.timestamp-value {
+    color: #ffffff;
+    font-weight: 500;
+    word-break: break-word;
+    font-size: 0.9rem;
+}
+
+
+.notice-box.active-note {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem; 
+    border-radius: 12px; 
+}
+
+.notice-box.active-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #ffa500;
+}
+.notice-box.active-note .notice-header {
+    color: #ffa500;
+    margin-bottom: 0.75rem; 
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.notice-box.active-note .notice-header i {
+    color: #ffa500;
+}
+
+.notice-box.active-note .notice-content {
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0; 
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-align: left; 
+    margin: 0; 
+    white-space: normal; 
+    line-height: 1.5; 
+}
+
+
+.notice-box.user-notices {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.notice-box.user-notices::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #dc3545;
+}
+
+.notice-box.user-notices .notice-header {
+    color: #dc3545;
+}
+
+.notice-box.user-notices .notice-header i {
+    color: #dc3545;
+}
+
+.notice-box.user-notices .notice-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.notice-box.user-notices .notice-item:last-child {
+    border-bottom: none;
+}
+
+.notice-box.user-notices .notice-item i {
+    color: #dc3545;
+    font-size: 1.1rem;
+}
+
+.role-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.role-badge {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.role-badge::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.role-badge:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.roles-container {
+    background: #1a1a2e;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.roles-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+}
+
+.roles-header i {
+    color: var(--accent-color);
+}
+
+.no-roles {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    padding: 1rem;
+    font-style: italic;
+}
+
+        
+        @media screen and (max-width: 768px) {
+
+            .role-list {
+        padding: 0.25rem;
+    }
+    
+    .role-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+    }
+
+    .notice-box.active-note {
+        max-width: 100%;
+    }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .user-timestamps {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+
+    .timestamp-item {
+        width: 100%;
+    }
+
+    .timestamp-value {
+        font-size: 0.85rem;
+    }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .back-button-container {
+        padding: 0.75rem 0.75rem 0 0.75rem;
+    }
+    
+    .back-button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+        }
+
+        @media screen and (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .back-button-container {
+    padding: 1rem 1rem 0 1rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    backdrop-filter: blur(8px);
+}
+
+.back-button:hover {
+    transform: translateX(-5px);
+    background: rgba(var(--accent-color-rgb), 0.15);
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    color: var(--accent-color);
+}
+
+.back-button i {
+    font-size: 0.9em;
+    transition: transform 0.3s ease;
+}
+
+.back-button:hover i {
+    transform: translateX(-3px);
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-input, .form-select {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    height: 42px !important;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-select {
+    height: auto !important;
+    min-height: 42px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.form-input::placeholder, .form-select::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+
+.switch-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.view-appeal-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.view-appeal-link:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+    border-color: rgba(var(--accent-color-rgb), 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: var(--accent-color);
+}
+
+.view-appeal-link i {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+}
+
+.messages-section {
+    background: #1a1a2e;
+    border: 1px solid rgba(var(--accent-color-rgb), 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message-item {
+    background: rgba(24, 21, 31, 0.4);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.message-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(26, 24, 38, 0.6);
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--accent-color-rgb), 0.3);
+    object-fit: cover;
+}
+
+.message-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.message-username {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.message-channel {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.message-time {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.message-content {
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.message-text {
+    margin-bottom: 0.5rem;
+}
+
+.message-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    word-break: break-all;
+}
+
+.message-link:hover {
+    text-decoration: underline;
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+.message-link i {
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+
+
+@media screen and (max-width: 768px) {
+    .message-header {
+        flex-wrap: wrap;
+    }
+    
+    .message-time {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+        margin-left: 2.5rem;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { user: user, currentPage: 'members' }) %>
+
+    <% 
+var daysSinceCreation = Math.floor((Date.now() - new Date(user2.user.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+
+var daysSinceJoin = inServer && user2.joinedAt ? Math.floor((Date.now() - new Date(user2.joinedAt).getTime()) / (1000 * 60 * 60 * 24)) : null;
+    %>
+
+<div class="back-button-container">
+    <div class="container">
+        <a href="/members" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back to Members
+        </a>
+    </div>
+</div>
+
+    <section class="section">
+        <div class="container">
+
+            
+            <% if ((userFromDB?.note || daysSinceCreation < 10 || daysSinceJoin < 5) && 
+            ((userFromDB?.note && userFromDB?.note.trim() !== "") || daysSinceCreation < 10 || daysSinceJoin < 5)) { %>
+<div class="notice-box user-notices">
+    <div class="notice-header">
+        <i class="fas fa-exclamation-triangle"></i>
+        User Notices
+    </div>
+    <ul class="notice-list">
+        <% if (daysSinceCreation < 10) { %>
+            <li class="notice-item">
+                <i class="fas fa-user-clock"></i>
+                New Discord account (created <%= getRelativeTime(user2.user.createdAt) %>)
+            </li>
+        <% } %>
+        
+        <% if (!inServer) { %>
+            <li class="notice-item">
+                <i class="fas fa-door-closed"></i>
+                This user is not currently in the server
+            </li>
+        <% } else if (daysSinceJoin !== null && daysSinceJoin < 5) { %>
+            <li class="notice-item">
+                <i class="fas fa-door-open"></i>
+                Recently joined server (joined <%= getRelativeTime(user2.joinedAt) %>)
+            </li>
+        <% } %>
+        
+        <% if (userFromDB?.note && userFromDB?.note !== undefined) { %>
+            <li class="notice-item">
+                <i class="fas fa-bookmark"></i>
+                This user has an active note.
+            </li>
+        <% } %>
+    </ul>
+</div>
+            <% } %>
+
+            
+            <div class="profile-header glass-card">
+                
+                <div class="profile-info <%= isStaff ? 'is-staff' : '' %>">
+    <img src="<%= profilePicture %>" alt="Profile Picture" class="profile-avatar">
+    <div class="profile-name"><%= globalName %></div>
+    <div class="profile-username"><%= username %></div>
+    <div class="profile-id"><%= user2.id %></div>
+
+    <% if (isStaff) { %>
+        <div class="profile-staff-badge">
+            <i class="fas fa-shield-alt"></i>
+            Staff
+        </div>
+    <% } %>
+                    
+                    <div class="user-timestamps">
+    <div class="timestamp-box">
+        <div class="timestamp-item">
+            <i class="fas fa-birthday-cake"></i>
+            <div class="timestamp-details">
+                <span class="timestamp-label">Account Created</span>
+                <span class="timestamp-value"><%= new Date(user2.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></span>
+            </div>
+        </div>
+    </div>
+    <div class="timestamp-box">
+    <div class="timestamp-item">
+        <i class="fas fa-user-plus"></i>
+        <div class="timestamp-details">
+            <span class="timestamp-label">Joined Server</span>
+            <% if (inServer && user2.joinedAt) { %>
+                <span class="timestamp-value"><%= new Date(user2.joinedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></span>
+            <% } else { %>
+                <span class="timestamp-value">Not in server</span>
+            <% } %>
+        </div>
+    </div>
+</div>
+</div>
+
+<% if (!isStaff && inServer) { %>
+    <div class="action-buttons">
+        <button class="action-button note" data-action="note">
+            <i class="fas fa-sticky-note"></i>
+            Set Note
+        </button>
+            <button class="action-button kick" data-action="kick">
+                <i class="fas fa-user-slash"></i>
+                Kick
+            </button>
+        <button class="action-button ban" data-action="ban">
+            <i class="fas fa-ban"></i>
+            Ban
+        </button>
+        <button class="action-button message" data-action="sendmessage">
+            <i class="fas fa-envelope"></i>
+            Send DM
+        </button>
+    </div>
+<% } %>
+
+                    <% if (userFromDB?.note && userFromDB?.note.trim() !== "") { %>
+    <div class="notice-box active-note">
+        <div class="notice-header">
+            <i class="fas fa-sticky-note"></i>
+            Active Note
+        </div>
+        <div class="notice-content">
+            <%= userFromDB?.note %>
+        </div>
+    </div>
+<% } %>
+                </div>
+            </div>
+
+            
+            <div class="roles-container">
+    <div class="roles-header">
+        <i class="fas fa-tags"></i>
+        Roles
+    </div>
+    <div class="role-list">
+    <% if (!inServer) { %>
+        <div class="no-roles">User not in server</div>
+    <% } else { %>
+        <% 
+        const roles = user2.roles.cache
+            .filter(role => role.name !== '@everyone')
+            .sort((a, b) => b.position - a.position);
+        
+        if (roles.size > 0) {
+            roles.forEach((role, index) => { %>
+                <div class="role-badge" style="color: <%= role.hexColor && role.hexColor !== '#000000' ? role.hexColor : '#99AAB5' %>;">
+                    <%= role.name %>
+                </div>
+            <% });
+        } else { %>
+            <div class="no-roles">No roles assigned</div>
+        <% } %>
+    <% } %>
+</div>
+</div>
+
+            <% if (!isStaff || permissions.MANAGE_STAFF_MEMBERS || isSameUser) { %>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-sign-out-alt stat-icon"></i>
+                        <div class="stat-value"><%= totalKicks %></div>
+                        <div class="stat-label">Total Kicks</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-ban stat-icon"></i>
+                        <div class="stat-value"><%= totalBans %></div>
+                        <div class="stat-label">Total Bans</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-exclamation-triangle stat-icon"></i>
+                        <div class="stat-value"><%= totalWarns %></div>
+                        <div class="stat-label">Total Warns</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-hourglass-start stat-icon"></i>
+                        <div class="stat-value"><%= totalTimeouts %></div>
+                        <div class="stat-label">Total Timeouts</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-comment-alt stat-icon"></i>
+                        <div class="stat-value"><%= userFromDB?.totalMessages || 0 %></div>
+                        <div class="stat-label">Total Messages</div>
+                    </div>
+                </div>
+
+                
+                <div class="history-section">
+    <div class="history-title">
+        <i class="fas fa-history"></i>
+        Punishment History (<%= punishments?.length || 0 %>)
+    </div>
+
+    <% if (permissions && permissions.VIEW_HISTORY) { %>
+        <% if (punishments.length === 0) { %>
+            <p style="color: rgba(255, 255, 255, 0.7); text-align: center; font-style: italic;">No punishments found.</p>
+        <% } else { %>
+            <div class="punishment-list">
+                <% punishments.forEach((punishment, index) => { %>
+                    <% if (punishment.status === 'Appealed' && settings.displayInactivePunishments === false) { return; } %>
+                    
+                    <div class="punishment-item <%= punishment.status === 'Appealed' ? 'inactive' : '' %>">
+    <div class="punishment-content">
+        <div class="punishment-header">
+            <span class="punishment-badge <%= 
+                punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'ban' : 
+                punishment.punishment.toLowerCase() %>">
+                <i class="fas <%= 
+                    punishment.punishment === 'PERM_BAN' || punishment.punishment === 'TEMP_BAN' ? 'fa-ban' : 
+                    punishment.punishment === 'Kick' ? 'fa-shoe-prints' :
+                    punishment.punishment === 'Timeout' ? 'fa-hourglass-start' : 
+                    'fa-exclamation-triangle' 
+                %>"></i>
+                <%= 
+                    punishment.punishment === 'PERM_BAN' ? 'Permanent Ban' : 
+                    punishment.punishment === 'TEMP_BAN' ? 'Temporary Ban' : 
+                    punishment.punishment 
+                %>
+            </span>
+            <span class="time"><%= getRelativeTime(punishment.date) %></span>
+        </div>
+
+        <div class="punishment-details">
+    <span class="username"><%= username %></span> was 
+    <%= 
+        punishment.punishment === 'PERM_BAN' ? 'permanently banned' : 
+        punishment.punishment === 'TEMP_BAN' ? 'temporarily banned' : 
+        punishment.punishment === 'Kick' ? 'kicked' : 
+        punishment.punishment === 'Warn' ? 'warned' : 
+        punishment.punishment === 'Timeout' ? 'timed out' : 
+        punishment.punishment.toLowerCase() 
+    %> by 
+    <span class="username"><%= staffUsernames[punishment.staff] || 'Unknown' %></span> for 
+    <span class="reason"><%= punishment.reason %></span>
+    <% if (punishment.duration) { %>
+        <div style="margin-top: 8px;">
+            <span style="display: inline-flex; align-items: center; background: rgba(var(--accent-color-rgb), 0.1); color: var(--accent-color); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">
+                <i class="fas fa-clock" style="margin-right: 6px;"></i>
+                Duration: <%= punishment.duration %>
+            </span>
+        </div>
+    <% } %>
+</div>
+
+                            <% if (punishment.status === 'Pending') { %>
+                                <div class="appeal-badge">
+                                    <i class="fas fa-gavel"></i>
+                                    <a href="/view-appeal/<%= punishment.appealID %>" target="_blank">
+                                        This punishment has an active appeal
+                                    </a>
+                                </div>
+                            <% } %>
+                            
+                            <% if (punishment.status === 'Appealed') { %>
+                                <div class="inactive-overlay">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>This punishment has been appealed and is no longer active</span>
+                                    <% if (punishment.appealID) { %>
+                                        <a href="/view-appeal/<%= punishment.appealID %>" target="_blank" class="view-appeal-link">
+                                            View Appeal
+                                        </a>
+                                    <% } %>
+                                </div>
+                            <% } %>
+
+                            <div class="punishment-meta">
+                                <a href="/punishment/lookup/<%= punishment.punishmentID %>" class="punishment-id">
+                                    <div class="id-badge">
+                                        <i class="fas fa-hashtag"></i>
+                                        <%= punishment.punishmentID %>
+                                    </div>
+                                </a>
+                                <span class="exact-date">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <%= new Date(punishment.date).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric',
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        hour12: true,
+                                        timeZone: config.Dashboard.Timezone 
+                                    }) %>
+                                </span>
+                                <% if (permissions && permissions.DELETE_PUNISHMENTS) { %>
+                                    <button class="action-button delete-btn" data-punishment-id="<%= punishment.punishmentID %>">
+                                        <i class="fas fa-trash-alt"></i>
+                                        Delete
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <% if (permissions && permissions.CLEAR_HISTORY) { %>
+                <div class="action-buttons" style="margin-top: 1rem;">
+                    <button class="action-button clear-history-button">
+                        <i class="fas fa-trash-alt"></i>
+                        Clear History
+                    </button>
+                </div>
+            <% } %>
+        <% } %>
+    <% } else { %>
+        <p style="color: rgba(255, 255, 255, 0.7); text-align: center; font-style: italic;">
+            You don't have permission to view punishment history.
+        </p>
+    <% } %>
+</div>
+
+                <% if (config.GeneralSettings.SaveRecentMessages) { %>
+                    
+                    <div class="messages-section">
+    <div class="history-title">
+        <i class="fas fa-comments"></i>
+        Recent Messages (<%= userFromDB && userFromDB.messageHistory ? userFromDB.messageHistory.length : 0 %>)
+    </div>
+
+    <% if (permissions && permissions.VIEW_RECENT_MESSAGES) { %>
+        <% if (!userFromDB || !userFromDB.messageHistory || userFromDB.messageHistory.length === 0) { %>
+            <p style="color: rgba(255, 255, 255, 0.7); text-align: center; font-style: italic;">
+                No messages found.
+            </p>
+        <% } else { %>
+            <div class="messages-list">
+                <% userFromDB.messageHistory.reverse().forEach(message => { %>
+                    <div class="message-item">
+                        <div class="message-header">
+                            <img src="<%= profilePicture %>" alt="<%= username %>" class="message-avatar">
+                            <div class="message-user-info">
+                                <span class="message-username"><%= username %></span>
+                                <span class="message-channel">#<%= message.channelName %></span>
+                            </div>
+                            <span class="message-time">
+                                <i class="fas fa-clock"></i>
+                                <%= new Date(message.timestamp).toLocaleString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true
+                                }) %>
+                            </span>
+                        </div>
+                        
+                        <div class="message-content">
+                            <div class="message-text">
+                                <% 
+                                // Simple URL detection
+                                let messageText = message.message || '';
+                                if (messageText.match(/^https?:\/\//i)) { 
+                                %>
+                                    <a href="<%= messageText %>" target="_blank" class="message-link">
+                                        <%= messageText %>
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                <% } else { %>
+                                    <%= messageText %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <% if (permissions && permissions.CLEAR_RECENT_MESSAGES) { %>
+                <div class="action-buttons" style="margin-top: 1rem;">
+                    <button class="action-button clear-messages-button">
+                        <i class="fas fa-trash-alt"></i>
+                        Clear History
+                    </button>
+                </div>
+            <% } %>
+        <% } %>
+    <% } else { %>
+        <p style="color: rgba(255, 255, 255, 0.7); text-align: center; font-style: italic;">
+            You don't have permission to view recent messages.
+        </p>
+    <% } %>
+</div>
+                <% } %>
+            <% } else { %>
+                <div style="text-align: center; color: rgba(255, 255, 255, 0.7); padding: 2rem;">
+                    Staff member information is private.
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <div class="modal" id="reasonModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="modalActionTitle">Enter Reason</span>
+            </p>
+            <button class="modal-delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="modal-user-info">
+                <img src="" class="modal-user-avatar" id="modalUserAvatar" alt="User Avatar">
+                <div class="modal-user-details">
+                    <div class="modal-username" id="modalUsername"></div>
+                    <div class="modal-user-id">
+                        ID: <span id="modalUserId"></span>
+                        <i class="fas fa-copy copy-id" onclick="copyUserId()" title="Copy ID"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-divider"></div>
+            
+            
+            <div id="banDurationSection" style="display: none; margin-bottom: 15px;">
+                <div class="switch-container mb-2">
+                    <label class="switch">
+                        <input type="checkbox" id="permanentBan" checked>
+                        <span class="switch-slider"></span>
+                    </label>
+                    <span class="switch-label">Permanent Ban</span>
+                </div>
+                
+                <div id="tempBanDurationSection" style="display: none; margin-top: 10px; padding: 10px; background: rgba(24, 21, 31, 0.3); border-radius: 8px;">
+                    <label class="form-label mb-2">Ban Duration</label>
+                    <div class="is-flex" style="gap: 0.5rem;">
+                        <div class="control" style="flex: 1;">
+                            <input type="number" class="form-input" id="banDuration" min="1" value="7" style="height: 36px;">
+                        </div>
+                        <div class="control" style="width: 120px;">
+                            <select class="form-select" id="banUnit" style="height: 36px;">
+                                <option value="d">Days</option>
+                                <option value="w">Weeks</option>
+                                <option value="m">Months</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="field">
+                <div class="control">
+                    <textarea class="modal-textarea" id="reasonInput" placeholder="Please enter a reason for this action..."></textarea>
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="modal-button danger" id="submitReason">
+                <i class="fas fa-check"></i>
+                Confirm
+            </button>
+            <button class="modal-button cancel" aria-label="close">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </footer>
+    </div>
+</div>
+
+
+<div class="modal" id="actionResultModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                <i class="fas fa-info-circle"></i>
+                Action Result
+            </p>
+            <button class="modal-delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <p id="actionResultModalBody"></p>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="modal-button primary" aria-label="close">
+                <i class="fas fa-check"></i>
+                Done
+            </button>
+        </footer>
+    </div>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    function setupModal(modalId) {
+        const modal = document.getElementById(modalId);
+        const closeButtons = modal.querySelectorAll('.modal-delete, .modal-button.cancel, .modal-button[aria-label="close"]');
+        const background = modal.querySelector('.modal-background');
+
+        function closeModal() {
+            modal.classList.remove('is-active');
+
+            const textarea = modal.querySelector('textarea');
+            if (textarea) {
+                textarea.value = '';
+            }
+        }
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', closeModal);
+        });
+        background.addEventListener('click', closeModal);
+
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                closeModal();
+            }
+        });
+    }
+
+
+    setupModal('reasonModal');
+    setupModal('actionResultModal');
+
+
+    $('.delete-btn').click(function() {
+        const punishmentID = $(this).data('punishment-id');
+        displayConfirmation('Are you sure you want to delete this punishment?', () => {
+            $.post('/delete-punishment', { punishmentID: punishmentID })
+                .done(function(response) {
+                    window.location.reload();
+                })
+                .fail(function(xhr) {
+                    displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+                });
+        });
+    });
+
+
+    $('.clear-history-button').click(function() {
+        displayConfirmation('Are you sure you want to clear all punishment history? This cannot be undone.', () => {
+            $.post('/clear-history', { userId: '<%= user2.id %>' })
+                .done(function(response) {
+                    window.location.reload();
+                })
+                .fail(function(xhr) {
+                    displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+                });
+        });
+    });
+
+
+    $('.clear-messages-button').click(function() {
+        displayConfirmation('Are you sure you want to clear all message history? This cannot be undone.', () => {
+            $.post('/clear-messages', { userId: '<%= user2.id %>' })
+                .done(function(response) {
+                    window.location.reload();
+                })
+                .fail(function(xhr) {
+                    displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+                });
+        });
+    });
+
+
+    $('.action-button').click(function() {
+        const action = $(this).data('action');
+        const userId = '<%= user2.id %>';
+        handleButtonClick(action, userId);
+    });
+});
+
+const permanentBanCheckbox = document.getElementById('permanentBan');
+    if (permanentBanCheckbox) {
+        permanentBanCheckbox.addEventListener('change', function() {
+            const tempBanDurationSection = document.getElementById('tempBanDurationSection');
+            if (tempBanDurationSection) {
+                tempBanDurationSection.style.display = this.checked ? 'none' : 'block';
+            }
+        });
+    }
+
+window.handleButtonClick = function(action, userId) {
+        const modal = document.getElementById('reasonModal');
+        const modalTitle = document.getElementById('modalActionTitle');
+        const submitButton = document.getElementById('submitReason');
+        const banDurationSection = document.getElementById('banDurationSection');
+        
+
+        modal.querySelector('#modalUsername').textContent = '<%= username %>';
+        modal.querySelector('#modalUserId').textContent = userId;
+        modal.querySelector('#modalUserAvatar').src = '<%= profilePicture %>';
+        
+
+        if (banDurationSection) {
+            banDurationSection.style.display = 'none';
+        }
+
+        if (action === 'note') {
+            modalTitle.innerHTML = '<i class="fas fa-sticky-note"></i> Add Note';
+            submitButton.innerHTML = '<i class="fas fa-check"></i> Save Note';
+            
+
+            const existingNoteElement = document.querySelector('.notice-box.active-note .notice-content');
+            if (existingNoteElement) {
+                reasonInput.value = existingNoteElement.textContent.trim();
+            } else {
+                reasonInput.value = ''; // Clear the input if no existing note
+            }
+            
+            modal.classList.add('is-active');
+            
+
+            reasonInput.focus();
+            reasonInput.setSelectionRange(reasonInput.value.length, reasonInput.value.length);
+            
+            submitButton.onclick = () => {
+                const note = reasonInput.value.trim();
+                if (note) {
+                    performNoteAction(userId, note);
+                    modal.classList.remove('is-active');
+                }
+            };
+        } else if (action === 'ban') {
+            modalTitle.innerHTML = '<i class="fas fa-ban"></i> Ban Member';
+            submitButton.innerHTML = '<i class="fas fa-check"></i> Confirm Ban';
+            
+
+            if (banDurationSection) {
+                banDurationSection.style.display = 'block';
+            }
+            
+
+            const permanentBanCheckbox = document.getElementById('permanentBan');
+            if (permanentBanCheckbox) {
+                permanentBanCheckbox.checked = true;
+
+                const tempBanDurationSection = document.getElementById('tempBanDurationSection');
+                if (tempBanDurationSection) {
+                    tempBanDurationSection.style.display = 'none';
+                }
+            }
+            
+            modal.classList.add('is-active');
+            
+            submitButton.onclick = () => {
+                const reason = modal.querySelector('#reasonInput').value.trim() || 'No reason provided.';
+                if (reason) {
+
+                    const isPermanent = document.getElementById('permanentBan').checked;
+                    let banDuration = null;
+                    let banUnit = null;
+                    
+                    if (!isPermanent) {
+                        banDuration = parseInt(document.getElementById('banDuration').value) || 7;
+                        banUnit = document.getElementById('banUnit').value || 'd';
+                    }
+                    
+                    performBanAction(userId, reason, isPermanent, banDuration, banUnit);
+                    modal.classList.remove('is-active');
+                }
+            };
+        } else if (action === 'kick') {
+            modalTitle.innerHTML = '<i class="fas fa-user-slash"></i> Kick Member';
+            submitButton.innerHTML = '<i class="fas fa-check"></i> Confirm Kick';
+            modal.classList.add('is-active');
+            
+            submitButton.onclick = () => {
+                const reason = modal.querySelector('#reasonInput').value.trim() || 'No reason provided.';
+                if (reason) {
+                    performKickAction(userId, reason);
+                    modal.classList.remove('is-active');
+                }
+            };
+        } else if (action === 'sendmessage') {
+            modalTitle.innerHTML = '<i class="fas fa-envelope"></i> Send Direct Message';
+            submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+            modal.classList.add('is-active');
+            
+            submitButton.onclick = () => {
+                const message = modal.querySelector('#reasonInput').value.trim();
+                if (message) {
+                    performDMAction(userId, message);
+                    modal.classList.remove('is-active');
+                }
+            };
+        }
+    };
+
+    window.performBanAction = function(userId, reason, isPermanent, banDuration, banUnit) {
+        $.ajax({
+            type: 'POST',
+            url: '/handleAction',
+            data: { 
+                action: 'ban', 
+                userId: userId, 
+                reason: reason,
+                isPermanent: isPermanent,
+                banDuration: banDuration,
+                banUnit: banUnit
+            },
+            success: function(response) {
+                if (response.success) {
+                    displayActionResult(response.message);
+                    window.location.href = '/members';
+                } else {
+                    displayActionResult('Error: ' + extractErrorMessage(response.message));
+                }
+            },
+            error: function(xhr) {
+                displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+            }
+        });
+    };
+
+    window.performKickAction = function(userId, reason) {
+        $.ajax({
+            type: 'POST',
+            url: '/handleAction',
+            data: { action: 'kick', userId: userId, reason: reason },
+            success: function(response) {
+                if (response.success) {
+                    displayActionResult(response.message);
+                    window.location.href = '/members';
+                } else {
+                    displayActionResult('Error: ' + extractErrorMessage(response.message));
+                }
+            },
+            error: function(xhr) {
+                displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+            }
+        });
+    };
+
+function performNoteAction(userId, note) {
+    $.ajax({
+        type: 'POST',
+        url: '/handleAction',
+        data: { action: 'note', userId: userId, noteText: note },
+        success: function(response) {
+            if (response.success) {
+                displayActionResult(response.message);
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                displayActionResult('Error: ' + extractErrorMessage(response.message));
+            }
+        },
+        error: function(xhr) {
+            displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+        }
+    });
+}
+
+function performDMAction(userId, message) {
+    $.ajax({
+        type: 'POST',
+        url: '/handleAction',
+        data: { action: 'dm', userId: userId, dmMessage: message },
+        success: function(response) {
+            if (response.success) {
+                displayActionResult(response.message);
+            } else {
+                displayActionResult('Error: ' + extractErrorMessage(response.message));
+            }
+        },
+        error: function(xhr) {
+            displayActionResult('Error: ' + extractErrorMessage(xhr.responseText));
+        }
+    });
+}
+
+function displayConfirmation(message, onConfirm) {
+    const modal = document.getElementById('reasonModal');
+    const modalTitle = document.getElementById('modalActionTitle');
+    const modalBody = modal.querySelector('.modal-card-body');
+    const submitButton = document.getElementById('submitReason');
+    
+
+    const originalBody = modalBody.innerHTML;
+    
+
+    modalTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Confirmation Required';
+    modalBody.innerHTML = `<p style="color: #ffffff; text-align: center;">${message}</p>`;
+    submitButton.innerHTML = '<i class="fas fa-check"></i> Confirm';
+    
+    modal.classList.add('is-active');
+    
+
+    submitButton.onclick = () => {
+        modal.classList.remove('is-active');
+
+        modalBody.innerHTML = originalBody;
+        onConfirm();
+    };
+}
+
+function displayActionResult(message) {
+    const modal = document.getElementById('actionResultModal');
+    const modalBody = document.getElementById('actionResultModalBody');
+    modalBody.textContent = message;
+    modal.classList.add('is-active');
+}
+
+function extractErrorMessage(errorMessage) {
+    try {
+        const parsedError = JSON.parse(errorMessage);
+        return parsedError.message;
+    } catch (error) {
+        return errorMessage;
+    }
+}
+
+function copyUserId() {
+    const userId = document.getElementById('modalUserId').textContent;
+    navigator.clipboard.writeText(userId).then(() => {
+        const copyIcon = document.querySelector('.copy-id');
+        copyIcon.classList.remove('fa-copy');
+        copyIcon.classList.add('fa-check');
+        setTimeout(() => {
+            copyIcon.classList.remove('fa-check');
+            copyIcon.classList.add('fa-copy');
+        }, 1500);
+    });
+}
+</script>
+
+
+
+</body>
+</html>

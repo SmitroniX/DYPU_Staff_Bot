@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Custom Commands | <%= settings.name %></title>
+        
+        
+        <meta property="og:title" content="Custom Commands | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+        <style>
+            :root {
+                --accent-color: <%= settings.accentColor %>;
+                --accent-color-rgb: <%= accentColorRgb %>;
+            }
+            
+            
+            body {
+                background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+                min-height: 100vh;
+                font-family: 'Inter', sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .section {
+                flex: 1;
+                padding: 1rem;
+                margin: 0;
+            }
+            
+            
+            .glass-card {
+                background: #1a1a2e;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                border-radius: 16px;
+                padding: 1.5rem;
+                transition: all 0.3s ease;
+                margin-bottom: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .section-title i {
+                color: var(--accent-color);
+            }
+            
+            .section-description {
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 1.5rem;
+            }
+            
+            
+            .command-card {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                border-radius: 12px;
+                padding: 1.25rem;
+                margin-bottom: 1rem;
+                transition: all 0.3s ease;
+            }
+            
+            .command-card:hover {
+                transform: translateX(5px);
+                border-color: var(--accent-color);
+                background: rgba(255, 255, 255, 0.04);
+            }
+            
+            .command-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            }
+            
+            .command-name {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .command-tag {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+                padding: 0.25rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .command-actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .action-button {
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .action-button.edit {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+            }
+            
+            .action-button.delete2 {
+                background: rgba(217, 83, 79, 0.1);
+                color: #d9534f;
+            }
+            
+            .action-button:hover {
+                transform: translateY(-2px);
+                filter: brightness(120%);
+            }
+            
+            .command-details {
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 1rem;
+                font-size: 0.95rem;
+            }
+            
+            strong {
+                color: var(--accent-color);
+            }
+
+            .command-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+            
+            .command-button {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+            }
+            
+            .command-button:hover {
+                background: rgba(var(--accent-color-rgb), 0.25);
+                transform: translateY(-2px);
+            }
+            
+            .command-settings {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                margin-top: 0.75rem;
+            }
+            
+            .setting-item {
+                background: rgba(30, 27, 38, 0.6);
+                border-radius: 6px;
+                padding: 0.5rem 0.75rem;
+                color: rgba(255, 255, 255, 0.75);
+                font-size: 0.85rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .setting-item i {
+                color: var(--accent-color);
+                font-size: 0.8rem;
+            }
+            
+            
+            .preview-card {
+                background: rgba(24, 21, 31, 0.5);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-top: 1rem;
+                border: 1px dashed rgba(var(--accent-color-rgb), 0.2);
+            }
+            
+            .preview-header {
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.6);
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .preview-header i {
+                color: var(--accent-color);
+            }
+            
+            .preview-content {
+                padding: 0.75rem;
+                background: rgba(19, 17, 26, 0.6);
+                border-radius: 8px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 0.95rem;
+                word-break: break-word;
+            }
+            
+            .embed-preview {
+                background: rgba(30, 27, 38, 0.7);
+                border-radius: 8px;
+                padding: 0.75rem 1rem;
+                border-left: 4px solid var(--accent-color);
+                margin-top: 0.5rem;
+            }
+            
+            .embed-title {
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 0.5rem;
+            }
+            
+            .embed-description {
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.9rem;
+            }
+            
+            .embed-footer {
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 0.8rem;
+                margin-top: 0.75rem;
+                padding-top: 0.5rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .button-preview {
+                display: inline-flex;
+                margin-top: 0.75rem;
+                gap: 0.5rem;
+            }
+            
+            .button-preview-item {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+                padding: 0.4rem 0.75rem;
+                border-radius: 4px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            
+            .create-command-button {
+                background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.15) 0%, rgba(var(--accent-color-rgb), 0.05) 100%);
+                border: 1px dashed rgba(var(--accent-color-rgb), 0.3);
+                border-radius: 12px;
+                padding: 1.25rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.75rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-top: 1rem;
+            }
+            
+            .create-command-button:hover {
+                transform: translateY(-3px);
+                background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.1) 100%);
+                border-color: var(--accent-color);
+            }
+            
+            .create-command-button i {
+                font-size: 2rem;
+                color: var(--accent-color);
+                background: rgba(var(--accent-color-rgb), 0.1);
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+            
+            .create-command-button span {
+                color: var(--accent-color);
+                font-weight: 500;
+            }
+
+            
+            .empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 1rem;
+                text-align: center;
+            }
+            
+            .empty-state-icon {
+                font-size: 3rem;
+                color: rgba(var(--accent-color-rgb), 0.5);
+                margin-bottom: 1.5rem;
+                background: rgba(var(--accent-color-rgb), 0.05);
+                width: 100px;
+                height: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+            
+            .empty-state-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 0.75rem;
+            }
+            
+            .empty-state-description {
+                color: rgba(255, 255, 255, 0.7);
+                max-width: 500px;
+                margin-bottom: 2rem;
+            }
+            
+            .empty-state-button {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: none;
+            }
+            
+            .empty-state-button:hover {
+                background: rgba(var(--accent-color-rgb), 0.25);
+                transform: translateY(-3px);
+            }
+            
+            
+            .modal-background {
+                background: rgba(19, 17, 26, 0.8);
+                backdrop-filter: blur(8px);
+            }
+            
+            .modal-card {
+                background: rgba(30, 27, 38, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+                border-radius: 16px;
+                max-width: 700px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            
+            .modal-card-head {
+                background: rgba(35, 32, 44, 0.6);
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.15);
+                border-radius: 16px 16px 0 0;
+                padding: 1.25rem;
+            }
+            
+            .modal-card-title {
+                color: #ffffff;
+                font-size: 1.1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .modal-card-title i {
+                color: var(--accent-color);
+            }
+            
+            .modal-card-body {
+                background: none;
+                padding: 1.5rem;
+                color: rgba(255, 255, 255, 0.9);
+                max-height: 70vh;
+            }
+            
+            .modal-card-foot {
+                background: rgba(35, 32, 44, 0.6);
+                border-top: 1px solid rgba(var(--accent-color-rgb), 0.15);
+                border-radius: 0 0 16px 16px;
+                padding: 1.25rem;
+                justify-content: flex-end;
+                gap: 0.75rem;
+            }
+            
+            .modal-delete {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+            }
+            
+            .modal-delete:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            
+            .modal-delete::before,
+            .modal-delete::after {
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+            
+            
+            .form-label {
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                font-size: 0.95rem;
+            }
+            
+            .form-input, .form-select, .form-textarea {
+                background: rgba(24, 21, 31, 0.6);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+                color: #ffffff;
+                border-radius: 8px;
+                padding: 0.75rem 1rem;
+                width: 100%;
+                transition: all 0.3s ease;
+                font-size: 0.95rem;
+            }
+            
+            .form-input:focus, .form-select:focus, .form-textarea:focus {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+                background: rgba(30, 27, 38, 0.8);
+                outline: none;
+            }
+            
+            .form-input::placeholder, .form-select::placeholder, .form-textarea::placeholder {
+                color: rgba(255, 255, 255, 0.4);
+            }
+            
+            .form-input, .form-select {
+                height: 42px;
+            }
+            
+            .form-textarea {
+                min-height: 100px;
+                resize: vertical;
+            }
+            
+            .form-select {
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 1em;
+                padding-right: 2.5rem;
+            }
+            
+            .form-select option {
+                background: #1e1b26;
+                color: #ffffff;
+                padding: 12px;
+            }
+            
+            
+            .switch-container {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 46px;
+                height: 24px;
+            }
+            
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            
+            .switch-slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.1);
+                transition: .4s;
+                border-radius: 24px;
+            }
+            
+            .switch-slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            
+            input:checked + .switch-slider {
+                background-color: var(--accent-color);
+            }
+            
+            input:checked + .switch-slider:before {
+                transform: translateX(22px);
+            }
+            
+            .switch-label {
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 500;
+                font-size: 0.95rem;
+            }
+            
+            
+            .tabs-container {
+                margin-bottom: 1.5rem;
+            }
+            
+            .tabs-header {
+                display: flex;
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+                margin-bottom: 1.5rem;
+            }
+            
+            .tab-item {
+                padding: 0.75rem 1.25rem;
+                color: rgba(255, 255, 255, 0.6);
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                position: relative;
+            }
+            
+            .tab-item.active {
+                color: var(--accent-color);
+            }
+            
+            .tab-item.active::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--accent-color);
+            }
+            
+            .tab-item:hover {
+                color: rgba(255, 255, 255, 0.9);
+            }
+            
+            .tab-content {
+                display: none;
+            }
+            
+            .tab-content.active {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            
+            .color-picker-container {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .color-preview {
+                width: 36px;
+                height: 36px;
+                border-radius: 6px;
+                border: 3px solid rgba(255, 255, 255, 0.1);
+                cursor: pointer;
+                position: relative;
+            }
+            
+            .color-input {
+                flex: 1;
+            }
+            
+            input[type="color"] {
+                opacity: 0;
+                width: 0;
+                height: 0;
+                position: absolute;
+            }
+            
+            
+            .button-item {
+                background: rgba(30, 27, 38, 0.6);
+                border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                position: relative;
+            }
+            
+            .button-item-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            }
+            
+            .button-title {
+                font-weight: 500;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .button-title i {
+                color: var(--accent-color);
+            }
+            
+            .button-actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .button-action {
+                background: none;
+                border: none;
+                color: rgba(255, 255, 255, 0.5);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-size: 0.9rem;
+                width: 26px;
+                height: 26px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 4px;
+            }
+            
+            .button-action:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.9);
+            }
+            
+            .button-action.delete {
+                color: #f14668;
+            }
+            
+            .button-action.delete:hover {
+                background: rgba(241, 70, 104, 0.1);
+            }
+            
+            .add-button-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 1rem;
+            }
+            
+            .add-button {
+                background: rgba(var(--accent-color-rgb), 0.1);
+                color: var(--accent-color);
+                border: 1px dashed rgba(var(--accent-color-rgb), 0.3);
+                border-radius: 8px;
+                padding: 0.6rem 1.25rem;
+                font-size: 0.95rem;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            
+            .add-button:hover {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                transform: translateY(-2px);
+            }
+            
+            
+            .modal-button {
+                padding: 0.6rem 1.25rem;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .modal-button.primary {
+                background: rgba(var(--accent-color-rgb), 0.15);
+                color: var(--accent-color);
+            }
+            .modal-button.primary:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.danger {
+    background: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+}
+
+.modal-button.danger:hover {
+    background: rgba(217, 83, 79, 0.25);
+    transform: translateY(-1px);
+}
+
+.modal-button.cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+
+.alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert.is-success {
+    background: rgba(72, 199, 116, 0.1);
+    border: 1px solid rgba(72, 199, 116, 0.2);
+    color: #48c774;
+}
+
+.alert.is-danger {
+    background: rgba(241, 70, 104, 0.1);
+    border: 1px solid rgba(241, 70, 104, 0.2);
+    color: #f14668;
+}
+
+.alert i {
+    font-size: 1.1rem;
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+
+@media screen and (max-width: 768px) {
+    .command-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .command-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .tabs-header {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 0.5rem;
+    }
+    
+    .color-picker-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .button-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .button-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+</style>
+</head>
+<body>
+    <%- include('../partials/navbar', { user: user, currentPage: 'settings' }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-terminal"></i>
+                        Custom Commands
+                    </div>
+                    <a href="/settings" class="action-button back" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); font-weight: 500; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Back to Settings
+                    </a>
+                </div>
+                
+                <p class="section-description">Create custom commands for your server with text or embed responses. Add up to 3 buttons per command to link users to websites or resources.</p>
+                
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    <div class="alert is-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages && messages.error && messages.error.length > 0) { %>
+                    <div class="alert is-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+                
+                <div class="glass-card mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Command Prefix Settings
+                    </div>
+                    
+                    <p class="section-description">Customize the prefix that users will type before your commands. For example, if your prefix is "!" then users will type "!commandname".</p>
+                    
+                    <form id="prefixForm" class="is-flex is-align-items-center">
+                        <div class="field mb-0 mr-4" style="flex: 1;">
+                            <label class="form-label" for="commandPrefix">Command Prefix</label>
+                            <div class="control">
+                                <input type="text" class="form-input" id="commandPrefix" name="commandPrefix" placeholder="Enter prefix (e.g. !)" value="<%= settings.commandPrefix || '!' %>" maxlength="5">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <button type="submit" class="action-button edit" style="margin-top: 1.5rem;">
+                                <i class="fas fa-save"></i>
+                                Save Prefix
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <h2 class="section-title mb-0">
+                        <i class="fas fa-list"></i>
+                        Your Custom Commands
+                    </h2>
+                    <button class="action-button edit" id="create-command-btn">
+                        <i class="fas fa-plus"></i>
+                        Create Command
+                    </button>
+                </div>
+                
+                <% if (commands && commands.length > 0) { %>
+                    
+                    <% commands.forEach(function(command) { %>
+                        <div class="command-card">
+                            <div class="command-header">
+                                <div class="is-flex is-align-items-center">
+                                    <span class="command-name">
+                                        <i class="fas fa-terminal"></i>
+                                        <%= command.name %>
+                                    </span>
+                                    <span class="command-tag">
+                                        <% if (command.responseType === 'text') { %>
+                                            <i class="fas fa-comment"></i> Text
+                                        <% } else { %>
+                                            <i class="fas fa-image"></i> Embed
+                                        <% } %>
+                                    </span>
+                                </div>
+                                <div class="command-actions">
+                                    <button class="action-button edit edit-command-btn" data-command-id="<%= command._id %>">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </button>
+                                    <button class="action-button delete2 delete-command-btn" data-command-id="<%= command._id %>" data-command-name="<%= command.name %>">
+                                        <i class="fas fa-trash-alt"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="command-details">
+                                <% if (command.responseType === 'text') { %>
+                                    <%= command.textResponse.substring(0, 100) %><%= command.textResponse.length > 100 ? '...' : '' %>
+                                <% } else { %>
+                                    <strong>Embed Title:</strong> <%= command.embedResponse.title || 'No title' %>
+                                <% } %>
+                            </div>
+                            
+                            <div class="command-settings">
+                                <div class="setting-item">
+                                    <i class="fas <%= command.deleteMessage ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                    <span>Delete Trigger: <%= command.deleteMessage ? 'Yes' : 'No' %></span>
+                                </div>
+                                <div class="setting-item">
+                                    <i class="fas <%= command.replyToUser ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+                                    <span>Reply to User: <%= command.replyToUser ? 'Yes' : 'No' %></span>
+                                </div>
+                                <div class="setting-item">
+                                    <i class="fas fa-link"></i>
+                                    <span>Buttons: <%= command.buttons ? command.buttons.length : 0 %></span>
+                                </div>
+                                <div class="setting-item">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <span>Uses: <%= command.usageCount || 0 %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Custom Commands Yet</h3>
+                        <p class="empty-state-description">
+                            Create custom commands to enhance your server experience. Commands can display text messages, embed content, and include buttons that link to websites.
+                        </p>
+                        <button class="empty-state-button" id="create-first-command-btn">
+                            <i class="fas fa-plus"></i>
+                            Create Your First Command
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    
+    
+    <div class="modal" id="commandModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-plus-circle"></i>
+                    <span id="commandModalLabel">Create Command</span>
+                </p>
+                <button class="modal-delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <form id="commandForm">
+                    <input type="hidden" id="commandId" value="">
+                    
+                    <div class="field mb-4">
+                        <label class="form-label" for="commandName">Command Name</label>
+                        <div class="control">
+                            <input type="text" class="form-input" id="commandName" placeholder="Enter command name without prefix" required>
+                        </div>
+                        <p class="help has-text-grey-light">This is what users will type after your bot prefix (e.g., !commandname)</p>
+                    </div>
+                    
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <div class="tab-item active" data-tab="response">Response Content</div>
+                            <div class="tab-item" data-tab="settings">Settings</div>
+                            <div class="tab-item" data-tab="buttons">Buttons</div>
+                            <div class="tab-item" data-tab="preview">Preview</div>
+                        </div>
+                        
+                        <div class="tab-content active" id="response-tab">
+                            <div class="field mb-4">
+                                <label class="form-label">Response Type</label>
+                                <div class="control">
+                                    <label class="radio has-text-white">
+                                        <input type="radio" name="responseType" value="text" checked> 
+                                        <span style="margin-left: 0.5rem;">Text Message</span>
+                                    </label>
+                                    <label class="radio has-text-white" style="margin-left: 1.5rem;">
+                                        <input type="radio" name="responseType" value="embed"> 
+                                        <span style="margin-left: 0.5rem;">Embed</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="textResponseContainer">
+                                <div class="field">
+                                    <label class="form-label" for="textResponse">Text Response</label>
+                                    <div class="control">
+                                        <textarea class="form-textarea" id="textResponse" placeholder="Enter response message here..."></textarea>
+                                    </div>
+                                    <p class="help has-text-grey-light">The message that will be sent when the command is used</p>
+                                </div>
+                            </div>
+                            
+                            <div id="embedResponseContainer" style="display: none;">
+                                <div class="field mb-3">
+                                    <label class="form-label" for="embedTitle">Embed Title</label>
+                                    <div class="control">
+                                        <input type="text" class="form-input" id="embedTitle" placeholder="Enter embed title">
+                                    </div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="form-label" for="embedDescription">Embed Description</label>
+                                    <div class="control">
+                                        <textarea class="form-textarea" id="embedDescription" placeholder="Enter embed description"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="form-label" for="embedColor">Embed Color</label>
+                                    <div class="color-picker-container">
+                                        <div class="color-preview" id="colorPreview" style="background-color: #7060be;"></div>
+                                        <div class="color-input">
+                                            <input type="color" id="embedColor" value="#7060be">
+                                            <input type="text" class="form-input" id="colorInput" value="#7060be">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="form-label" for="embedFooter">Embed Footer</label>
+                                    <div class="control">
+                                        <input type="text" class="form-input" id="embedFooter" placeholder="Enter embed footer">
+                                    </div>
+                                </div>
+                                
+                                <div class="switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" id="embedTimestamp">
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="switch-label">Include Timestamp</span>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="form-label" for="embedThumbnail">Thumbnail URL (Optional)</label>
+                                    <div class="control">
+                                        <input type="text" class="form-input" id="embedThumbnail" placeholder="Enter thumbnail image URL">
+                                    </div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="form-label" for="embedImage">Image URL (Optional)</label>
+                                    <div class="control">
+                                        <input type="text" class="form-input" id="embedImage" placeholder="Enter main image URL">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="settings-tab">
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="deleteMessage">
+                                    <span class="switch-slider"></span>
+                                </label>
+                                <span class="switch-label">Delete Trigger Message</span>
+                            </div>
+                            <p class="help has-text-grey-light mb-4">If enabled, the message that triggered this command will be deleted</p>
+                            
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="replyToUser">
+                                    <span class="switch-slider"></span>
+                                </label>
+                                <span class="switch-label">Reply to User</span>
+                            </div>
+                            <p class="help has-text-grey-light">If enabled, the bot will reply to the user's message (cannot be used with Delete Trigger)</p>
+                        </div>
+                        
+                        <div class="tab-content" id="buttons-tab">
+                            <p class="has-text-grey-light mb-3">Add up to 3 link buttons to your command response.</p>
+                            
+                            <div id="buttonContainer">
+                                
+                            </div>
+                            
+                            <div class="add-button-container" id="addButtonContainer">
+                                <button type="button" class="add-button" id="addButton">
+                                    <i class="fas fa-plus"></i>
+                                    Add Button
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="preview-tab">
+                            <div class="preview-header">
+                                <i class="fas fa-eye"></i>
+                                Command Preview
+                            </div>
+                            
+                            <div class="preview-content">
+                                <div class="preview-text-content" id="previewTextContent">
+                                    
+                                </div>
+                                
+                                <div class="embed-preview" id="previewEmbedContent" style="display: none;">
+                                    <div class="embed-title" id="previewEmbedTitle">Embed Title</div>
+                                    <div class="embed-description" id="previewEmbedDescription">This is a preview of how your embed will look.</div>
+                                    <div class="embed-footer" id="previewEmbedFooter">Footer text • Timestamp</div>
+                                </div>
+                                
+                                <div class="button-preview" id="previewButtons">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="button" class="modal-button primary" id="saveCommandBtn">
+                    <i class="fas fa-save"></i>
+                    Save Command
+                </button>
+                <button type="button" class="modal-button cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+    
+    
+    <div class="modal" id="deleteCommandModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirm Delete Command
+                </p>
+                <button class="modal-delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="has-text-centered">
+                    <i class="fas fa-trash-alt has-text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p class="mb-4">Are you sure you want to delete the command <strong id="deleteCommandName" class="has-text-white"></strong>?</p>
+                    <p class="has-text-danger">This action cannot be undone.</p>
+                    <input type="hidden" id="deleteCommandId">
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="button" class="modal-button danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete Permanently
+                </button>
+                <button type="button" class="modal-button cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </footer>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', function() {
+
+                    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+
+                    this.classList.add('active');
+                    
+
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById(tabName + '-tab').classList.add('active');
+                    
+
+                    if (tabName === 'preview') {
+                        updatePreview();
+                    }
+                });
+            });
+            
+
+            document.querySelectorAll('input[name="responseType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'text') {
+                        document.getElementById('textResponseContainer').style.display = 'block';
+                        document.getElementById('embedResponseContainer').style.display = 'none';
+                    } else {
+                        document.getElementById('textResponseContainer').style.display = 'none';
+                        document.getElementById('embedResponseContainer').style.display = 'block';
+                    }
+                    
+
+                    if (document.querySelector('.tab-item[data-tab="preview"]').classList.contains('active')) {
+                        updatePreview();
+                    }
+                });
+            });
+            
+
+            const colorPicker = document.getElementById('embedColor');
+            const colorInput = document.getElementById('colorInput');
+            const colorPreview = document.getElementById('colorPreview');
+            
+            colorPicker.addEventListener('input', function(e) {
+                const color = e.target.value;
+                colorPreview.style.backgroundColor = color;
+                colorInput.value = color;
+                updatePreview();
+            });
+            
+            colorInput.addEventListener('input', function(e) {
+                let color = e.target.value;
+                
+
+                if (!color.startsWith('#')) {
+                    color = '#' + color;
+                    colorInput.value = color;
+                }
+                
+
+                if (/^#[0-9A-F]{6}$/i.test(color)) {
+                    colorPicker.value = color;
+                    colorPreview.style.backgroundColor = color;
+                    updatePreview();
+                }
+            });
+            
+            colorPreview.addEventListener('click', function() {
+                colorPicker.click();
+            });
+            
+
+            document.getElementById('deleteMessage').addEventListener('change', function() {
+                if (this.checked && document.getElementById('replyToUser').checked) {
+                    document.getElementById('replyToUser').checked = false;
+                    alert('You cannot enable both "Delete Trigger Message" and "Reply to User" at the same time.');
+                }
+            });
+            
+            document.getElementById('replyToUser').addEventListener('change', function() {
+                if (this.checked && document.getElementById('deleteMessage').checked) {
+                    document.getElementById('deleteMessage').checked = false;
+                    alert('You cannot enable both "Reply to User" and "Delete Trigger Message" at the same time.');
+                }
+            });
+            
+
+            let buttonCount = 0;
+            
+            function addButton(buttonData = null) {
+                if (buttonCount >= 3) {
+                    alert('You can only add up to 3 buttons per command.');
+                    return;
+                }
+                
+                const buttonId = 'button-' + Date.now();
+                const buttonContainer = document.getElementById('buttonContainer');
+                
+                const buttonItem = document.createElement('div');
+                buttonItem.className = 'button-item';
+                buttonItem.setAttribute('data-button-id', buttonId);
+                
+                const buttonContent = `
+                    <div class="button-item-header">
+                        <div class="button-title">
+                            <i class="fas fa-link"></i>
+                            Button ${buttonCount + 1}
+                        </div>
+                        <div class="button-actions">
+                            <button type="button" class="button-action delete" data-button-id="${buttonId}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="field mb-3">
+                        <label class="form-label">Button Label</label>
+                        <div class="control">
+                            <input type="text" class="form-input button-label-input" placeholder="Enter button text" value="${buttonData ? buttonData.label : ''}">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="form-label">Button URL</label>
+                        <div class="control">
+                            <input type="text" class="form-input button-url-input" placeholder="https://example.com" value="${buttonData ? buttonData.url : ''}">
+                        </div>
+                    </div>
+                `;
+                
+                buttonItem.innerHTML = buttonContent;
+                buttonContainer.appendChild(buttonItem);
+                
+
+                buttonItem.querySelector('.button-action.delete').addEventListener('click', function() {
+                    const buttonId = this.getAttribute('data-button-id');
+                    removeButton(buttonId);
+                });
+                
+
+                buttonItem.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('input', updatePreview);
+                });
+                
+                buttonCount++;
+                
+
+                if (buttonCount >= 3) {
+                    document.getElementById('addButtonContainer').style.display = 'none';
+                }
+                
+                return buttonId;
+            }
+            
+            function removeButton(buttonId) {
+                const buttonItem = document.querySelector(`.button-item[data-button-id="${buttonId}"]`);
+                if (buttonItem) {
+                    buttonItem.remove();
+                    buttonCount--;
+                    
+
+                    document.querySelectorAll('.button-item').forEach((button, index) => {
+                        button.querySelector('.button-title').innerHTML = `<i class="fas fa-link"></i> Button ${index + 1}`;
+                    });
+                    
+
+                    document.getElementById('addButtonContainer').style.display = 'flex';
+                    
+
+                    updatePreview();
+                }
+            }
+            
+            document.getElementById('addButton').addEventListener('click', function() {
+                addButton();
+                updatePreview();
+            });
+            
+
+            function updatePreview() {
+                const responseType = document.querySelector('input[name="responseType"]:checked').value;
+                
+
+                if (responseType === 'text') {
+                    const textContent = document.getElementById('textResponse').value || 'Your command response will appear here...';
+                    
+                    document.getElementById('previewTextContent').textContent = textContent;
+                    document.getElementById('previewTextContent').style.display = 'block';
+                    document.getElementById('previewEmbedContent').style.display = 'none';
+                } else {
+
+                    const embedTitle = document.getElementById('embedTitle').value || 'Embed Title';
+                    const embedDescription = document.getElementById('embedDescription').value || 'This is a preview of how your embed will look.';
+                    const embedColor = document.getElementById('embedColor').value || '#7060be';
+                    const embedFooter = document.getElementById('embedFooter').value || '';
+                    const embedTimestamp = document.getElementById('embedTimestamp').checked;
+                    
+                    document.getElementById('previewEmbedTitle').textContent = embedTitle;
+                    document.getElementById('previewEmbedDescription').textContent = embedDescription;
+                    document.getElementById('previewEmbedContent').style.borderLeftColor = embedColor;
+                    
+                    let footerText = embedFooter;
+                    if (embedTimestamp) {
+                        const now = new Date();
+                        footerText += (footerText ? ' • ' : '') + now.toLocaleString();
+                    }
+                    
+                    document.getElementById('previewEmbedFooter').textContent = footerText;
+                    document.getElementById('previewEmbedFooter').style.display = footerText ? 'block' : 'none';
+                    
+                    document.getElementById('previewTextContent').style.display = 'none';
+                    document.getElementById('previewEmbedContent').style.display = 'block';
+                }
+                
+
+                const previewButtons = document.getElementById('previewButtons');
+                previewButtons.innerHTML = '';
+                
+                document.querySelectorAll('.button-item').forEach(buttonItem => {
+                    const labelInput = buttonItem.querySelector('.button-label-input');
+                    if (labelInput && labelInput.value) {
+                        const buttonPreview = document.createElement('div');
+                        buttonPreview.className = 'button-preview-item';
+                        buttonPreview.innerHTML = `<i class="fas fa-link"></i> ${labelInput.value}`;
+                        previewButtons.appendChild(buttonPreview);
+                    }
+                });
+                
+                previewButtons.style.display = previewButtons.children.length > 0 ? 'flex' : 'none';
+            }
+            
+
+            document.querySelectorAll('#commandForm input, #commandForm textarea').forEach(input => {
+                input.addEventListener('input', function() {
+                    if (document.querySelector('.tab-item[data-tab="preview"]').classList.contains('active')) {
+                        updatePreview();
+                    }
+                });
+            });
+            
+
+            function setupModal(modalId) {
+                const modal = document.getElementById(modalId);
+                const closeButtons = modal.querySelectorAll('.modal-delete, .modal-button.cancel, [data-dismiss="modal"]');
+                const background = modal.querySelector('.modal-background');
+                
+                function closeModal() {
+                    modal.classList.remove('is-active');
+
+                    const form = modal.querySelector('form');
+                    if (form) form.reset();
+                    
+
+                    if (modalId === 'commandModal') {
+                        document.getElementById('buttonContainer').innerHTML = '';
+                        buttonCount = 0;
+                        document.getElementById('addButtonContainer').style.display = 'flex';
+                        
+
+                        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        document.querySelector('.tab-item[data-tab="response"]').classList.add('active');
+                        document.getElementById('response-tab').classList.add('active');
+                        
+
+                        document.querySelector('input[name="responseType"][value="text"]').checked = true;
+                        document.getElementById('textResponseContainer').style.display = 'block';
+                        document.getElementById('embedResponseContainer').style.display = 'none';
+                    }
+                }
+                
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', closeModal);
+                });
+                
+                background.addEventListener('click', closeModal);
+                
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                        closeModal();
+                    }
+                });
+                
+                return closeModal;
+            }
+            
+
+            const closeCommandModal = setupModal('commandModal');
+            setupModal('deleteCommandModal');
+
+const createCommandBtns = [
+    document.getElementById('create-command-btn'),
+    document.getElementById('create-first-command-btn')
+];
+
+createCommandBtns.forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', function() {
+            const modal = document.getElementById('commandModal');
+            document.getElementById('commandModalLabel').textContent = 'Create Command';
+            document.getElementById('commandId').value = '';
+            document.getElementById('commandForm').reset();
+            
+
+            document.getElementById('embedColor').value = '#7060be';
+            document.getElementById('colorInput').value = '#7060be';
+            document.getElementById('colorPreview').style.backgroundColor = '#7060be';
+            
+
+            modal.classList.add('is-active');
+        });
+    }
+});
+
+
+document.querySelectorAll('.edit-command-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const commandId = this.getAttribute('data-command-id');
+        const modal = document.getElementById('commandModal');
+        
+        document.getElementById('commandModalLabel').textContent = 'Edit Command';
+        document.getElementById('commandId').value = commandId;
+        
+
+        fetch(`/settings/get-command?id=${commandId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const command = data.command;
+                    
+
+                    document.getElementById('commandName').value = command.name;
+                    
+
+                    document.querySelector(`input[name="responseType"][value="${command.responseType}"]`).checked = true;
+                    
+                    if (command.responseType === 'text') {
+                        document.getElementById('textResponseContainer').style.display = 'block';
+                        document.getElementById('embedResponseContainer').style.display = 'none';
+                        document.getElementById('textResponse').value = command.textResponse || '';
+                    } else {
+                        document.getElementById('textResponseContainer').style.display = 'none';
+                        document.getElementById('embedResponseContainer').style.display = 'block';
+                        
+
+                        if (command.embedResponse) {
+                            document.getElementById('embedTitle').value = command.embedResponse.title || '';
+                            document.getElementById('embedDescription').value = command.embedResponse.description || '';
+                            document.getElementById('embedFooter').value = command.embedResponse.footer || '';
+                            document.getElementById('embedTimestamp').checked = command.embedResponse.timestamp || false;
+                            document.getElementById('embedThumbnail').value = command.embedResponse.thumbnail || '';
+                            document.getElementById('embedImage').value = command.embedResponse.image || '';
+                            
+
+                            const embedColor = command.embedResponse.color || '#7060be';
+                            document.getElementById('embedColor').value = embedColor;
+                            document.getElementById('colorInput').value = embedColor;
+                            document.getElementById('colorPreview').style.backgroundColor = embedColor;
+                        }
+                    }
+                    
+
+                    document.getElementById('deleteMessage').checked = command.deleteMessage || false;
+                    document.getElementById('replyToUser').checked = command.replyToUser || false;
+                    
+
+                    document.getElementById('buttonContainer').innerHTML = '';
+                    buttonCount = 0;
+                    
+
+                    if (command.buttons && command.buttons.length > 0) {
+                        command.buttons.forEach(button => {
+                            addButton(button);
+                        });
+                    }
+                    
+
+                    modal.classList.add('is-active');
+                } else {
+                    alert('Error fetching command data: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching command:', error);
+                alert('Error fetching command data. Please try again.');
+            });
+    });
+});
+
+
+document.querySelectorAll('.delete-command-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const commandId = this.getAttribute('data-command-id');
+        const commandName = this.getAttribute('data-command-name');
+        const modal = document.getElementById('deleteCommandModal');
+        
+        document.getElementById('deleteCommandName').textContent = commandName;
+        document.getElementById('deleteCommandId').value = commandId;
+        
+        modal.classList.add('is-active');
+    });
+});
+
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    const commandId = document.getElementById('deleteCommandId').value;
+    
+
+    fetch('/settings/delete-command', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ commandId: commandId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+
+            window.location.href = '/settings/custom-commands?success=Command deleted successfully';
+        } else {
+            alert('Error: ' + data.message);
+            document.getElementById('deleteCommandModal').classList.remove('is-active');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting command:', error);
+        alert('Error deleting command. Please try again.');
+        document.getElementById('deleteCommandModal').classList.remove('is-active');
+    });
+});
+
+
+document.getElementById('saveCommandBtn').addEventListener('click', function() {
+
+    const commandName = document.getElementById('commandName').value;
+    if (!commandName) {
+        alert('Please enter a command name');
+        return;
+    }
+    
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(commandName)) {
+        alert('Command name can only contain letters, numbers, underscores, and dashes');
+        return;
+    }
+    
+    const responseType = document.querySelector('input[name="responseType"]:checked').value;
+    let isValid = true;
+    
+    if (responseType === 'text') {
+        const textResponse = document.getElementById('textResponse').value;
+        if (!textResponse) {
+            alert('Please enter a text response');
+            isValid = false;
+        }
+    } else {
+
+
+        const embedTitle = document.getElementById('embedTitle').value;
+        const embedDescription = document.getElementById('embedDescription').value;
+        
+        if (!embedTitle && !embedDescription) {
+            if (!confirm('Your embed has no title or description. Are you sure you want to continue?')) {
+                isValid = false;
+            }
+        }
+    }
+    
+    if (!isValid) return;
+    
+
+    const commandData = {
+        id: document.getElementById('commandId').value,
+        name: commandName,
+        responseType: responseType,
+        deleteMessage: document.getElementById('deleteMessage').checked,
+        replyToUser: document.getElementById('replyToUser').checked,
+        buttons: []
+    };
+    
+
+    if (responseType === 'text') {
+        commandData.textResponse = document.getElementById('textResponse').value;
+    } else {
+        commandData.embedResponse = {
+            title: document.getElementById('embedTitle').value,
+            description: document.getElementById('embedDescription').value,
+            color: document.getElementById('embedColor').value,
+            footer: document.getElementById('embedFooter').value,
+            timestamp: document.getElementById('embedTimestamp').checked,
+            thumbnail: document.getElementById('embedThumbnail').value,
+            image: document.getElementById('embedImage').value
+        };
+    }
+    
+
+    document.querySelectorAll('.button-item').forEach(buttonItem => {
+        const label = buttonItem.querySelector('.button-label-input').value;
+        const url = buttonItem.querySelector('.button-url-input').value;
+        
+        if (label && url) {
+            commandData.buttons.push({
+                label: label,
+                url: url
+            });
+        }
+    });
+    
+
+    fetch('/settings/save-command', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(commandData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+
+            window.location.href = '/settings/custom-commands?success=' + 
+                (commandData.id ? 'Command updated successfully' : 'Command created successfully');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving command:', error);
+        alert('Error saving command. Please try again.');
+    });
+});
+
+document.getElementById('prefixForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const prefix = document.getElementById('commandPrefix').value.trim();
+    
+
+    if (!prefix) {
+        alert('Please enter a prefix');
+        return;
+    }
+    
+
+    fetch('/settings/update-command-prefix', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prefix: prefix })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+
+            const successMessage = document.createElement('div');
+            successMessage.className = 'alert is-success';
+            successMessage.innerHTML = `<i class="fas fa-check-circle"></i> Command prefix updated successfully!`;
+            
+
+            const form = document.getElementById('prefixForm');
+            form.parentNode.insertBefore(successMessage, form);
+            
+
+            setTimeout(() => {
+                successMessage.remove();
+            }, 3000);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating prefix:', error);
+        alert('Error updating prefix. Please try again.');
+    });
+});
+
+});
+</script>
+</body>
+</html>

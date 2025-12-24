@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard Appearance | <%= settings.name %></title>
+        
+        <meta property="og:title" content="Dashboard Appearance | <%= settings.name %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="<%= config.baseURL %>" />
+        <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+        <meta property="og:description" content="<%= settings.description %>" />
+        <meta name="theme-color" content="<%= settings.accentColor %>">
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+        <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+:root {
+    --accent-color: <%= settings.accentColor %>;
+    --accent-color-rgb: <%= accentColorRgb %>;
+}
+
+body {
+    background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.section {
+    flex: 1;
+    padding: 1rem;
+    margin: 0;
+}
+
+.glass-card {
+    background: #1a1a2e;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.section-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: var(--accent-color);
+}
+
+.form-input, .form-select {
+    background: rgba(24, 21, 31, 0.6);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    height: 42px !important;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.15);
+    background: rgba(30, 27, 38, 0.8);
+    outline: none;
+}
+
+.form-input::placeholder, .form-select::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.settings-card {
+    background: rgba(24, 21, 31, 0.3);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.settings-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-header i {
+    color: var(--accent-color);
+}
+
+.file-input-container {
+    margin-bottom: 1rem;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 27, 38, 0.6);
+    border: 1px dashed rgba(var(--accent-color-rgb), 0.3);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.7);
+    flex-direction: column;
+}
+
+.file-input-label:hover {
+    background: rgba(var(--accent-color-rgb), 0.05);
+    border-color: var(--accent-color);
+}
+
+.file-input-label i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.file-input {
+    display: none;
+}
+
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    background: rgba(30, 27, 38, 0.4);
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+.file-preview img {
+    max-width: 60px;
+    max-height: 60px;
+    border-radius: 4px;
+}
+
+.file-preview-info {
+    flex: 1;
+}
+
+.file-preview-name {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.file-preview-size {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.file-preview-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.file-preview-button {
+    background: rgba(var(--accent-color-rgb), 0.1);
+    color: var(--accent-color);
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-preview-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.2);
+}
+
+.file-preview-button.remove {
+    background: rgba(241, 70, 104, 0.1);
+    color: #f14668;
+}
+
+.file-preview-button.remove:hover {
+    background: rgba(241, 70, 104, 0.2);
+}
+
+.color-picker-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.color-preview {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.color-preview:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.2);
+}
+
+.color-input {
+    flex: 1;
+}
+
+.color-input input[type="color"] {
+    opacity: 0;
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+}
+
+.alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert.is-success {
+    background: rgba(72, 199, 116, 0.1);
+    border: 1px solid rgba(72, 199, 116, 0.2);
+    color: #48c774;
+}
+
+.alert.is-danger {
+    background: rgba(241, 70, 104, 0.1);
+    border: 1px solid rgba(241, 70, 104, 0.2);
+    color: #f14668;
+}
+
+.alert i {
+    font-size: 1.1rem;
+}
+
+.save-button {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.save-button:hover {
+    background: rgba(var(--accent-color-rgb), 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.save-button i {
+    font-size: 1.1rem;
+}
+
+.color-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(30, 27, 38, 0.4);
+    border-radius: 8px;
+}
+
+.color-preset {
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.color-preset:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+    z-index: 1;
+}
+
+.action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(120%);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+@media screen and (max-width: 768px) {
+    .color-picker-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .color-preview {
+        width: 100%;
+        height: 38px;
+    }
+    
+    .color-input input[type="color"] {
+        width: 100%;
+        height: 38px;
+    }
+
+}
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar', { user: user, currentPage: 'settings', permissions }) %>
+
+    <section class="section">
+        <div class="container">
+            <div class="glass-card">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                    <div class="section-title">
+                        <i class="fas fa-paint-brush"></i>
+                        Dashboard Appearance
+                    </div>
+                    <a href="/settings" class="action-button back" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); font-weight: 500; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Back to Settings
+                    </a>
+                </div>
+                
+                <p class="section-description">Customize the appearance of your dashboard with your own branding, colors, and visual identity.</p>
+                
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    <div class="alert is-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= messages.success[0] %>
+                    </div>
+                <% } %>
+                
+                <% if (messages && messages.error && messages.error.length > 0) { %>
+                    <div class="alert is-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= messages.error[0] %>
+                    </div>
+                <% } %>
+                
+                <form id="appearanceForm" action="/settings/appearance" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-id-card"></i>
+                            Branding
+                        </div>
+                        
+                        <div class="columns is-multiline">
+                            
+                            <div class="column is-6">
+                                
+                                <div class="field mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-signature"></i>
+                                        Dashboard Name
+                                    </label>
+                                    <div class="control">
+                                        <input type="text" name="name" class="form-input" value="<%= settings.name || 'Plex Staff' %>" placeholder="Enter dashboard name">
+                                    </div>
+                                    <p class="help has-text-grey-light mt-1">This name will be displayed across the dashboard and page titles.</p>
+                                </div>
+                                
+                                
+                                <div class="field">
+                                    <label class="form-label">
+                                        <i class="fas fa-align-left"></i>
+                                        Dashboard Description
+                                    </label>
+                                    <div class="control">
+                                        <input type="text" name="description" class="form-input" value="<%= settings.description || 'Discord Moderation Dashboard' %>" placeholder="Enter dashboard description" maxlength="100">
+                                    </div>
+                                    <p class="help has-text-grey-light mt-1">A brief description of your dashboard. This will appear in embeds and meta tags. (100 characters max)</p>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="column is-6">
+                                
+                                <div class="field">
+                                    <label class="form-label">
+                                        <i class="fas fa-palette"></i>
+                                        Accent Color
+                                    </label>
+                                    <div class="color-picker-container">
+                                        <div class="color-preview" id="colorPreview" style="background-color: <%= settings.accentColor %>"></div>
+                                        <div class="color-input">
+                                            <input type="color" name="accentColor" id="accentColorPicker" value="<%= settings.accentColor %>" />
+                                            <input type="text" class="form-input" id="colorInput" value="<%= settings.accentColor %>" placeholder="#7060be">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="color-preset-grid">
+                                        <div class="color-preset" style="background-color: #7060be" data-color="#7060be" title="Default Purple"></div>
+                                        <div class="color-preset" style="background-color: #3498db" data-color="#3498db" title="Blue"></div>
+                                        <div class="color-preset" style="background-color: #2ecc71" data-color="#2ecc71" title="Green"></div>
+                                        <div class="color-preset" style="background-color: #e74c3c" data-color="#e74c3c" title="Red"></div>
+                                        <div class="color-preset" style="background-color: #f39c12" data-color="#f39c12" title="Orange"></div>
+                                        <div class="color-preset" style="background-color: #9b59b6" data-color="#9b59b6" title="Violet"></div>
+                                        <div class="color-preset" style="background-color: #1abc9c" data-color="#1abc9c" title="Teal"></div>
+                                        <div class="color-preset" style="background-color: #e91e63" data-color="#e91e63" title="Pink"></div>
+                                    </div>
+                                    <p class="help has-text-grey-light mt-2">This color will be used as the accent throughout the dashboard.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="fas fa-image"></i>
+                            Image Assets
+                        </div>
+                        
+                        <div class="columns is-multiline">
+                            
+                            <div class="column is-6">
+                                <div class="field mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-bookmark"></i>
+                                        Logo Image
+                                    </label>
+                                    <div class="file-input-container">
+                                        <label class="file-input-label" for="logoInput">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <span>Upload Logo Image</span>
+                                            <p class="mt-2 is-size-7 has-text-grey-light">Recommended size: 512x512px, PNG or JPG</p>
+                                        </label>
+                                        <input type="file" id="logoInput" name="logo" class="file-input" accept="image/png, image/jpeg, image/jpg">
+                                        
+                                        <% if (settings.logo) { %>
+                                        <div class="file-preview" id="logoPreview">
+                                            <img src="<%= settings.logo %>" alt="Current Logo">
+                                            <div class="file-preview-info">
+                                                <div class="file-preview-name">Current Logo</div>
+                                                <div class="file-preview-size">PNG/JPG image</div>
+                                            </div>
+                                            <div class="file-preview-actions">
+                                                <button type="button" class="file-preview-button remove" data-target="logoInput">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <p class="help has-text-grey-light">This logo will be displayed in the navigation bar and other places throughout the dashboard.</p>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="column is-6">
+                                <div class="field mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-star"></i>
+                                        Favicon
+                                    </label>
+                                    <div class="file-input-container">
+                                        <label class="file-input-label" for="faviconInput">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <span>Upload Favicon</span>
+                                            <p class="mt-2 is-size-7 has-text-grey-light">Recommended size: 32x32px, ICO or PNG</p>
+                                        </label>
+                                        <input type="file" id="faviconInput" name="favicon" class="file-input" accept="image/png, image/x-icon">
+                                        
+                                        <% if (settings.favicon) { %>
+                                        <div class="file-preview" id="faviconPreview">
+                                            <img src="<%= settings.favicon %>" alt="Current Favicon">
+                                            <div class="file-preview-info">
+                                                <div class="file-preview-name">Current Favicon</div>
+                                                <div class="file-preview-size">ICO/PNG image</div>
+                                            </div>
+                                            <div class="file-preview-actions">
+                                                <button type="button" class="file-preview-button remove" data-target="faviconInput">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <p class="help has-text-grey-light">This icon will be displayed in the browser tab and when users bookmark your dashboard.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    
+                    <div class="has-text-centered mt-5">
+                        <button type="submit" class="save-button">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <%- include('../partials/footer') %>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const colorPicker = document.getElementById('accentColorPicker');
+    const colorInput = document.getElementById('colorInput');
+    const colorPreview = document.getElementById('colorPreview');
+    const previewButton = document.getElementById('previewButton');
+    
+
+    colorPicker.addEventListener('input', function(e) {
+        const color = e.target.value;
+        colorPreview.style.backgroundColor = color;
+        colorInput.value = color;
+        updatePreviewColors(color);
+    });
+    
+
+    colorInput.addEventListener('input', function(e) {
+        let color = e.target.value;
+        
+
+        if (!color.startsWith('#')) {
+            color = '#' + color;
+            colorInput.value = color;
+        }
+        
+
+        if (/^#[0-9A-F]{6}$/i.test(color)) {
+            colorPicker.value = color;
+            colorPreview.style.backgroundColor = color;
+            updatePreviewColors(color);
+        }
+    });
+    
+
+    colorPreview.addEventListener('click', function() {
+        colorPicker.click();
+    });
+    
+
+    document.querySelectorAll('.color-preset').forEach(preset => {
+        preset.addEventListener('click', function() {
+            const color = this.getAttribute('data-color');
+            colorPicker.value = color;
+            colorInput.value = color;
+            colorPreview.style.backgroundColor = color;
+            updatePreviewColors(color);
+        });
+    });
+    
+
+    const logoInput = document.getElementById('logoInput');
+    if (logoInput) {
+        logoInput.addEventListener('change', function(e) {
+            handleFileInputChange(e, 'logoPreview', 'previewLogoContainer');
+        });
+    }
+    
+
+    const faviconInput = document.getElementById('faviconInput');
+    if (faviconInput) {
+        faviconInput.addEventListener('change', function(e) {
+            handleFileInputChange(e, 'faviconPreview');
+        });
+    }
+    
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.file-preview-button.remove')) {
+            const button = e.target.closest('.file-preview-button.remove');
+            const targetId = button.getAttribute('data-target');
+            const targetInput = document.getElementById(targetId);
+            
+
+            if (targetInput) {
+                targetInput.value = '';
+                
+
+                const previewContainer = button.closest('.file-preview');
+                if (previewContainer) {
+
+                    previewContainer.style.animation = 'fadeOut 0.3s ease forwards';
+                    
+
+                    setTimeout(() => {
+                        previewContainer.remove();
+                        
+
+                        if (targetId === 'logoInput') {
+                            const previewLogo = document.getElementById('previewLogoContainer');
+                            if (previewLogo) {
+                                previewLogo.innerHTML = 'P';
+                            }
+                        }
+                    }, 300);
+                }
+            }
+        }
+    });
+    
+
+    const nameInput = document.querySelector('input[name="name"]');
+    const previewName = document.getElementById('previewName');
+    
+    if (nameInput && previewName) {
+        nameInput.addEventListener('input', function(e) {
+            previewName.textContent = e.target.value || 'Plex Staff';
+        });
+    }
+    
+
+    function handleFileInputChange(event, previewId, logoPreviewId) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+
+        let previewContainer = document.getElementById(previewId);
+        
+        if (!previewContainer) {
+            previewContainer = document.createElement('div');
+            previewContainer.id = previewId;
+            previewContainer.className = 'file-preview';
+            previewContainer.style.animation = 'fadeIn 0.3s ease';
+            event.target.parentNode.appendChild(previewContainer);
+        } else {
+
+            previewContainer.innerHTML = '';
+        }
+        
+
+        const previewImg = document.createElement('img');
+        previewImg.src = URL.createObjectURL(file);
+        previewImg.alt = file.name;
+        
+        const previewInfo = document.createElement('div');
+        previewInfo.className = 'file-preview-info';
+        
+        const previewName = document.createElement('div');
+        previewName.className = 'file-preview-name';
+        previewName.textContent = file.name;
+        
+        const previewSize = document.createElement('div');
+        previewSize.className = 'file-preview-size';
+        previewSize.textContent = formatFileSize(file.size);
+        
+        const previewActions = document.createElement('div');
+        previewActions.className = 'file-preview-actions';
+        
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'file-preview-button remove';
+        removeButton.setAttribute('data-target', event.target.id);
+        removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        
+
+        previewInfo.appendChild(previewName);
+        previewInfo.appendChild(previewSize);
+        
+        previewActions.appendChild(removeButton);
+        
+        previewContainer.appendChild(previewImg);
+        previewContainer.appendChild(previewInfo);
+        previewContainer.appendChild(previewActions);
+        
+
+        if (logoPreviewId) {
+            const logoPreview = document.getElementById(logoPreviewId);
+            if (logoPreview) {
+                logoPreview.innerHTML = '';
+                const logoImg = document.createElement('img');
+                logoImg.src = URL.createObjectURL(file);
+                logoImg.alt = 'Logo';
+                logoImg.style.maxWidth = '100%';
+                logoImg.style.maxHeight = '100%';
+                logoPreview.appendChild(logoImg);
+            }
+        }
+    }
+    
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+
+    function updatePreviewColors(color) {
+
+        if (previewButton) {
+            previewButton.style.backgroundColor = hexToRgba(color, 0.15);
+            previewButton.style.color = color;
+        }
+        
+
+        document.documentElement.style.setProperty('--accent-color', color);
+        
+
+        const rgb = hexToRgb(color);
+        if (rgb) {
+            document.documentElement.style.setProperty('--accent-color-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+        }
+    }
+    
+
+    function hexToRgb(hex) {
+
+        hex = hex.replace(/^#/, '');
+        
+
+        const bigint = parseInt(hex, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        
+        return { r, g, b };
+    }
+    
+
+    function hexToRgba(hex, alpha) {
+        const rgb = hexToRgb(hex);
+        return rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})` : '';
+    }
+    
+
+    function showAlert(type, message) {
+
+        const alert = document.createElement('div');
+        alert.className = `alert is-${type === 'success' ? 'success' : 'danger'}`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            ${message}
+        `;
+        
+
+        const container = document.querySelector('.glass-card');
+        container.insertBefore(alert, container.querySelector('.section-description').nextSibling);
+        
+
+        alert.style.animation = 'fadeIn 0.3s ease';
+        
+
+        setTimeout(() => {
+            alert.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 5000);
+    }
+    
+
+    const appearanceForm = document.getElementById('appearanceForm');
+    if (appearanceForm) {
+        appearanceForm.addEventListener('submit', function(e) {
+            const nameInput = document.querySelector('input[name="name"]');
+            if (nameInput && !nameInput.value.trim()) {
+                e.preventDefault();
+                showAlert('error', 'Dashboard name cannot be empty.');
+                nameInput.focus();
+            }
+        });
+    }
+});
+</script>

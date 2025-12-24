@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | <%= settings.name %></title>
+    
+    
+    <meta property="og:title" content="Login | <%= settings.name %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= config.baseURL %>" />
+    <meta property="og:image" content="<%= config.baseURL %>/logo.png" />
+    <meta property="og:description" content="<%= settings.description %>" />
+    <meta name="theme-color" content="<%= settings.accentColor %>">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= settings.favicon %>" type="image/x-icon">
+    <link rel="apple-touch-icon" href="<%= settings.favicon %>" type="image/png">
+
+    <style>
+        :root {
+            --accent-color: <%= settings.accentColor %>;
+            --accent-color-rgb: <%= accentColorRgb %>;
+        }
+
+        html, body {
+            background: radial-gradient(circle at top left, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--accent-color-rgb), 0.15) 50%, rgba(var(--accent-color-rgb), 0.1) 100%), #0f0f13;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .login-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            padding: 1.5rem;
+        }
+
+        .login-container {
+            background: #1a1a2e;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(var(--accent-color-rgb), 0.15);
+            border-color: rgba(var(--accent-color-rgb), 0.3);
+        }
+
+        .logo-container {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
+            border: 2px solid var(--accent-color);
+            padding: 3px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.2);
+            object-fit: cover;
+        }
+
+        .title {
+            color: #ffffff;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .discord-button {
+            background: var(--accent-color);
+            color: #ffffff;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(var(--accent-color-rgb), 0.3);
+        }
+
+        .discord-button:hover {
+            background: rgba(var(--accent-color-rgb), 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--accent-color-rgb), 0.4);
+            color: #ffffff;
+        }
+        
+        .discord-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .discord-button:hover::before {
+            left: 100%;
+        }
+
+        
+        .login-shape {
+            position: absolute;
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .login-shape.circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--accent-color-rgb), 0.1) 0%, rgba(var(--accent-color-rgb), 0) 70%);
+            top: -75px;
+            left: -75px;
+        }
+
+        .login-shape.square {
+            width: 100px;
+            height: 100px;
+            background: rgba(var(--accent-color-rgb), 0.08);
+            border-radius: 16px;
+            bottom: -40px;
+            right: -40px;
+            transform: rotate(20deg);
+        }
+        
+        .login-shape.dots {
+            width: 180px;
+            height: 180px;
+            background-image: radial-gradient(rgba(var(--accent-color-rgb), 0.2) 2px, transparent 2px);
+            background-size: 18px 18px;
+            top: -30px;
+            right: -30px;
+            opacity: 0.3;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .animated-bg .star {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+        
+        .glow {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(var(--accent-color-rgb), 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            animation: pulse 4s infinite ease-in-out;
+        }
+        
+        .discord-icon {
+            font-size: 1.3rem;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-4px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        
+    </div>
+
+    <section class="login-section">
+        <div class="login-container">
+            <div class="login-shape circle"></div>
+            <div class="login-shape square"></div>
+            <div class="login-shape dots"></div>
+            <div class="glow"></div>
+            
+            <div class="logo-container">
+                <% if (settings.logo) { %>
+                    <img src="<%= settings.logo %>" alt="<%= settings.name %> Logo" class="logo">
+                <% } else { %>
+                    <div class="logo" style="display: flex; align-items: center; justify-content: center; background-color: var(--accent-color); color: white; font-size: 2rem; font-weight: bold;">
+                        <%= settings.name.charAt(0) %>
+                    </div>
+                <% } %>
+                <h1 class="title"><%= settings.name %></h1>
+                <p class="subtitle">Discord Moderation Dashboard</p>
+            </div>
+
+            <a href="/auth/discord" class="discord-button">
+                <i class="fab fa-discord discord-icon"></i>
+                Continue with Discord
+            </a>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const bg = document.querySelector('.animated-bg');
+            const starCount = 20;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+
+                const size = Math.random() * 10 + 5;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+
+                star.style.animationDelay = `${Math.random() * 8}s`;
+                
+
+                star.style.opacity = Math.random() * 0.5;
+                
+                bg.appendChild(star);
+            }
+            
+
+            const card = document.querySelector('.login-container');
+            card.addEventListener('mousemove', function(e) {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+
+                const angleX = (y - centerY) / 40;
+                const angleY = (centerX - x) / 40;
+                
+                card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+                
+
+                const glow = document.querySelector('.glow');
+                glow.style.opacity = 0.8;
+                glow.style.top = `${y}px`;
+                glow.style.left = `${x}px`;
+                
+
+                glow.style.animation = 'none';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                
+
+                const glow = document.querySelector('.glow');
+                glow.style.top = '50%';
+                glow.style.left = '50%';
+                glow.style.opacity = 0.5;
+                glow.style.animation = 'pulse 4s infinite ease-in-out';
+            });
+        });
+    </script>
+</body>
+</html>
